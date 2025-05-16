@@ -139,6 +139,7 @@ const PopupDetailKeepStock = (props) => {
             value: isValue.idWarehouse,
             placeholder: "Kho chuyển",
             key: "idWarehouse",
+            className: "min-w-[300px]",
         },
         {
             id: uuid(),
@@ -252,7 +253,8 @@ const PopupDetailKeepStock = (props) => {
                 <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]"></div>
                 <div className="3xl:w-[1300px] 2xl:w-[1150px] xl:w-[999px] w-[950px] 3xl:h-auto 2xl:max-h-auto xl:h-auto h-auto ">
                     <div className=" customsroll overflow-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100 flex flex-col">
-                        <div className="grid grid-cols-11 gap-2 items-center py-2 bg-slate-100 w-full rounded-t-lg">
+                        <div className="flex justify-between grid-cols-11 gap-2 items-center py-2 pl-2 bg-slate-100 w-full rounded-t-lg">
+                            <div className="flex items-center gap-2">
                             {selectArray.map((e) => (
                                 <SelectComponent
                                     key={e.id}
@@ -261,6 +263,7 @@ const PopupDetailKeepStock = (props) => {
                                     options={[{ label: e.placeholder, value: null, isDisabled: true }, ...e.options]}
                                     value={e.value}
                                     colSpan={2}
+                                    className={e.className}
                                     styles={{
                                         placeholder: (base) => ({
                                             ...base,
@@ -281,6 +284,7 @@ const PopupDetailKeepStock = (props) => {
                                     placeholder={e.placeholder}
                                 />
                             ))}
+                            </div>
                             <div className="col-span-5 justify-end flex items-center gap-1 mr-2">
                                 <OnResetData onClick={refetchListKeepStock.bind(this)} sOnFetching={(e) => { }} />
                                 {dataClone?.transfer?.length > 0 && (

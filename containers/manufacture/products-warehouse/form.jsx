@@ -749,7 +749,7 @@ const ProductsWarehouseForm = (props) => {
                                         <label className="text-sm text-red-500">{"Vui lòng chọn kho"}</label>
                                     )}
                                 </div>
-                                <div className="col-span-2 ">
+                                {/* <div className="col-span-2 ">
                                     <label className="text-[#344054] font-normal text-sm mb-1 ">
                                         {dataLang?.production_warehouse_LSX || "production_warehouse_LSX"}
                                     </label>
@@ -797,7 +797,7 @@ const ProductsWarehouseForm = (props) => {
                                             }),
                                         }}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

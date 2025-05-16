@@ -1888,7 +1888,7 @@ const PurchaseReturnsForm = (props) => {
                                                                             e?.id,
                                                                             ce?.id
                                                                         )}
-                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
+                                                                        className="flex flex-col items-center justify-center p-2 text-red-500 transition-all ease-linear rounded-md  hover:scale-110 bg-red-50 hover:bg-red-200"
                                                                     >
                                                                         <IconDelete />
                                                                     </button>
