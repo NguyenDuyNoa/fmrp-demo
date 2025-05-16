@@ -715,7 +715,7 @@ const SalesOrder = (props) => {
                             </RowItemTable>
 
                             <RowItemTable colSpan={4}>
-                              <div className="grid grid-cols-3 items-start py-2 px-12 relative">
+                              <div className="grid grid-cols-4 items-start py-2 pl-12 relative">
                                 {e?.process.map((item, i) => {
                                   const isValue = [
                                     "production_plan",
@@ -729,7 +729,7 @@ const SalesOrder = (props) => {
 
                                   return (
                                     <div
-                                      className={`${i === e?.process.length - 1 ? 'absolute top-2 right-12 translate-x-full' : 'relative'}`}
+                                      className={`${i === e?.process.length - 1 ? ' relative' : 'relative'}`}
                                       key={`process-${i}`}
                                     >
                                       {![
@@ -783,7 +783,7 @@ const SalesOrder = (props) => {
                                           </div>
                                         </>
                                       )}
-                                      <p className={`${isValueDelivery ? 'mt-[24px]' : 'mt-3'} py-2 text-blue-700 text-center cursor-pointer responsive-text-sm left-0 translate-x-[-40%]  font-semibold`}>
+                                      <p className={`${isValueDelivery ? '3xl:mt-8 mt-7' : 'mt-3'} py-2 text-blue-700 text-center cursor-pointer responsive-text-sm left-0 translate-x-[-40%]  font-semibold`}>
                                         {/* <p className="text-blue-700 cursor-pointer  3xl:text-[9.5px] xxl:text-[9px] 2xl:text-[9px] xl:text-[7.5px] lg:text-[6px] text-[7px]  left-0 3xl:-translate-x-[17%] 2xl:-translate-x-1/3 xl:-translate-x-1/3 lg:-translate-x-1/3 -translate-x-1/4 3xl:translate-y-[10%] xxl:translate-y-1/3 2xl:translate-y-1/3 xl:translate-y-1/2 lg:translate-y-full translate-y-1/2 font-semibold"> */}
 
                                         {item?.reference &&
@@ -801,7 +801,8 @@ const SalesOrder = (props) => {
                                               >
                                                 {ci?.reference_no}
                                               </div>
-                                            ))}
+                                            ))
+                                        }
                                         {item?.reference &&
                                           item?.reference?.length > 2 && (
                                             <button onClick={toggleShowAll}>

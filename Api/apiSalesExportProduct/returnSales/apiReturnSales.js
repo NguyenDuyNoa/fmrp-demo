@@ -34,7 +34,7 @@ const apiReturnSales = {
         return response.data
     },
     async apiHandingReturnSales(id, data) {
-        const response = await axiosCustom('GET', id ? `/api_web/Api_return_order/return_order/${id}?csrf_protection=true` : "/api_web/Api_return_order/return_order/?csrf_protection=true", data);
+        const response = await axiosCustom('POST', id ? `/api_web/Api_return_order/return_order/${id}?csrf_protection=true` : "/api_web/Api_return_order/return_order/?csrf_protection=true", data);
         return response.data
     },
 
