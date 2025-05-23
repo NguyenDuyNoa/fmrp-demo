@@ -143,7 +143,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const listDropdownCompleteStage = [
     {
       id: 1,
-      label: "Xuất kho NVL",
+      label: "Xuất kho nguyên liệu",
       icon: <ExportMaterialsIcon className="size-full" />,
       isPremium: true,
       type: "export_materials",
@@ -189,6 +189,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
   // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
   const { isStateProvider, queryStateProvider } = useContext(StateContext);
+  console.log("🚀 ~ ProductionsOrderMain ~ isStateProvider.productionsOrders.dataProductionOrderDetail.title:", isStateProvider)
 
   const params = useMemo(
     () => ({
@@ -787,8 +788,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const triggerFilterAll = (
     <button
       className={`${stateFilterDropdown?.open || activeFilterCount > 0
-          ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-          : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+        ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+        : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
         } flex items-center space-x-2 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition`}
     >
       <span className="3xl:size-5 size-4 shrink-0">
@@ -796,8 +797,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       </span>
       <span
         className={`${stateFilterDropdown?.open || activeFilterCount > 0
-            ? "text-[#0F4F9E]"
-            : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+          ? "text-[#0F4F9E]"
+          : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
           } text-nowrap 3xl:text-base text-sm custom-transition`}
       >
         {dataLang?.productions_orders_filter || "productions_orders_filter"}
@@ -814,8 +815,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       <span className="3xl:size-4 size-3.5 shrink-0">
         <CaretDownIcon
           className={`${stateFilterDropdown?.open || activeFilterCount > 0
-              ? "rotate-180"
-              : "rotate-0"
+            ? "rotate-180"
+            : "rotate-0"
             } w-full h-full custom-transition`}
         />
       </span>
@@ -828,18 +829,18 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const triggerFilterStatus = (
     <button
       className={`${stateFilterDropdown?.open ||
-          isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-          ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
-          : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
+        isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+        ? "text-[#0F4F9E] border-[#3276FA] bg-[#EBF5FF]"
+        : "bg-white text-[#9295A4] border-[#D0D5DD] hover:text-[#0F4F9E] hover:bg-[#EBF5FF] hover:border-[#3276FA]"
         } relative flex items-center justify-between 3xl:space-x-2 space-x-0 border rounded-lg 3xl:h-10 h-9 px-3 group custom-transition w-full`}
     >
       <ChartDonutIcon className="absolute -translate-y-1/2 top-1/2 3xl:size-5 size-4" />
 
       <span
         className={`${stateFilterDropdown?.open ||
-            isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-            ? "text-[#0F4F9E]"
-            : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
+          isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+          ? "text-[#0F4F9E]"
+          : "text-[#3A3E4C] group-hover:text-[#0F4F9E]"
           } xl:pl-6 pl-4 text-nowrap 3xl:text-base text-sm custom-transition`}
       >
         {dataLang?.purchase_status || "purchase_status"}
@@ -848,9 +849,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       <span className="3xl:size-4 size-3.5 shrink-0">
         <CaretDownIcon
           className={`${stateFilterDropdown?.open ||
-              isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
-              ? "rotate-180"
-              : "rotate-0"
+            isStateProvider?.productionsOrders?.selectStatusFilter?.length > 0
+            ? "rotate-180"
+            : "rotate-0"
             } w-full h-full custom-transition`}
         />
       </span>
@@ -1022,9 +1023,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   type: "statePopupGlobal",
                   payload: { open: false },
                 });
-
-                refreshData();
+                // refreshData();
               }}
+              code={isStateProvider.productionsOrders.dataProductionOrderDetail.title}
             />
           ),
         },
@@ -1182,8 +1183,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 }
                 hideTitle={true}
                 className={`${isOpenSearch
-                    ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
-                    : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
+                  ? "rounded-r-lg bg-[#1760B9] text-white border-[#3276FA]"
+                  : "rounded-lg text-[#9295A4] border-[#D0D5DD]"
                   } flex items-center justify-center 3xl:w-12 w-10 3xl:h-10 h-9 shrink-0 border`}
                 onClick={toggleSearch}
               />
@@ -1510,8 +1511,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           renderLabel={(tab, activeTab) => (
             <h3
               className={`${isStateProvider?.productionsOrders?.isTabList?.id === tab.id
-                  ? "text-[#0375F3] scale-[1.02]"
-                  : "text-[#9295A4] scale-[1]"
+                ? "text-[#0375F3] scale-[1.02]"
+                : "text-[#9295A4] scale-[1]"
                 } font-medium group-hover:text-[#0375F3] transition-all duration-100 ease-linear origin-left`}
             >
               <span>{tab.name}</span>

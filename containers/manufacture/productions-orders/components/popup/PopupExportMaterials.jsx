@@ -323,7 +323,7 @@ const InputNumberCustom = memo(
         return (
             <div
                 className={twMerge(
-                    "p-2 flex items-center border rounded-full shadow-sm border-[#D0D5DD] w-fit h-fit overflow-hidden",
+                    "p-2 flex items-center border rounded-full shadow-sm border-[#D0D5DD] w-fit h-fit overflow-hidden bg-white",
                     disabled ? "opacity-50 cursor-not-allowed" : "",
                     className
                 )}
@@ -347,7 +347,7 @@ const InputNumberCustom = memo(
                     onBlur={handleBlur}
                     onMouseDown={(e) => e.stopPropagation()}
                     className={twMerge(
-                        "w-20 text-center outline-none text-lg font-normal text-secondary-09 bg-transparent",
+                        "w-20 text-center outline-none text-lg font-normal text-[#1B1A18] bg-transparent",
                         isError && inputValue > 0 ? "text-red-500" : "",
                         classNameInput
                     )}
@@ -401,7 +401,11 @@ const SubProductRow = memo(
             <tr key={id} >
                 <td
                     colSpan={12}
-                    className="p-0 border-t border-[#F3F3F4] bg-[#EBF5FF] bg-opacity-50"
+                    // className="p-0 border-t border-[#F3F3F4] bg-[#EBF5FF] bg-opacity-50"
+                    className={twMerge("p-0 !bg-[#EBF5FF] bg-opacity-50",
+                        index === 0 && "border-t border-[#F3F3F4]",
+                        index === lastIndex && "border-b border-[#F3F3F4]"
+                    )}
                 >
                     <CollapseRowWrapper isOpen={isOpen}>
                         <table className="w-full border-separate border-spacing-0">
@@ -414,7 +418,7 @@ const SubProductRow = memo(
                                     </td>
                                     <td className="py-2 px-3 text-left ">
                                         <div className=" flex gap-x-4 justify-between items-center">
-                                            {warehouse ?
+                                            {selectedWarehouse ?
                                                 <div className="flex flex-row gap-x-2 text-[#3276FA] text-xs font-normal">
                                                     <p>LOT: {lot}</p>
                                                     <p>Date: {date}</p>
@@ -437,6 +441,7 @@ const SubProductRow = memo(
                                                 setState={(value) =>
                                                     updateProductQuantity(index, value)
                                                 }
+                                                className="bg-white"
                                             />
                                         </div>
                                     </td>
@@ -587,7 +592,8 @@ const ProductRow = memo(
     }
 );
 
-const PopupExportMaterials = ({ onClose }) => {
+const PopupExportMaterials = ({ code, onClose }) => {
+    console.log("🚀 ~ PopupExportMaterials ~ code:", code)
     const [selectAll, setSelectAll] = useState(false);
     const [products, setProducts] = useState(dumyData);
     const dataSeting = useSetingServer();
@@ -673,7 +679,7 @@ const PopupExportMaterials = ({ onClose }) => {
             <div className="flex gap-2 justify-between">
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-bold capitalize">Xuất kho sản xuất</h2>
-                    <p className="text-base text-typo-blue-4">LSX-13032514</p>
+                    <p className="text-base text-typo-blue-4">{code}</p>
                 </div>
                 <div className="flex gap-8 items-center">
                     <button
@@ -681,7 +687,7 @@ const PopupExportMaterials = ({ onClose }) => {
                         //   disabled={selectedCount === 0 || isLoadingSubmit}
                         className={confirmButtonClass}
                     >
-                        <CheckIcon className="size-4" /> Xác nhận
+                        <CheckIcon className="size-4" /> Xác nhận  {selectedCount > 0 && `(${selectedCount})`}
                     </button>
                     <motion.div
                         whileHover={{ scale: 1.2, rotate: 90 }}
