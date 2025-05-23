@@ -20,13 +20,7 @@ import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import { debounce } from "lodash";
-import React, {
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { v4 as uddid } from "uuid";
 import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
@@ -80,6 +74,8 @@ import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
 import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
 import DetailProductionOrderList from "../ui/DetailProductionOrderList";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
+import ExportMaterialsIcon from "@/components/icons/common/ExportMaterialsIcon";
+import PopupExportMaterials from "@/containers/manufacture/productions-orders/components/popup/PopupExportMaterials";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const statusExprired = useStatusExprired();
@@ -147,13 +143,20 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const listDropdownCompleteStage = [
     {
       id: 1,
+      label: "Xuất kho nguyên liệu",
+      icon: <ExportMaterialsIcon className="size-full" />,
+      isPremium: true,
+      type: "export_materials",
+    },
+    {
+      id: 2,
       label: dataLang?.S_total_product_order || "S_total_product_order",
       icon: <ListChecksIcon className="size-full" />, // bạn thay bằng icon tương ứng
       isPremium: false,
       type: "normal",
     },
     {
-      id: 2,
+      id: 3,
       label: "Chi tiết công đoạn",
       icon: <KanbanIcon className="size-full" />,
       isPremium: true,
@@ -186,6 +189,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
   // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
   const { isStateProvider, queryStateProvider } = useContext(StateContext);
+  console.log("🚀 ~ ProductionsOrderMain ~ isStateProvider.productionsOrders.dataProductionOrderDetail.title:", isStateProvider)
 
   const params = useMemo(
     () => ({
@@ -940,10 +944,16 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       if (isStateProvider?.productionsOrders?.idDetailProductionOrder) {
         await refetchProductionOrderDetail();
       }
-      isShow("success", `${dataLang?.data_updated_success || "Dữ liệu đã được cập nhật"}`);
+      isShow(
+        "success",
+        `${dataLang?.data_updated_success || "Dữ liệu đã được cập nhật"}`
+      );
     } catch (error) {
       console.error("Error refreshing data:", error);
-      isShow("error", `${dataLang?.update_failed || "Cập nhật dữ liệu thất bại"}`);
+      isShow(
+        "error",
+        `${dataLang?.update_failed || "Cập nhật dữ liệu thất bại"}`
+      );
     }
   };
 
@@ -991,6 +1001,32 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 đến thành phẩm cuối cùng
               </p>
             </PopupRequestUpdateVersion>
+          ),
+        },
+      });
+
+      return;
+    }
+
+    //xử lý button hoàn thành công đoạn  (đang điều kiện là gói user basic)
+    if (type === "export_materials") {
+      dispatch({
+        type: "statePopupGlobal",
+        payload: {
+          open: true,
+          allowOutsideClick: false,
+          allowEscape: false,
+          children: (
+            <PopupExportMaterials
+              onClose={() => {
+                dispatch({
+                  type: "statePopupGlobal",
+                  payload: { open: false },
+                });
+                // refreshData();
+              }}
+              code={isStateProvider.productionsOrders.dataProductionOrderDetail.title}
+            />
           ),
         },
       });
@@ -1047,8 +1083,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             ...item,
             quality: 1,
             expiration_date: item.expiration_date
-              // ? new Date(item.expiration_date).toLocaleDateString("vi-VN") // 👉 Format theo dd/mm/yyyy
-              ? dayjs(item.expiration_date).format("DD/MM/YYYY")
+              ? // ? new Date(item.expiration_date).toLocaleDateString("vi-VN") // 👉 Format theo dd/mm/yyyy
+              dayjs(item.expiration_date).format("DD/MM/YYYY")
               : null,
             idItem: index + 1,
           };
@@ -1058,7 +1094,12 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           payload: {
             open: true,
             allowOutsideClick: false,
-            children: <PopupPrintTemProduct dataItem={formatData} idManufacture={idManufacture} />,
+            children: (
+              <PopupPrintTemProduct
+                dataItem={formatData}
+                idManufacture={idManufacture}
+              />
+            ),
           },
         });
       }
