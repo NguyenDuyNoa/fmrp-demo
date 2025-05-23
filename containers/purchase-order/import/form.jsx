@@ -1868,7 +1868,7 @@ const PurchaseImportForm = (props) => {
                                                             </div>
                                                             {/* <div>{ce?.totalMoney}</div> */}
                                                             <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                                                {formatMoney(ce?.price * (1 - Number(ce?.discount) / 100) * (1 + Number(ce?.tax?.tax_rate) / 100) * Number(ce?.amount))}
+                                                                {formatMoney(ce?.price * (1 - Number(ce?.discount) / 100) * (1 + Number(ce?.tax?.tax_rate ? ce?.tax?.tax_rate : 0) / 100) * Number(ce?.amount))}
                                                             </div>
                                                             {/* <div>{ce?.note}</div> */}
                                                             <div className="col-span-1  flex items-center justify-center  h-full p-0.5">
