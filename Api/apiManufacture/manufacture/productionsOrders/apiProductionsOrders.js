@@ -168,5 +168,17 @@ const apiProductionsOrders = {
         const response = await axiosCustom('POST', `/api_web/Api_Production_orders/handlingProductCompleted`, data);
         return response.data
     },
+
+    // Danh sách xuất kho LSX
+    async apiGetListExportProductionOrder(id) {
+        const response = await axiosCustom('GET', `/api_web/Api_Production_order_bom/show/${id}?is_web=1`);
+        return response.data
+    },
+
+    // Lấy danh sách kho của BOM (POST)
+    async apiGetWarehousesBOM(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Production_order_bom/getWarehousesBOM`, data);
+        return response.data;
+    },
 }
 export default apiProductionsOrders
