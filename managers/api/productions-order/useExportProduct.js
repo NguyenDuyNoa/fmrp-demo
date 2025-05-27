@@ -98,10 +98,132 @@ export const useWarehousesBOM = (params) => {
           }
         });
       }
-      console.log(formData)
       const response = await apiProductionsOrders.apiGetWarehousesBOM(formData);
       return response.data;
     },
     enabled: !!params,
   });
+};
+
+export const useHandlingExportTotalPO = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      const formData = new FormData();
+      formData.append("po_id", data.po_id);
+      formData.append("is_app", 0);
+
+      // Xử lý dữ liệu BOM
+      if (data.bom && Array.isArray(data.bom)) {
+        data.bom.forEach((item, index) => {
+          Object.entries(item).forEach(([key, value]) => {
+            if (key === 'warehouses' && Array.isArray(value)) {
+              value.forEach((warehouse, wIndex) => {
+                Object.entries(warehouse).forEach(([wKey, wValue]) => {
+                  if (wValue !== undefined) {
+                    formData.append(`bom[${index}][warehouses][${wIndex}][${wKey}]`, wValue === null ? 'null' : wValue);
+                  }
+                });
+              });
+            } else if (value !== undefined) {
+              formData.append(`bom[${index}][${key}]`, value === null ? 'null' : value);
+            }
+          });
+        });
+      }
+
+      // Xử lý dữ liệu BOM POI
+      if (data.bom_poi && typeof data.bom_poi === 'object') {
+        Object.entries(data.bom_poi).forEach(([poiId, items]) => {
+          if (Array.isArray(items)) {
+            items.forEach((item, itemIndex) => {
+              Object.entries(item).forEach(([key, value]) => {
+                if (value !== undefined) {
+                  formData.append(`bom_poi[${poiId}][${itemIndex}][${key}]`, value === null ? 'null' : value);
+                }
+              });
+            });
+          }
+        });
+      }
+
+      // Xử lý dữ liệu BOM Semi Keep
+      if (data.bom_semi_keep && typeof data.bom_semi_keep === 'object') {
+        Object.entries(data.bom_semi_keep).forEach(([poiId, poiData]) => {
+          // Thêm thông tin poi_id và reference_no
+          formData.append(`bom_semi_keep[${poiId}][poi_id]`, poiData.poi_id);
+          formData.append(`bom_semi_keep[${poiId}][reference_no]`, poiData.reference_no);
+
+          // Xử lý mảng items
+          if (Array.isArray(poiData.items)) {
+            poiData.items.forEach((item, itemIndex) => {
+              Object.entries(item).forEach(([key, value]) => {
+                if (key === 'warehouses' && Array.isArray(value)) {
+                  // Xử lý mảng warehouses
+                  value.forEach((warehouse, warehouseIndex) => {
+                    Object.entries(warehouse).forEach(([wKey, wValue]) => {
+                      if (wValue !== undefined) {
+                        formData.append(
+                          `bom_semi_keep[${poiId}][items][${itemIndex}][warehouses][${warehouseIndex}][${wKey}]`,
+                          wValue === null ? 'null' : wValue
+                        );
+                      }
+                    });
+                  });
+                } else if (value !== undefined) {
+                  formData.append(
+                    `bom_semi_keep[${poiId}][items][${itemIndex}][${key}]`,
+                    value === null ? 'null' : value
+                  );
+                }
+              });
+            });
+          }
+        });
+      }
+
+      const response = await apiProductionsOrders.apiHandlingExportTotalPO(formData);
+      return response;
+    },
+    onSuccess: (data, variables) => {
+      if (data && data.isSuccess === 1) {
+        // Cập nhật lại các queries liên quan
+        queryClient.invalidateQueries({
+          queryKey: ["api_list_export_production_order", variables.po_id],
+        });
+        
+        // Thêm invalidate cho các query khác có thể bị ảnh hưởng
+        queryClient.invalidateQueries({
+          queryKey: ["api_get_warehouses_bom"],
+        });
+        
+        queryClient.invalidateQueries({
+          queryKey: ["api_production_orders"],
+        });
+      }
+      return data;
+    },
+    onError: (error) => {
+      console.error("Lỗi khi xử lý xuất kho LSX tổng:", error);
+      throw error;
+    },
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      return await mutation.mutateAsync(data);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  return {
+    onSubmit,
+    isLoading: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+    isError: mutation.isError,
+    error: mutation.error,
+    data: mutation.data,
+  };
 };

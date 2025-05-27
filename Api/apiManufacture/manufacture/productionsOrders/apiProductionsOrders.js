@@ -175,9 +175,15 @@ const apiProductionsOrders = {
         return response.data
     },
 
-    // Lấy danh sách kho của BOM (POST)
+    // Lấy danh sách kho của BOM
     async apiGetWarehousesBOM(data) {
         const response = await axiosCustom('POST', `/api_web/Api_Production_order_bom/getWarehousesBOM`, data);
+        return response.data;
+    },
+
+    // Xác nhận xuất kho BOM
+    async apiHandlingExportTotalPO(data) {
+        const response = await axiosCustom('POST', `/api_web/Api_Suggest_Exporting/handlingExportTotalPO`, data);
         return response.data;
     },
 }
