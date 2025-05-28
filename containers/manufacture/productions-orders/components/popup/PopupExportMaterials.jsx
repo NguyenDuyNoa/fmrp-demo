@@ -335,7 +335,7 @@ export const PopupOrderCompleted = ({ onClose, className }) => {
       <div className="flex items-center gap-2">
         <CheckIcon className="size-6 text-[#1FC583]" />
         <h3 className="text-2xl font-semibold text-[#25387A]">
-          Kho đã xuất đủ số lượng cần thiết
+          Lệnh này đã xuất đủ số lượng
         </h3>
       </div>
       <div className="flex justify-center">
@@ -583,13 +583,22 @@ const ProductRow = memo(
     isVisible = true,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [lotRows, setLotRows] = useState(
-      product.warehouses.map((w) => ({
-        ...w,
-        id: w.id_warehouse_custom,
-        quantity: w.total_quantity || 0,
-      }))
-    );
+    const [lotRows, setLotRows] = useState([]);
+
+    // Khởi tạo lotRows khi component mount hoặc product thay đổi
+    useEffect(() => {
+      if (product.warehouses?.length > 0) {
+        setLotRows(
+          product.warehouses.map((w) => ({
+            ...w,
+            id: w.id_warehouse_custom,
+            quantity: w.total_quantity || 0,
+            list_warehouses: product.list_warehouses || [],
+          }))
+        );
+        setIsOpen(true);
+      }
+    }, [product]);
 
     // Cập nhật warehouses của product khi lotRows thay đổi
     useEffect(() => {
@@ -608,26 +617,6 @@ const ProductRow = memo(
         product.warehouses = updatedWarehouses;
       }
     }, [lotRows]);
-
-    // Cập nhật lại lotRows khi product.warehouses thay đổi từ props
-    useEffect(() => {
-      const newLotRows = product.warehouses.map((w) => ({
-        ...w,
-        id: w.id_warehouse_custom,
-        quantity: w.total_quantity || 0,
-        total_quantity: w.total_quantity || 0,
-        quantity_enter: w.quantity_enter || w.total_quantity || 0,
-      }));
-
-      // So sánh với lotRows hiện tại
-      const isLotRowsChanged =
-        JSON.stringify(newLotRows) !== JSON.stringify(lotRows);
-
-      if (isLotRowsChanged) {
-        setIsOpen(true);
-        setLotRows(newLotRows);
-      }
-    }, [product.warehouses]);
 
     const handleAddLotRow = async () => {
       setIsOpen(true);
@@ -746,7 +735,7 @@ const ProductRow = memo(
           </td>
         </tr>
 
-        {product.list_warehouses && product.list_warehouses.length > 0 ? (
+        {lotRows.length > 0 ? (
           lotRows.map((lot, index) => (
             <SubProductRow
               key={lot.id}
@@ -1208,7 +1197,7 @@ const PopupExportMaterials = ({ code, onClose, id }) => {
             </tr>
           </thead>
         </table>
-        <Customscrollbar className="max-h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+        <Customscrollbar className="h-[420px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
           <table className="min-w-full table-fixed border-separate border-spacing-0">
             <tbody>
               {products.map((product, index) => (
