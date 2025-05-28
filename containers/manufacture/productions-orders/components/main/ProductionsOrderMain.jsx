@@ -76,9 +76,11 @@ import DetailProductionOrderList from "../ui/DetailProductionOrderList";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
 import ExportMaterialsIcon from "@/components/icons/common/ExportMaterialsIcon";
 import PopupExportMaterials from "@/containers/manufacture/productions-orders/components/popup/PopupExportMaterials";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const statusExprired = useStatusExprired();
+  const { setItem, removeItem, getItem } = FnlocalStorage();
 
   const dispatch = useDispatch();
 
@@ -878,9 +880,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
 
   // toggle chọn trạng thái lọc lệnh sản xuất
   const toggleStatus = (value) => {
-    const currentSelected =
-      isStateProvider?.productionsOrders.selectStatusFilter || [];
-
+    const currentSelected = isStateProvider?.productionsOrders.selectStatusFilter || [];
     const updatedSelected = currentSelected.includes(value)
       ? currentSelected.filter((v) => v !== value)
       : [...currentSelected, value];
@@ -891,6 +891,9 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         selectStatusFilter: updatedSelected,
       },
     });
+
+    // Lưu trạng thái mới vào localStorage
+    setItem("productionsOrdersStatusFilter", JSON.stringify(updatedSelected));
   };
 
   // tính toán chiều cao của các element
@@ -1104,6 +1107,27 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       console.log("🚀 ~ handOpentPrintTemProduct ~ error:", error);
     }
   };
+
+  useEffect(() => {
+    const dataFilter = getItem("productionsOrdersStatusFilter") || "[]";
+    if (JSON.parse(dataFilter).length > 0) {
+      queryStateProvider({
+        productionsOrders: {
+          ...isStateProvider?.productionsOrders,
+          selectStatusFilter: JSON.parse(dataFilter)
+        }
+      });
+      return;
+    }
+    const defaultStatus = ["0", "1"]; // Mặc định chọn "Chưa sản xuất" và "Đang sản xuất"
+    queryStateProvider({
+      productionsOrders: {
+        ...isStateProvider?.productionsOrders,
+        selectStatusFilter: defaultStatus
+      }
+    });
+    setItem("productionsOrdersStatusFilter", JSON.stringify(defaultStatus));
+  }, []);
 
   return (
     <React.Fragment>
