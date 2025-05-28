@@ -433,14 +433,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             </PopupCustom>
         ) : (
         <PopupCustom
-            title={<p>Hoàn thành công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
+            title={<p>Hoàn thành chi tiết công đoạn <span className="text-blue-500">(Số lệnh sản xuất: {data?.po?.reference_no})</span></p>}
             button={
                 <div className="flex items-center gap-2 w-full">
                     <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
                         <KanbanIcon className="size-full" />
                     </span>
                     <span className="3xl:text-base text-sm font-normal text-[#101828]">
-                        Chi tiết công đoạn
+                        Hoàn thành chi tiết CĐ
                     </span>
                 </div>
             }
