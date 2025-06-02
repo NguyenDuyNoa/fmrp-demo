@@ -239,6 +239,7 @@ const Register = React.memo((props) => {
             queryState({ sendOtp: true });
 
             const dataSubmit = new FormData();
+            dataSubmit.append("is_web", 1);
             dataSubmit.append("career", data?.major);
             dataSubmit.append("company_name", data?.companyName);
             dataSubmit.append("fullname", data?.fullName);

@@ -152,14 +152,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     },
     {
       id: 2,
-      label: dataLang?.S_total_product_order || "S_total_product_order",
+      label: "Hoàn thành tổng lệnh",
       icon: <ListChecksIcon className="size-full" />, // bạn thay bằng icon tương ứng
       isPremium: false,
       type: "normal",
     },
     {
       id: 3,
-      label: "Chi tiết công đoạn",
+      label: "Hoàn thành chi tiết công đoạn",
       icon: <KanbanIcon className="size-full" />,
       isPremium: true,
       type: "complete_stage",
@@ -864,7 +864,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
           <CheckThinIcon className={`size-full`} />
         </span>
 
-        <span>Hoàn thành sản xuất</span>
+        <span>Thao tác sản xuất</span>
       </span>
 
       <span className="xl:size-4 size-3.5 shrink-0">
