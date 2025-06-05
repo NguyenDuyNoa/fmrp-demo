@@ -10,7 +10,7 @@ const SelectWithSort = ({ placeholderText, options, formatNumber, onChange }) =>
   return (
     <div className="relative w-full">
       <Select
-        className="select-by-search w-full h-14 truncate placeholder:text-secondary-color-text-disabled px-3 py-2"
+        className="select-by-search w-full h-14 truncate placeholder:text-secondary-color-text-disabled 3xl:px-3 px-0 py-2"
         showSearch
         placeholder={placeholderText}
         allowClear
@@ -57,7 +57,7 @@ const SelectWithSort = ({ placeholderText, options, formatNumber, onChange }) =>
       </Select>
 
       {/* Icon search */}
-      <div className="absolute right-6 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
+      <div className="absolute 3xl:right-6 right-2 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
         <CiSearch className="text-white text-lg" size={16} />
       </div>
     </div>

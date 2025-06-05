@@ -219,8 +219,6 @@ const SalesOrderForm = (props) => {
 
   const { data: dataQuotes, refetch: refetchQuote } = useSalesOrderQuotaByBranch(params)
 
-  // const { data: dataCustomer = [] } = useClientComboboxByBranch({ search: "", branch_id: branch !== null ? [branch?.value]?.map((e) => e) : null, });
-
   useEffect(() => {
     router.query && setErrDate(false)
     router.query && sErrCustomer(false)
@@ -1336,7 +1334,7 @@ const SalesOrderForm = (props) => {
             : dataLang?.sales_product_add_order || 'sales_product_add_order'}
         </title>
       </Head>
-      <Container className="!h-max py-6">
+      <Container className="!h-max py-6 bg-gray-color">
         {statusExprired ? (
           <EmptyExprired />
         ) : (
@@ -2283,11 +2281,11 @@ const SalesOrderForm = (props) => {
           </div>
         </div>
         {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-10 w-full bg-white border-t border-gray-color p-4 flex justify-end space-x-2 shadow-lg">
+        <div className="fixed bottom-0 left-0 z-10 w-full 3xl:h-20 h-16 bg-white border-t border-gray-color p-4 flex justify-end space-x-2 shadow-lg">
           <button
             onClick={() => router.push(routerSalesOrder.home)}
             dataLang={dataLang}
-            className="px-6 py-3 bg-[#F2F3F5] text-base font-normal rounded-lg"
+            className="3xl:px-6 3xl:py-3 px-4 py-2 bg-[#F2F3F5] 3xxl:text-base xxl:text-sm font-normal rounded-lg"
           >
             Thoát
           </button>
@@ -2295,7 +2293,7 @@ const SalesOrderForm = (props) => {
             onClick={handleSubmitValidate.bind(this)}
             dataLang={dataLang}
             loading={onSending}
-            className="sale-order-btn-submit h-auto px-6 py-3 bg-light-blue-color text-white text-base font-medium rounded-lg"
+            className="sale-order-btn-submit h-auto 3xl:px-6 3xl:py-3 px-4 py-2 bg-light-blue-color text-white 3xxl:text-base xxl:text-sm font-medium rounded-lg"
           >
             Lưu
           </Button>
