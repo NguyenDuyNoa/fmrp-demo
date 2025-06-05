@@ -96,7 +96,7 @@ const SalesOrderForm = (props) => {
   useEffect(() => {
     if (dataStaffs.length > 0 && authState?.staff_id) {
       const staff = dataStaffs.find((e) => e.value === authState?.staff_id)
-      setSelectedStaff(staff)
+      setSelectedStaff(staff?.value)
     }
   }, [dataStaffs, authState?.staff_id])
 
