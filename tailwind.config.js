@@ -30,6 +30,13 @@ module.exports = {
         deca: ["Lexend Deca", "sans-serif"],
       },
       colors: {
+        "gray-color": '#F4F6F8',
+        "brand-color": '#003DA0',
+        "black-color": '#141522',
+        "blue-color": "#0375F3",
+        "secondary-color-text": '#637381',
+        "secondary-color-text-disabled": '#919EAB',
+        "light-blue-color": "#0375F3",
         primary: {
           "05": "#C7DFFB",
           "07": "#EBF5FF",
@@ -195,7 +202,7 @@ module.exports = {
         },
       });
     },
-    function({ addComponents, theme }) {
+    function({ addComponents }) {
       addComponents({
         '.responsive-text-xs': {
           fontSize: '9px',

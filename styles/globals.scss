@@ -939,3 +939,112 @@ body {
   padding: 8px !important;
   border-radius: 16px !important;
 }
+
+// Search bar trong component form sales-export-product
+.input-searchbar {
+  font-family: "Lexend Deca", "sans-serif";
+  font-size: 14px;
+  outline-offset: 0px;
+  outline: none;
+  border: 1px solid;
+}
+
+.input-searchbar:hover {
+  border: 1px solid #003DA0;
+}
+
+.sale-order-btn-submit {
+  background: #0375F3 !important;
+}
+
+.sale-order-btn-submit:hover {
+  color: #ffff !important;
+  border-color: #4096ff !important;
+  background: #003DA0 !important;
+}
+
+.select-with-sort, .sales-product-date {
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+}
+
+.select-with-sort .ant-select-selector {
+  border-radius: 8px;
+}
+
+.select-with-sort .ant-select-selector:hover {
+  border-color: #003DA0 !important;
+  border-radius: 8px;
+}
+
+.select-with-sort .ant-select-selector:focus {
+  border-color: #003DA0 !important;
+}
+
+.select-with-sort .ant-select-selector:focus-visible {
+  border-color: #003DA0 !important;
+}
+
+.select-with-sort .ant-select-selection-wrap{
+  margin-left: 20px;
+}
+
+.select-with-sort .ant-select-selection-placeholder {
+  color: #919EAB;
+  font-weight: 400;
+  font-family: 'Lexend Deca';
+}
+
+.select-with-sort .ant-select-dropdown .ant-select-item {
+  padding: 5px 6px !important;
+}
+
+.select-with-sort.ant-select-focused .ant-select-selector {
+  border-color: #003DA0 !important;
+}
+
+.select-with-sort .option-content:last-child {
+  border-bottom: none;
+}
+
+.ant-picker-outlined:hover {
+  border-color: #003DA0 !important;
+}
+
+.ant-picker-outlined:focus, .ant-picker-outlined:focus-within {
+  border-color: #003DA0 !important;
+}
+
+.ant-picker .ant-picker-input input::placeholder {
+  color: #919EAB;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 28px;
+  font-family: 'Lexend Deca';
+}
+
+.select-by-search {
+  font-family: "Lexend Deca", "sans-serif";
+  font-size: 14px;
+  outline-offset: 0px;
+  outline: none;
+}
+
+.select-by-search .ant-select-selector {
+  border-radius: 8px;
+}
+
+.select-by-search .ant-select-selector:hover {
+  border-color: #003DA0 !important;
+}
+
+.select-by-search .ant-select-selector:focus, .select-by-search .ant-select-selector:focus-within {
+  border: 2px solid;
+  border-color: #003DA0 !important;
+}
+
+.select-by-search .ant-select-clear {
+  margin-right: 60px;
+  font-size: 14px;
+}
