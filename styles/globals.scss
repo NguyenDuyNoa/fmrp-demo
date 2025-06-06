@@ -1048,3 +1048,32 @@ body {
   margin-right: 60px;
   font-size: 14px;
 }
+
+.price-input-number {
+  margin: 0 10px;
+}
+
+.price-input-number .ant-input-number .ant-input-number-input-wrap input {
+  text-align: end;
+  color: #141522;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Lexend Deca';
+}
+
+.price-input-number .ant-input-number-suffix {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ant-input-number-outlined:hover {
+  border-color: #003DA0 !important;
+}
+
+.ant-input-number-outlined:focus {
+  border-color: #003DA0 !important;
+}
+
+.react-select-2-placeholder {
+  font-size: 10px;
+}
