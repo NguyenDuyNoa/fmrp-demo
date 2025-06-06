@@ -1,15 +1,15 @@
 import Image from 'next/image'
 
-const NotFoundData = () => {
+const NoData = () => {
   return (
-    <div className='w-full h-full flex flex-col justify-center items-center select-none'>
+    <div className='w-full min-h-[78vh] flex flex-col justify-center items-center select-none'>
       <Image
         src={'/data-not-found.png'}
-        alt=""
+        alt="No Data"
         width={400}
         height={400}
-        //quality={100}
-        className="3xl:w-[245px] 3xl:h-[150px] 2xl:w-[100px] xl:w-[90px] w-[90px] h-auto object-contain"
+        quality={100}
+        className="3xl:w-[300px] 2xl:w-[200px] w-[175px] h-auto object-contain"
         loading="lazy"
         crossOrigin="anonymous"
       ></Image>
@@ -18,4 +18,4 @@ const NotFoundData = () => {
   )
 }
 
-export default NotFoundData
+export default NoData

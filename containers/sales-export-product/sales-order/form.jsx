@@ -24,7 +24,7 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Add, Trash as IconDelete, Minus, SearchNormal1, ArrowDown2, ArrowUp2 } from 'iconsax-react'
+import { Add, Trash as IconDelete, Minus, ArrowDown2, ArrowUp2 } from 'iconsax-react'
 import { debounce } from 'lodash'
 import moment from 'moment'
 import Head from 'next/head'
@@ -47,8 +47,8 @@ import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 
 // Optimize UI
 import { motion, AnimatePresence } from 'framer-motion'
-import NotFoundData from './notfound'
-import { Button, DatePicker, ConfigProvider } from 'antd'
+import NoData from './noData'
+import { Button, DatePicker, ConfigProvider, Dropdown, Menu } from 'antd'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import { useSelector } from 'react-redux'
@@ -67,6 +67,8 @@ const SalesOrderForm = (props) => {
   // State
   const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [activeTab, setActiveTab] = useState('info')
+  const [isOpenDiscount, setIsOpenDiscount] = useState(false)
+  const [isOpenTax, setIsOpenTax] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedBranch, setSelectedBranch] = useState(null)
   const [selectedPersonalContact, setSelectedPersonalContact] = useState(null)
@@ -1049,14 +1051,14 @@ const SalesOrderForm = (props) => {
     onSending && handleSubmit()
   }, [onSending])
 
-  const handleClearDate = (type, id) => {
-    if (type === 'deliveryDate') {
-      setDeliveryDate(null)
-    }
-    if (type === 'startDate') {
-      setStartDate(dayjs())
-    }
-  }
+  // const handleClearDate = (type, id) => {
+  //   if (type === 'deliveryDate') {
+  //     setDeliveryDate(null)
+  //   }
+  //   if (type === 'startDate') {
+  //     setStartDate(dayjs())
+  //   }
+  // }
 
   // codeProduct new
   const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : []
@@ -1343,544 +1345,220 @@ const SalesOrderForm = (props) => {
           </React.Fragment>
         )}
 
-        <h2 className="text-title-section text-[#52575E] capitalize font-medium mt-1 !mb-5">
+        <h2 className="3xl:text-[28px] text-xl text-typo-gray-5 capitalize font-medium mt-1 !mb-5">
           {id
             ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
             : dataLang?.sales_product_add_order || 'sales_product_add_order'}
         </h2>
-        <div className="flex w-full gap-x-6 items-stretch pb-40">
+        <div className="flex w-full gap-x-6 items-stretch pb-40 relative">
           {/* Cột trái */}
           <div className="w-3/4">
-            <div className="flex items-center justify-between">
-              {/* <div className="flex items-center justify-end mr-2">
-                <ButtonBack onClick={() => router.push(routerSalesOrder.home)} dataLang={dataLang} />
-              </div> */}
-            </div>
-            {/* fix */}
             {/* Thông tin mặt hàng */}
             <div className="h-full bg-white border border-[#919EAB3D] rounded-2xl p-4">
-              {/* Heading & Searchbar */}
               <div className="flex justify-between items-center">
+                {/* Heading */}
                 <h2 className="w-full 3xl:text-[20px] font-medium 2xl:text-[16px] xl:text-[15px] text-[14px] text-brand-color capitalize">
                   {dataLang?.item_information || 'item_information'}
                 </h2>
                 {/* Search Bar */}
-                {/* <div className="relative w-full">
-                  <input
-                    type="search"
-                    placeholder="Tìm kiếm mặt hàng"
-                    className="input-searchbar w-full h-[40px] border border-gray-300 rounded-lg px-3 py-2 pr-10"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-brand-color rounded-lg p-1"
-                  >
-                    <SearchNormal1 size={16} className="text-white" />
-                  </button>
-                </div> */}
-                <SelectBySearch placeholderText='Tìm kiếm mặt hàng' options={typeOrder === '1' && quote === null ? [] : allItems} formatNumber={formatNumber} />
-              </div>
-              {/* Search mặt hàng */}
-              <div className="grid grid-cols-12">
-                <div div className="col-span-3">
-                  {/* <label className="text-[#344054] font-normal 2xl:text-base text-[14px]">
-                    {dataLang?.import_click_items || 'import_click_items'}
-                  </label> */}
-                  {/* <SelectComponent
-                    onInputChange={(event) => {
-                      _HandleSeachApi(event)
-                    }}
-                    options={typeOrder === '1' && quote === null ? [] : allItems}
-                    // closeMenuOnSelect={false}
-                    onChange={(value) => {
-                      console.log(value)
-                      handleOnChangeInput('itemAll', value)
-                    }}
-                    value={itemsAll?.value ? itemsAll?.value : option?.map((e) => e?.item)}
-                    isMulti
-                    maxShowMuti={0}
-                    components={{ MenuList, MultiValue }}
-                    formatOptionLabel={(option) => {
-                      if (option.value === '0') {
-                        return <div className="font-medium text-gray-400">{option.label}</div>
-                      } else if (option.value === null) {
-                        return <div className="font-medium text-gray-400">{option.label}</div>
-                      } else {
-                        return (
-                          <>
-                            {dataItems.length == 0 ? (
-                              <Loading className="h-80" color="#0f4f9e" />
-                            ) : (
-                              <div className="flex items-center justify-between py-2">
-                                <div className="flex items-center gap-2">
-                                  <div>
-                                    {option.e?.images != null ? (
-                                      <img
-                                        src={option.e?.images}
-                                        alt="Product Image"
-                                        style={{
-                                          width: '40px',
-                                          height: '50px',
-                                        }}
-                                        className="object-cover rounded"
-                                      />
-                                    ) : (
-                                      <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
-                                        <img
-                                          src="/icon/noimagelogo.png"
-                                          alt="Product Image"
-                                          style={{
-                                            width: '40px',
-                                            height: '40px',
-                                          }}
-                                          className="object-cover rounded"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    <h3 className="font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {option.e?.name}
-                                    </h3>
-                                    <div className="flex gap-2">
-                                      <h5 className="font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.product_variation}
-                                      </h5>
-                                    </div>
-                                    <h5 className="text-gray-400 font-medium 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {dataLang[option.e?.text_type]}
-                                    </h5>
-                                  </div>
-                                </div>
-
-                                <div className="">
-                                  <div className="text-right opacity-0">{'0'}</div>
-                                  <div className="flex gap-2">
-                                    <div className="flex items-center gap-2">
-                                      <h5 className="font-normal text-gray-400">
-                                        {dataLang?.purchase_survive || 'purchase_survive'}:
-                                      </h5>
-                                      <h5 className="font-medium ">{formatNumber(option.e?.qty_warehouse || 0)}</h5>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        )
-                      }
-                    }}
-                    placeholder='Tìm kiếm mặt hàng'
-                    hideSelectedOptions={false}
-                    className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px]"
-                    isSearchable={true}
-                    noOptionsMessage={() => 'Không có dữ liệu'}
-                    menuPortalTarget={document.body}
-                    styles={{
-                      placeholder: (base) => ({
-                        ...base,
-                        color: '#cbd5e1',
-                      }),
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 100,
-                      }),
-                      control: (base) => ({
-                        ...base,
-                        boxShadow: 'none',
-                        padding: '0.7px',
-                      }),
-                    }}
-                  /> */}
-                </div>
+                <SelectBySearch
+                  placeholderText="Tìm kiếm mặt hàng"
+                  options={typeOrder === '1' && quote === null ? [] : allItems}
+                  formatNumber={formatNumber}
+                  selectedOptions={itemsAll}
+                  flag={option}
+                  onChange={(value) => {
+                    handleOnChangeInput('itemAll', value)
+                  }}
+                />
               </div>
 
-              {/* Thông tin mặt hàng Header */}
-              {/* <div className="pr-2">
-                <div className="grid grid-cols-12 items-center  sticky top-0 bg-[#F7F8F9] py-2 ">
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-2 text-left truncate font-[400]">
-                    {dataLang?.sales_product_item || 'sales_product_item'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {dataLang?.sales_product_from_unit || 'sales_product_from_unit'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {dataLang?.sales_product_quantity || 'sales_product_quantity'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    font-[400] whitespace-nowrap">
-                    {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {dataLang?.sales_product_tax || 'sales_product_tax'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]">
-                    {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center font-[400] whitespace-nowrap">
-                    {dataLang?.sales_product_item_date || 'sales_product_item_date'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center    truncate font-[400]">
-                    {dataLang?.sales_product_note || 'sales_product_note'}
-                  </h4>
-                  <h4 className="3xl:text-[14px] 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-2  text-[#667085] uppercase  col-span-1 text-center  truncate font-[400]">
-                    {dataLang?.sales_product_operations || 'sales_product_operations'}
-                  </h4>
-                </div>
-              </div> */}
-              {sortedArr.length <= 0 && <NotFoundData />}
-              {/* Thông tin mặt hàng Body */}
+              {sortedArr.length <= 0 && <NoData />}
               {sortedArr.length > 0 && (
-                <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2">
-                  <div className="h-full divide-y divide-slate-200">
-                    {/* phân chia,m */}
-                    <div className="grid grid-cols-12">
-                      <div className="col-span-2 ">
-                        <SelectComponent
-                          onInputChange={(event) => {
-                            _HandleSeachApi(event)
-                          }}
-                          dangerouslySetInnerHTML={{
-                            __html: option.label,
-                          }}
-                          options={typeOrder === '1' && quote === null ? [] : options}
-                          onChange={(value) => handleAddParent(value)}
-                          value={null}
-                          formatOptionLabel={selectItemsLabel}
-                          placeholder={dataLang?.sales_product_select_item || 'sales_product_select_item'}
-                          hideSelectedOptions={false}
-                          className={`cursor-pointer rounded-md bg-white  3xl:text-[14px] 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
-                          isSearchable={true}
-                          noOptionsMessage={() => 'Không có dữ liệu'}
-                          menuPortalTarget={document.body}
-                          styles={{
-                            placeholder: (base) => ({
-                              ...base,
-                              color: '#cbd5e1',
-                            }),
-                            menuPortal: (base) => ({
-                              ...base,
-                              zIndex: 9999,
-                            }),
-                            control: (base, state) => ({
-                              ...base,
-                              ...(state.isFocused && {
-                                border: '0 0 0 1px #92BFF7',
-                                boxShadow: 'none',
-                              }),
-                            }),
-                          }}
-                        />
-                      </div>
-
-                      <div className="grid items-center grid-cols-10 col-span-10 gap-1 mb-1">
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <h3 className={`cursor-default 3xl:text-[16px] 2xl:text-[14px] xl:text-[13px] text-[12px]`} />
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <button
-                            disabled={true}
-                            className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          >
-                            <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90 " />
-                          </button>
-                          <InPutNumericFormat
-                            className={`cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                            value={1}
-                            allowNegative={false}
-                            thousandSeparator=","
-                          />
-                          <button
-                            disabled={true}
-                            className=" 2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          >
-                            <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <InPutNumericFormat
-                            value={1}
-                            allowNegative={false}
-                            readOnly={true}
-                            decimalScale={0}
-                            isNumericString={true}
-                            className={`cursor-default appearance-none 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                            thousandSeparator=","
-                          />
-                        </div>
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <InPutNumericFormat
-                            value={0}
-                            className={`cursor-default appearance-none text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                            thousandSeparator=","
-                            allowNegative={false}
-                            readOnly={true}
-                            isNumericString={true}
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-1 text-right">
-                          <h3
-                            className={`cursor-default px-2 py-2.5 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                          >
-                            1
-                          </h3>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <SelectComponent
-                            options={taxOptions}
-                            value={null}
-                            placeholder={'% Thuế'}
-                            isDisabled={true}
-                            hideSelectedOptions={false}
-                            formatOptionLabel={taxRateLabel}
-                            className={`border-transparent placeholder:text-slate-300 3xl:mb-4 2xl:mb-3 mb-3.5 3x:h-4 h-6 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            menuPortalTarget={document.body}
-                            closeMenuOnSelect={true}
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: '#cbd5e1',
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 20,
-                              }),
-                              control: (base, state) => ({
-                                ...base,
-                                boxShadow: 'none',
-                                padding: '0.7px',
-                              }),
-                            }}
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-1 text-right">
-                          <h3
-                            className={`cursor-default px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                          >
-                            1
-                          </h3>
-                        </div>
-                        <div className="col-span-1 ">
-                          <div className="relative flex flex-row custom-date-picker">
-                            <DatePicker
-                              selected={null}
-                              blur
-                              disabled={true}
-                              placeholderText="DD/MM/YYYY"
-                              dateFormat="dd/MM/yyyy"
-                              className={`bg-gray-100 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[7px] border placeholder:text-slate-300 rounded text-[#52575E] font-normal xl:px-1 px-0.5 outline-none cursor-default `}
-                            />
-                            <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%]  text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-default" />
+                <React.Fragment>
+                  {/* Thông tin mặt hàng Header */}
+                  <div className="grid grid-cols-8 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-2 text-left truncate font-[400]">
+                      {dataLang?.sales_product_item || 'sales_product_item'}
+                    </h4>
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-center truncate font-[400]">
+                      {dataLang?.sales_product_quantity || 'sales_product_quantity'}
+                    </h4>
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-center truncate font-[400]">
+                      {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
+                    </h4>
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
+                    </h4>
+                     {/* <Dropdown overlay={menu} trigger={['click']}>
+                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
+                    </h4>
+                    </Dropdown> */}
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start font-[400] whitespace-nowrap">
+                      {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
+                    </h4>
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                      {dataLang?.sales_product_tax || 'sales_product_tax'}
+                    </h4>
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                      {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
+                    </h4>
+                  </div>
+                  {/* Thông tin mặt hàng Body */}
+                  <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2">
+                    <div className="h-full divide-y divide-slate-200">
+                      {sortedArr.map((e) => (
+                        <div className="grid items-center grid-cols-8 gap-1 py-1" key={e?.id}>
+                          {/* Mặt hàng */}
+                          <div className="col-span-2">
+                            <div className="max-w-sm flex">
+                              <div className="w-16 h-16 flex items-center justify-center">
+                                <img src={e?.item?.e?.images} alt={e?.item?.e?.name} className="w-10 h-10 rounded-lg" />
+                              </div>
+                              <div className="flex-1">
+                                <h2 className="3xl:text-sm text-[10px] font-semibold text-brand-color mb-1 line-clamp-1">
+                                  {e?.item?.e?.name}
+                                </h2>
+                                <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal mb-1">
+                                  Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
+                                  <span>
+                                    {e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}
+                                  </span>
+                                </p>
+                                <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal">
+                                  ĐVT: <span>{e?.unit}</span> - Tồn:{' '}
+                                  <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <input
-                            value={null}
-                            name="optionEmail"
-                            placeholder="Ghi chú"
-                            disabled={true}
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                          />
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <button
-                            onClick={() => _HandleDelete('default', 'default')}
-                            type="button"
-                            title="Xóa"
-                            className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                          >
-                            <IconDelete />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    {/* phân chia  */}
-                    {sortedArr.map((e) => (
-                      <div className="grid items-center grid-cols-12 gap-1 py-1" key={e?.id}>
-                        <div className="col-span-2 ">
-                          <SelectComponent
-                            onInputChange={(event) => {
-                              _HandleSeachApi(event)
-                            }}
-                            dangerouslySetInnerHTML={{
-                              __html: option.label,
-                            }}
-                            options={options}
-                            onChange={(value) => _HandleChangeValue(e?.id, value)}
-                            value={e?.item}
-                            formatOptionLabel={selectItemsLabel}
-                            placeholder={dataLang?.sales_product_select_item || 'sales_product_select_item'}
-                            hideSelectedOptions={false}
-                            className={`cursor-pointer rounded-md bg-white 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            menuPortalTarget={document.body}
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: '#cbd5e1',
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 9999,
-                              }),
-                              control: (base, state) => ({
-                                ...base,
-                                ...(state.isFocused && {
-                                  boxShadow: 'none',
-                                  padding: '0',
-                                }),
-                              }),
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <h3 className={`'cursor-text 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}>
-                            {e?.unit}
-                          </h3>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <div className="flex items-center justify-center">
-                            <button
-                              onClick={() => handleDecrease(e?.id)}
-                              className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            >
-                              <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                            </button>
-                            <InPutNumericFormat
-                              value={e?.quantity}
-                              onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
-                              isAllowed={({ floatValue }) => {
-                                if (floatValue == 0) {
-                                  return true
-                                } else {
-                                  return true
-                                }
-                              }}
-                              allowNegative={false}
-                              className={`${
-                                (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                              } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                            />
-                            <button
-                              onClick={() => handleIncrease(e.id)}
-                              className="2xl:scale-100 xl:scale-90 scale-75 text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            >
-                              <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <InPutMoneyFormat
-                            value={e?.price}
-                            onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
-                            isAllowed={isAllowedNumber}
-                            allowNegative={false}
-                            className={`${
-                              (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                            } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] py-1 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                          />
-                        </div>
-                        <div className="flex items-center justify-center col-span-1 text-center">
-                          <InPutNumericFormat
-                            value={e?.discount}
-                            onValueChange={(value) => handleOnChangeInputOption(e?.id, 'discount', value)}
-                            className={`cursor-text appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                            isAllowed={isAllowedDiscount}
-                            isNumericString={true}
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-1 text-right">
-                          <h3 className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px]`}>
-                            {formatNumber(e?.price_after_discount)}
-                          </h3>
-                        </div>
-                        <div className="flex items-center justify-center col-span-1 p-0">
-                          <SelectComponent
-                            options={taxOptions}
-                            onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
-                            value={
-                              e?.tax
-                                ? {
-                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
-                                    value: e?.tax?.value,
-                                    tax_rate: e?.tax?.tax_rate,
+                          {/* Số lượng */}
+                          <div className="flex items-center justify-center col-span-1">
+                            <div className="flex items-center justify-center p-2 border border-border-gray-2 rounded-3xl">
+                              <button
+                                onClick={() => handleDecrease(e?.id)}
+                                className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                              >
+                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                              </button>
+                              <InPutNumericFormat
+                                value={e?.quantity}
+                                onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
+                                isAllowed={({ floatValue }) => {
+                                  if (floatValue == 0) {
+                                    return true
+                                  } else {
+                                    return true
                                   }
-                                : null
-                            }
-                            placeholder={'% Thuế'}
-                            hideSelectedOptions={false}
-                            formatOptionLabel={taxRateLabel}
-                            className={` border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            menuPortalTarget={document.body}
-                            closeMenuOnSelect={true}
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: '#cbd5e1',
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 20,
-                              }),
-                              control: (base, state) => ({
-                                ...base,
-                                boxShadow: 'none',
-                                padding: '0px',
-                                margin: '0px',
-                              }),
-                            }}
-                          />
-                        </div>
-                        <div className="flex items-center justify-end col-span-1 text-right">
-                          <h3
-                            className={`cursor-text px-2 3xl:text-[13px] 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99]`}
-                          >
-                            {formatMoney(e?.total_amount)}
-                          </h3>
-                        </div>
-                        <div className="col-span-1">
-                          <div className="relative flex flex-row custom-date-picker">
-                            <DatePicker
-                              selected={e?.delivery_date ? e?.delivery_date : null}
-                              blur
-                              placeholderText="DD/MM/YYYY"
-                              dateFormat="dd/MM/yyyy"
-                              onSelect={(date) => handleOnChangeInputOption(e?.id, 'delivery_date', date)}
-                              onChange={(date) => handleOnChangeInputOption(e?.id, 'delivery_date', date)}
-                              className={`${
-                                errDeliveryDate && e?.delivery_date === null
-                                  ? 'border-red-500'
-                                  : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                              } 3xl:h-10 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[8px] border placeholder:text-slate-300 bg-[#ffffff] rounded text-[#52575E] font-normal px-0.5 outline-none cursor-pointer `}
-                            />
-
-                            {e?.delivery_date && (
-                              <>
-                                <MdClear
-                                  className="absolute right-0 3xl:-translate-x-[320%] 3xl:translate-y-[1%] 2xl:-translate-x-[150%] 2xl:translate-y-[1%] xl:-translate-x-[140%] xl:translate-y-[1%] -translate-x-[90%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] 3xl:scale-110 xl:scale-90 scale-75 cursor-pointer"
-                                  onClick={() => handleOnChangeInputOption(e?.id, 'clear_delivery_date')}
-                                />
-                              </>
-                            )}
-                            <BsCalendarEvent className="absolute right-0 3xl:-translate-x-[75%] 3xl:translate-y-[70%] 2xl:-translate-x-[40%] 2xl:translate-y-[70%] xl:-translate-x-[30%] xl:translate-y-[70%] -translate-x-[10%] translate-y-[70%] text-[#CCCCCC] 3xl:scale-110 2xl:scale-95 xl:scale-90 scale-75 cursor-pointer" />
+                                }}
+                                allowNegative={false}
+                                className={`${
+                                  (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
+                                } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal xl:w-[30px] w-[22px] focus:outline-none`}
+                              />
+                              <button
+                                onClick={() => handleIncrease(e.id)}
+                                className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                              >
+                                <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                              </button>
+                            </div>
                           </div>
-                          {errDeliveryDate && e?.delivery_date === null && (
-                            <label className="text-[12px] max-w-10px text-red-500">Vui lòng chọn ngày cần hàng!</label>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-center col-span-1">
+                          {/* Đơn giá */}
+                          <div className="flex items-center justify-center col-span-1 text-center">
+                            <InPutMoneyFormat
+                              value={e?.price}
+                              onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
+                              isAllowed={isAllowedNumber}
+                              allowNegative={false}
+                              className={`price-input-number ${
+                                (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
+                              } cursor-default appearance-none text-end 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 3xl:p-2 m-1 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                            />
+                          </div>
+                          {/* % Chiết khấu */}
+                          <div className="flex items-center justify-start col-span-1 text-center">
+                            <InPutNumericFormat
+                              value={e?.discount}
+                              onValueChange={(value) => {
+                                console.log(value)
+                                handleOnChangeInputOption(e?.id, 'discount', value)
+                              }}
+                              className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
+                              isAllowed={isAllowedDiscount}
+                              isNumericString={true}
+                            />
+                          </div>
+                          {/* Đơn giá sau chiết khấu */}
+                          <div className="flex items-center justify-start col-span-1 text-right">
+                            <h3
+                              className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] text-black-color`}
+                            >
+                              {formatNumber(e?.price_after_discount)}
+                            </h3>
+                          </div>
+                          {/* % Thuế */}
+                          <div className="w-full col-span-1 3xl:px-2 px-0">
+                            <SelectComponent
+                              options={taxOptions}
+                              onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
+                              value={
+                                e?.tax
+                                  ? {
+                                      label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                      value: e?.tax?.value,
+                                      tax_rate: e?.tax?.tax_rate,
+                                    }
+                                  : null
+                              }
+                              placeholder={'Chọn % thuế'}
+                              hideSelectedOptions={false}
+                              formatOptionLabel={taxRateLabel}
+                              className={`border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
+                              isSearchable={true}
+                              noOptionsMessage={() => 'Không có dữ liệu'}
+                              menuPortalTarget={document.body}
+                              closeMenuOnSelect={true}
+                              styles={{
+                                placeholder: (base) => ({
+                                  ...base,
+                                  color: '#cbd5e1',
+                                }),
+                                menuPortal: (base) => ({
+                                  ...base,
+                                  zIndex: 20,
+                                }),
+                                control: (base) => ({
+                                  ...base,
+                                  boxShadow: 'none',
+                                  padding: '0px',
+                                  margin: '0px',
+                                  borderRadius: '8px',
+                                }),
+                              }}
+                            />
+                          </div>
+                          {/* Thành tiền */}
+                          <div className="flex items-center justify-between col-span-1 text-right">
+                            <h3
+                              className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] text-black-color`}
+                            >
+                              {formatMoney(e?.total_amount)}
+                            </h3>
+                            {/* Nút xoá */}
+                            <div className="flex items-center justify-center">
+                              <button
+                                onClick={_HandleDelete.bind(this, e?.id)}
+                                type="button"
+                                title="Xóa"
+                                className="transition w-6 h-6 bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                              >
+                                <MdClear />
+                              </button>
+                            </div>
+                          </div>
+                          {/* <div className="flex items-center justify-center col-span-1">
                           <input
                             value={e?.note}
                             onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
@@ -1889,30 +1567,66 @@ const SalesOrderForm = (props) => {
                             type="text"
                             className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
                           />
+                        </div> */}
                         </div>
-                        <div className="flex items-center justify-center col-span-1">
-                          <button
-                            onClick={_HandleDelete.bind(this, e?.id)}
-                            type="button"
-                            title="Xóa"
-                            className="transition w-[40px] h-10 rounded-[5.5px] hover:text-red-600 text-red-500 flex flex-col justify-center items-center"
-                          >
-                            <IconDelete />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Customscrollbar>
+                      ))}
+                    </div>
+                  </Customscrollbar>
+                </React.Fragment>
               )}
             </div>
           </div>
+          {/* <div className="flex items-center col-span-3 gap-2">
+            <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
+              {dataLang?.sales_product_tax || 'sales_product_tax'}
+            </h2>
+            <SelectComponent
+              classParent={'w-[80%]'}
+              options={taxOptions}
+              onChange={(value) => handleOnChangeInput('total_tax', value)}
+              value={totalTax ? '' : ''}
+              formatOptionLabel={(option) => (
+                <div className="flex items-center justify-start gap-1 ">
+                  <h2>{option?.label}</h2>
+                  <h2>{`(${option?.tax_rate})`}</h2>
+                </div>
+              )}
+              placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
+              hideSelectedOptions={false}
+              className={` 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 xl:w-[70%] w-[60%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+              isSearchable={true}
+              noOptionsMessage={() => 'Không có dữ liệu'}
+              dangerouslySetInnerHTML={{
+                __html: option.label,
+              }}
+              menuPortalTarget={document.body}
+              closeMenuOnSelect={true}
+              styles={{
+                placeholder: (base) => ({
+                  ...base,
+                  color: '#cbd5e1',
+                }),
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 20,
+                }),
+                control: (base, state) => ({
+                  ...base,
+                  boxShadow: 'none',
+                  padding: '2.7px',
+                  ...(state.isFocused && {
+                    border: '0 0 0 1px #92BFF7',
+                  }),
+                }),
+              }}
+            />
+          </div> */}
           {/* Cột phải */}
           <div className="w-1/4">
             <div className="flex flex-col gap-y-6">
               {/* Cột thông tin chung */}
               <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="text-[20px] font-medium text-brand-color mt-6 mb-4 capitalize">Thông tin</h2>
+                <h2 className="3xl:text-[20px] xxl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">Thông tin</h2>
                 <div className="w-full">
                   {/* Tab header */}
                   <div className="w-full flex items-center space-x-2 bg-blue-100 p-1 mb-6 rounded-xl relative">
@@ -1927,7 +1641,7 @@ const SalesOrderForm = (props) => {
                         )}
                         <button
                           onClick={() => handleTabClick(tab.key)}
-                          className={`relative w-full py-2 text-base font-normal rounded-lg z-10 transition-all duration-300
+                          className={`relative w-full py-2 3xl:text-base xxl:text-sm xlg:text-[12px] font-normal rounded-lg z-10 transition-all duration-300
                             ${activeTab === tab.key ? 'text-white' : 'text-gray-800'}
                           `}
                         >
@@ -1999,10 +1713,10 @@ const SalesOrderForm = (props) => {
                                   suffixIcon={null}
                                   value={dayjs(startDate)}
                                   onChange={(date) => {
-                                      if (date) {
-                                        const dateString = date.toDate().toString();
-                                        setStartDate(dateString);
-                                      }
+                                    if (date) {
+                                      const dateString = date.toDate().toString()
+                                      setStartDate(dateString)
+                                    }
                                   }}
                                 />
                               </ConfigProvider>
@@ -2043,10 +1757,10 @@ const SalesOrderForm = (props) => {
                                   value={deliveryDate ? dayjs(deliveryDate) : null}
                                   onChange={(date) => {
                                     if (date) {
-                                      const dateString = date.toDate().toString();
-                                      setDeliveryDate(dateString);
+                                      const dateString = date.toDate().toString()
+                                      setDeliveryDate(dateString)
                                     } else {
-                                      setDeliveryDate(null); // Xử lý khi user xóa date
+                                      setDeliveryDate(null) // Xử lý khi user xóa date
                                     }
                                   }}
                                 />
@@ -2070,38 +1784,6 @@ const SalesOrderForm = (props) => {
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                               <LuBriefcase color="#7a7a7a" />
                             </span>
-                            {/* <SelectComponent
-                              options={dataCustomer}
-                              onChange={handleOnChangeInput.bind(this, 'customer')}
-                              value={customer}
-                              placeholder={dataLang?.select_customer || 'select_customer'}
-                              hideSelectedOptions={false}
-                              isClearable={true}
-                              className={`${
-                                errCustomer ? 'border border-red-500' : ''
-                              } 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] !z-0`}
-                              isSearchable={true}
-                              noOptionsMessage={() => 'Không có dữ liệu'}
-                              menuPortalTarget={document.body}
-                              menuPortal={true}
-                              closeMenuOnSelect={true}
-                              styles={{
-                                singleValue: (base) => ({
-                                  ...base,
-                                  paddingLeft: '20px',
-                                }),
-                                placeholder: (base) => ({
-                                  ...base,
-                                  paddingLeft: '20px',
-                                }),
-                                control: (base) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding: '0.7px',
-                                  borderRadius: '8px',
-                                }),
-                              }}
-                            /> */}
                             <SelectWithSort
                               title="Khách hàng"
                               placeholderText="Chọn khách hàng"
@@ -2240,21 +1922,21 @@ const SalesOrderForm = (props) => {
               </div>
               {/* Cột tổng cộng */}
               <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="text-[20px] font-medium text-brand-color mb-6 capitalize">
+                <h2 className="3xl:text-2xl xxl:text-lg font-medium text-brand-color mb-6 capitalize">
                   {'Tổng cộng' || dataLang?.price_quote_total}
                 </h2>
                 {/* Tổng tiền */}
-                <div className="flex justify-between items-center mb-4 text-base font-normal text-black-color">
+                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-black-color">
                   <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
                   <span>{isTotalMoney.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
                 </div>
                 {/* Tiền chiết khấu */}
-                <div className="flex justify-between items-center mb-4 text-base font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
                   <span>{isTotalMoney.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
                 </div>
                 {/* Tiền sau chiết khấu */}
-                <div className="flex justify-between items-center mb-4 text-base font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
                   <h4 className="w-full">
                     {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
                   </h4>
@@ -2263,16 +1945,16 @@ const SalesOrderForm = (props) => {
                   </span>
                 </div>
                 {/* Tiền thuế */}
-                <div className="flex justify-between items-center mb-4 text-base font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
                   <span>{isTotalMoney.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
                 </div>
                 {/* Thành tiền */}
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="w-full text-black text-base font-semibold">
+                  <h4 className="w-full text-black 3xl:text-base xlg:text-sm font-semibold">
                     {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                   </h4>
-                  <span className="text-blue-color text-base font-semibold">
+                  <span className="text-blue-color 3xl:text-base xlg:text-sm font-semibold">
                     {isTotalMoney.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
                   </span>
                 </div>
@@ -2285,7 +1967,7 @@ const SalesOrderForm = (props) => {
           <button
             onClick={() => router.push(routerSalesOrder.home)}
             dataLang={dataLang}
-            className="3xl:px-6 3xl:py-3 px-4 py-2 bg-[#F2F3F5] 3xxl:text-base xxl:text-sm font-normal rounded-lg"
+            className="3xl:px-6 3xl:py-3 px-4 py-2 bg-[#F2F3F5] 3xxl:text-base text-[10px] font-normal rounded-lg"
           >
             Thoát
           </button>
@@ -2293,12 +1975,11 @@ const SalesOrderForm = (props) => {
             onClick={handleSubmitValidate.bind(this)}
             dataLang={dataLang}
             loading={onSending}
-            className="sale-order-btn-submit h-auto 3xl:px-6 3xl:py-3 px-4 py-2 bg-light-blue-color text-white 3xxl:text-base xxl:text-sm font-medium rounded-lg"
+            className="sale-order-btn-submit h-auto 3xl:px-6 3xl:py-3 px-4 py-2 bg-light-blue-color text-white 3xxl:text-base text-[10px] font-medium rounded-lg"
           >
             Lưu
           </Button>
         </div>
-
       </Container>
       <PopupConfim
         dataLang={dataLang}
