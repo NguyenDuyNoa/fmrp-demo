@@ -1,31 +1,47 @@
 import React, { useState, useEffect } from 'react'
 import { Select, Empty } from 'antd'
-//import { debounce } from 'lodash'
 import { CiSearch } from 'react-icons/ci'
 
 const { Option } = Select
 
-const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOptions = [], flag = [], onChange }) => {
-  const [selectedItems, setSelectedItems] = useState([])
+const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOptions = [], idProductSale, onChange }) => {
+  // Khởi tạo selectedItems bằng selectedOptions từ props
+  const [_, setSelectedItems] = useState(selectedOptions)
 
-  const handleChange = (_, option) => {
-    if (!option?.option) return;
-
-    const newOption = option.option;
-
-    const exists = selectedOptions.find(o => o.value === newOption.value);
-    if (!exists) {
-      const updatedOptions = [...selectedOptions, newOption];
-      setSelectedItems(updatedOptions)
-      console.log(updatedOptions)
-    }
-  };
-
+  // Theo dõi thay đổi từ component cha và cập nhật state
   useEffect(() => {
-    // Truyền ngược về cho component cha
-    onChange?.(selectedItems);
-  }, [selectedItems])
+    setSelectedItems(selectedOptions)
+  }, [selectedOptions])
 
+  // Theo dõi idProductSale khi xoá khỏi mảng ở component cha (cần id này để xoá đồng bộ ra khỏi mảng ở đây)
+  useEffect(() => {
+    if (!idProductSale) return
+
+    setSelectedItems((prevItems) => {
+      const filteredItems = prevItems.filter((item) => item.value !== idProductSale)
+      return filteredItems
+    })
+  }, [idProductSale])
+
+  // Hàm xử lý chọn option vào lưu vào mảng sau đó callback về cho component cha
+  const handleChange = (_, option) => {
+    if (!option?.option) return
+
+    const newOption = option.option
+
+    // Kiểm tra và xử lý dựa trên state hiện tại
+    setSelectedItems((prevItems) => {
+      // Nếu đã tồn tại thì giữ nguyên
+      if (prevItems.find((o) => o.value === newOption.value)) {
+        return prevItems
+      }
+
+      // Nếu chưa tồn tại thì thêm vào
+      const updatedItems = [...prevItems, newOption]
+      onChange?.(updatedItems) // Gọi callback với mảng mới
+      return updatedItems
+    })
+  }
 
   return (
     <div className="relative w-full">
@@ -35,7 +51,7 @@ const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOption
         placeholder={placeholderText}
         allowClear
         value={null}
-        onChange={handleChange} // Callback props (truyền props lên component cha)
+        onChange={handleChange}
         filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
         notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
         optionLabelProp="label"

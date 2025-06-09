@@ -36,19 +36,20 @@ import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 import { FiUser } from 'react-icons/fi'
 import { MdClear } from 'react-icons/md'
+import { FaPencilAlt } from "react-icons/fa";
 import { components } from 'react-select'
 import { v4 as uuidv4 } from 'uuid'
 import { useSalesOrderQuotaByBranch } from './hooks/useSalesOrderQuotaByBranch'
 import { useClientComboboxByBranch } from '@/hooks/common/useClients'
 import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
 import { useTaxList } from '@/hooks/common/useTaxs'
-import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
+//import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 
 // Optimize UI
 import { motion, AnimatePresence } from 'framer-motion'
 import NoData from './noData'
-import { Button, DatePicker, ConfigProvider, Dropdown, Menu } from 'antd'
+import { Button, DatePicker, ConfigProvider, Dropdown } from 'antd'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import { useSelector } from 'react-redux'
@@ -67,8 +68,9 @@ const SalesOrderForm = (props) => {
   // State
   const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [activeTab, setActiveTab] = useState('info')
-  const [isOpenDiscount, setIsOpenDiscount] = useState(false)
-  const [isOpenTax, setIsOpenTax] = useState(false)
+  //const [isOpenDiscount, setIsOpenDiscount] = useState(false)
+  //const [isOpenTax, setIsOpenTax] = useState(false)
+  const [idProductSale, setIdProductSale] = useState(null)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedBranch, setSelectedBranch] = useState(null)
   const [selectedPersonalContact, setSelectedPersonalContact] = useState(null)
@@ -88,6 +90,7 @@ const SalesOrderForm = (props) => {
     search: '',
     branch_id: selectedBranch !== null ? [selectedBranch]?.map((e) => e) : null,
   })
+  const { data: dataTasxes = [] } = useTaxList()
 
   // Gán chi nhánh đầu tiên vào state selectedBranch khi render
   useEffect(() => {
@@ -109,9 +112,9 @@ const SalesOrderForm = (props) => {
     } else {
       setFlagStateChange(false)
     }
-    setSelectedCustomer(null)
-    setSelectedStaff(null)
-    setSelectedPersonalContact(null)
+    //setSelectedCustomer(null)
+    //setSelectedStaff(null)
+    //setSelectedPersonalContact(null)
   }, [selectedBranch])
 
   // Reset state của ô "người liên lạc" khi ô "khách hàng" thay đổi, để đổ dữ liệu mới (khi có)
@@ -216,8 +219,6 @@ const SalesOrderForm = (props) => {
     'filter[branch_id]': selectedBranch !== null ? +selectedBranch : null,
     'filter[client_id]': selectedCustomer !== null ? +selectedCustomer : null,
   }
-
-  const { data: dataTasxes = [] } = useTaxList()
 
   const { data: dataQuotes, refetch: refetchQuote } = useSalesOrderQuotaByBranch(params)
 
@@ -420,13 +421,14 @@ const SalesOrderForm = (props) => {
     onFetchingItem && handleFetchingItem()
   }, [onFetchingItem])
 
+  // Validate state
   useEffect(() => {
     setErrDate(false)
   }, [startDate != null])
 
   useEffect(() => {
     sErrCustomer(false)
-  }, [customer != null])
+  }, [selectedCustomer != null])
 
   useEffect(() => {
     setErrDeliveryDate(false)
@@ -434,11 +436,11 @@ const SalesOrderForm = (props) => {
 
   useEffect(() => {
     setErrBranch(false)
-  }, [branch != null])
+  }, [selectedBranch != null])
 
   useEffect(() => {
     setErrStaff(false)
-  }, [staff != null])
+  }, [selectedStaff != null])
 
   // search api
   const _HandleSeachApi = debounce(async (inputValue) => {
@@ -536,7 +538,7 @@ const SalesOrderForm = (props) => {
     } else if (type === 'branch') {
       if (option?.length >= 1) {
         handleQueryId({ status: true, id: value, idChild: type })
-      } else if (value !== branch) {
+      } else if (value !== selectedBranch) {
         setBranch(value)
         setCustomer(null)
         setContactPerson(null)
@@ -650,72 +652,72 @@ const SalesOrderForm = (props) => {
     }
   }
 
-  const handleAddParent = (value) => {
-    const checkData = option?.some((e) => e?.item?.value === value?.value)
-    if (!checkData) {
-      let money = 0
-      if (value.e?.tax?.tax_rate == undefined) {
-        money = Number(1) * (1 + Number(0) / 100) * Number(value?.e?.quantity)
-      } else {
-        money =
-          Number(value?.e?.affterDiscount) * (1 + Number(value?.e?.tax?.tax_rate) / 100) * Number(value?.e?.quantity)
-      }
-      if (typeOrder === '0') {
-        const newData = {
-          id: uuidv4(),
-          item: value,
-          unit: value?.e?.unit_name,
-          quantity: 1,
-          price: value?.e?.price_sell,
-          discount: totalDiscount ? totalDiscount : 0,
-          price_after_discount: 1,
-          tax: null,
-          price_after_tax: 1,
-          total_amount: Number(money.toFixed(2)),
-          note: '',
-          delivery_date: null,
-        }
-        setOption([newData, ...option])
-      }
-      if (typeOrder === '1' && quote !== null) {
-        const newData = {
-          id: uuidv4(),
-          item: {
-            e: value?.e,
-            label: value?.label,
-            value: value?.value,
-          },
-          unit: value?.e?.unit_name,
-          quantity: value?.e?.quantity,
-          price: value?.e?.price_sell,
-          discount: value?.e?.discount_percent,
-          price_after_discount: +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
-          tax: {
-            label: value?.e?.tax_name,
-            value: value?.e?.tax_id,
-            tax_rate: value?.e?.tax_rate,
-          },
-          price_after_tax:
-            +value?.e?.price_sell *
-            value?.e?.quantity *
-            (1 - +value?.e?.discount_percent / 100) *
-            (1 + value?.e?.tax_rate / 100),
-          total_amount:
-            +value?.e?.price_sell *
-            (1 - +value?.e?.discount_percent / 100) *
-            (1 + +value?.e?.tax_rate / 100) *
-            +value?.e?.quantity,
-          note: value?.e?.note_item,
-          delivery_date: null,
-        }
-        setOption([newData, ...option])
-      } else if (typeOrder === '1' && quote === null) {
-        isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
-      }
-    } else {
-      isShow('error', `Mặt hàng đã được chọn`)
-    }
-  }
+  // const handleAddParent = (value) => {
+  //   const checkData = option?.some((e) => e?.item?.value === value?.value)
+  //   if (!checkData) {
+  //     let money = 0
+  //     if (value.e?.tax?.tax_rate == undefined) {
+  //       money = Number(1) * (1 + Number(0) / 100) * Number(value?.e?.quantity)
+  //     } else {
+  //       money =
+  //         Number(value?.e?.affterDiscount) * (1 + Number(value?.e?.tax?.tax_rate) / 100) * Number(value?.e?.quantity)
+  //     }
+  //     if (typeOrder === '0') {
+  //       const newData = {
+  //         id: uuidv4(),
+  //         item: value,
+  //         unit: value?.e?.unit_name,
+  //         quantity: 1,
+  //         price: value?.e?.price_sell,
+  //         discount: totalDiscount ? totalDiscount : 0,
+  //         price_after_discount: 1,
+  //         tax: null,
+  //         price_after_tax: 1,
+  //         total_amount: Number(money.toFixed(2)),
+  //         note: '',
+  //         delivery_date: null,
+  //       }
+  //       setOption([newData, ...option])
+  //     }
+  //     if (typeOrder === '1' && quote !== null) {
+  //       const newData = {
+  //         id: uuidv4(),
+  //         item: {
+  //           e: value?.e,
+  //           label: value?.label,
+  //           value: value?.value,
+  //         },
+  //         unit: value?.e?.unit_name,
+  //         quantity: value?.e?.quantity,
+  //         price: value?.e?.price_sell,
+  //         discount: value?.e?.discount_percent,
+  //         price_after_discount: +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
+  //         tax: {
+  //           label: value?.e?.tax_name,
+  //           value: value?.e?.tax_id,
+  //           tax_rate: value?.e?.tax_rate,
+  //         },
+  //         price_after_tax:
+  //           +value?.e?.price_sell *
+  //           value?.e?.quantity *
+  //           (1 - +value?.e?.discount_percent / 100) *
+  //           (1 + value?.e?.tax_rate / 100),
+  //         total_amount:
+  //           +value?.e?.price_sell *
+  //           (1 - +value?.e?.discount_percent / 100) *
+  //           (1 + +value?.e?.tax_rate / 100) *
+  //           +value?.e?.quantity,
+  //         note: value?.e?.note_item,
+  //         delivery_date: null,
+  //       }
+  //       setOption([newData, ...option])
+  //     } else if (typeOrder === '1' && quote === null) {
+  //       isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
+  //     }
+  //   } else {
+  //     isShow('error', `Mặt hàng đã được chọn`)
+  //   }
+  // }
 
   // change items
   const handleOnChangeInputOption = (id, type, value) => {
@@ -839,41 +841,41 @@ const SalesOrderForm = (props) => {
     setOption(newOption) // cập nhật lại mảng
   }
 
-  const _HandleChangeValue = (parentId, value) => {
-    const checkData = option?.some((e) => e?.item?.value === value?.value)
+  // const _HandleChangeValue = (parentId, value) => {
+  //   const checkData = option?.some((e) => e?.item?.value === value?.value)
 
-    if (!checkData) {
-      const newData = option?.map((e, index) => {
-        if (e?.id === parentId) {
-          return {
-            ...e,
-            id: uuidv4(),
-            item: {
-              e: value?.e,
-              label: value?.label,
-              value: value?.value,
-            },
-            unit: value.unit_name,
-            quantity: 1,
-            sortIndex: index,
-            price: 1,
-            discount: 0,
-            price_after_discount: 1,
-            tax: 0,
-            price_after_tax: 1,
-            total_amount: 1,
-            note: '',
-            delivery_date: null,
-          }
-        } else {
-          return e
-        }
-      })
-      setOption([...newData])
-    } else {
-      isShow('error', `${'Mặt hàng đã được chọn'}`)
-    }
-  }
+  //   if (!checkData) {
+  //     const newData = option?.map((e, index) => {
+  //       if (e?.id === parentId) {
+  //         return {
+  //           ...e,
+  //           id: uuidv4(),
+  //           item: {
+  //             e: value?.e,
+  //             label: value?.label,
+  //             value: value?.value,
+  //           },
+  //           unit: value.unit_name,
+  //           quantity: 1,
+  //           sortIndex: index,
+  //           price: 1,
+  //           discount: 0,
+  //           price_after_discount: 1,
+  //           tax: 0,
+  //           price_after_tax: 1,
+  //           total_amount: 1,
+  //           note: '',
+  //           delivery_date: null,
+  //         }
+  //       } else {
+  //         return e
+  //       }
+  //     })
+  //     setOption([...newData])
+  //   } else {
+  //     isShow('error', `${'Mặt hàng đã được chọn'}`)
+  //   }
+  // }
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
 
@@ -934,17 +936,23 @@ const SalesOrderForm = (props) => {
 
   let newDataOption = dataOption?.filter((e) => e?.item !== undefined)
 
-  // validate submit
+  // Validate submit
   const handleSubmitValidate = (e) => {
     e.preventDefault()
     let deliveryDateInOption = option.some((e) => e?.delivery_date === null)
 
     if (typeOrder === '0') {
-      if (startDate == null || customer == null || branch == null || staff == null || deliveryDateInOption === true) {
+      if (
+        startDate == null ||
+        selectedCustomer == null ||
+        selectedBranch == null ||
+        selectedStaff == null ||
+        deliveryDateInOption === true
+      ) {
         startDate == null && setErrDate(true)
-        customer?.value == null && sErrCustomer(true)
-        branch?.value == null && setErrBranch(true)
-        staff?.value == null && setErrStaff(true)
+        selectedCustomer == null && sErrCustomer(true)
+        selectedBranch == null && setErrBranch(true)
+        selectedStaff == null && setErrStaff(true)
         deliveryDateInOption === true && setErrDeliveryDate(true)
         // deliveryDate == null && setErrDeliveryDate(true)
         isShow('error', `${dataLang?.required_field_null}`)
@@ -954,16 +962,16 @@ const SalesOrderForm = (props) => {
     } else if (typeOrder === '1') {
       if (
         startDate == null ||
-        customer == null ||
-        branch == null ||
-        staff == null ||
+        selectedCustomer == null ||
+        selectedBranch == null ||
+        selectedStaff == null ||
         deliveryDateInOption === true ||
         quote == null
       ) {
         startDate == null && setErrDate(true)
-        customer?.value == null && sErrCustomer(true)
-        branch?.value == null && setErrBranch(true)
-        staff?.value == null && setErrStaff(true)
+        selectedCustomer == null && sErrCustomer(true)
+        selectedBranch == null && setErrBranch(true)
+        selectedStaff == null && setErrStaff(true)
         deliveryDateInOption === true && setErrDeliveryDate(true)
         quote?.value == null && setErrQuote(true)
         // deliveryDate == null && setErrDeliveryDate(true)
@@ -980,10 +988,10 @@ const SalesOrderForm = (props) => {
     let formData = new FormData()
     formData.append('code', codeProduct)
     formData.append('date', formatMoment(startDate, FORMAT_MOMENT.DATE_TIME_LONG))
-    formData.append('branch_id', branch?.value ? branch?.value : '')
-    formData.append('client_id', customer?.value ? customer?.value : '')
-    formData.append('person_contact_id', contactPerson?.value ? contactPerson?.value : '')
-    formData.append('staff_id', staff?.value ? staff?.value : '')
+    formData.append('branch_id', selectedBranch ? selectedBranch : '')
+    formData.append('client_id', selectedCustomer ? selectedCustomer : '')
+    formData.append('person_contact_id', selectedPersonalContact ? selectedPersonalContact : '')
+    formData.append('staff_id', selectedStaff ? selectedStaff : '')
     formData.append('note', note ? note : '')
     formData.append('quote_id', typeOrder === '1' ? quote?.value : '')
     newDataOption.forEach((item, index) => {
@@ -1061,243 +1069,246 @@ const SalesOrderForm = (props) => {
   // }
 
   // codeProduct new
-  const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : []
+  //const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : []
   //const fakeDataQuotes = branch != null ? dataQuotes?.filter((x) => !hiddenOptions.includes(x.value)) : []
 
   // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
+
   const allItems = [...options]
 
-  const _HandleSelectAll = () => {
-    if (typeOrder === '0') {
-      const data = allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: '',
-        delivery_date: null,
-      }))
+  // const _HandleSelectAll = () => {
+  //   if (typeOrder === '0') {
+  //     const data = allItems?.map((e, index) => ({
+  //       id: uuidv4(),
+  //       item: {
+  //         e: e?.e,
+  //         label: e?.label,
+  //         value: e?.value,
+  //       },
+  //       unit: e?.e?.unit_name,
+  //       quantity: 1,
+  //       sortIndex: index,
+  //       price: 1,
+  //       discount: 0,
+  //       price_after_discount: 1,
+  //       tax: 0,
+  //       price_after_tax: 1,
+  //       total_amount: 1,
+  //       note: '',
+  //       delivery_date: null,
+  //     }))
 
-      setOption(data)
-      //new
-      setItemsAll(
-        allItems?.map((e, index) => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: 1,
-          sortIndex: index,
-          price: 1,
-          discount: 0,
-          price_after_discount: 1,
-          tax: 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: '',
-          delivery_date: null,
-        }))
-      )
-      setOption(
-        allItems?.map((e, index) => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: 1,
-          sortIndex: index,
-          price: 1,
-          discount: 0,
-          price_after_discount: 1,
-          tax: 0,
-          price_after_tax: 1,
-          total_amount: 1,
-          note: '',
-          delivery_date: null,
-        }))
-      )
-    }
-    if (typeOrder === '1' && quote !== null) {
-      const data = allItems?.map((e, index) => ({
-        id: uuidv4(),
-        item: {
-          e: e?.e,
-          label: e?.label,
-          value: e?.value,
-        },
-        unit: e?.e?.unit_name,
-        quantity: 1,
-        sortIndex: index,
-        price: 1,
-        discount: 0,
-        price_after_discount: 1,
-        tax: 0,
-        price_after_tax: 1,
-        total_amount: 1,
-        note: '',
-        delivery_date: null,
-      }))
-      setOption(data)
-      //new
-      setItemsAll(
-        allItems?.map((e, index) => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: e?.e?.quantity,
-          price: e?.e?.price,
-          discount: e?.e?.discount_percent,
-          price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-          tax: {
-            label: e?.e?.tax_name,
-            value: e?.e?.tax_id,
-            tax_rate: e?.e?.tax_rate,
-          },
-          price_after_tax:
-            +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-          total_amount:
-            +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
-          note: e?.e?.note_item,
-          delivery_date: null,
-        }))
-      )
-      setOption(
-        allItems?.map((e, index) => ({
-          id: uuidv4(),
-          item: {
-            e: e?.e,
-            label: e?.label,
-            value: e?.value,
-          },
-          unit: e?.e?.unit_name,
-          quantity: e?.e?.quantity,
-          price: e?.e?.price,
-          discount: e?.e?.discount_percent,
-          price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-          tax: {
-            label: e?.e?.tax_name,
-            value: e?.e?.tax_id,
-            tax_rate: e?.e?.tax_rate,
-          },
-          price_after_tax:
-            +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-          total_amount:
-            +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
-          note: e?.e?.note_item,
-          delivery_date: null,
-        }))
-      )
-    } else if (typeOrder === '1' && quote === null) {
-      isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
-    }
-  }
+  //     setOption(data)
+  //     //new
+  //     setItemsAll(
+  //       allItems?.map((e, index) => ({
+  //         id: uuidv4(),
+  //         item: {
+  //           e: e?.e,
+  //           label: e?.label,
+  //           value: e?.value,
+  //         },
+  //         unit: e?.e?.unit_name,
+  //         quantity: 1,
+  //         sortIndex: index,
+  //         price: 1,
+  //         discount: 0,
+  //         price_after_discount: 1,
+  //         tax: 0,
+  //         price_after_tax: 1,
+  //         total_amount: 1,
+  //         note: '',
+  //         delivery_date: null,
+  //       }))
+  //     )
+  //     setOption(
+  //       allItems?.map((e, index) => ({
+  //         id: uuidv4(),
+  //         item: {
+  //           e: e?.e,
+  //           label: e?.label,
+  //           value: e?.value,
+  //         },
+  //         unit: e?.e?.unit_name,
+  //         quantity: 1,
+  //         sortIndex: index,
+  //         price: 1,
+  //         discount: 0,
+  //         price_after_discount: 1,
+  //         tax: 0,
+  //         price_after_tax: 1,
+  //         total_amount: 1,
+  //         note: '',
+  //         delivery_date: null,
+  //       }))
+  //     )
+  //   }
+  //   if (typeOrder === '1' && quote !== null) {
+  //     const data = allItems?.map((e, index) => ({
+  //       id: uuidv4(),
+  //       item: {
+  //         e: e?.e,
+  //         label: e?.label,
+  //         value: e?.value,
+  //       },
+  //       unit: e?.e?.unit_name,
+  //       quantity: 1,
+  //       sortIndex: index,
+  //       price: 1,
+  //       discount: 0,
+  //       price_after_discount: 1,
+  //       tax: 0,
+  //       price_after_tax: 1,
+  //       total_amount: 1,
+  //       note: '',
+  //       delivery_date: null,
+  //     }))
+  //     setOption(data)
+  //     //new
+  //     setItemsAll(
+  //       allItems?.map((e, index) => ({
+  //         id: uuidv4(),
+  //         item: {
+  //           e: e?.e,
+  //           label: e?.label,
+  //           value: e?.value,
+  //         },
+  //         unit: e?.e?.unit_name,
+  //         quantity: e?.e?.quantity,
+  //         price: e?.e?.price,
+  //         discount: e?.e?.discount_percent,
+  //         price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+  //         tax: {
+  //           label: e?.e?.tax_name,
+  //           value: e?.e?.tax_id,
+  //           tax_rate: e?.e?.tax_rate,
+  //         },
+  //         price_after_tax:
+  //           +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
+  //         total_amount:
+  //           +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
+  //         note: e?.e?.note_item,
+  //         delivery_date: null,
+  //       }))
+  //     )
+  //     setOption(
+  //       allItems?.map((e, index) => ({
+  //         id: uuidv4(),
+  //         item: {
+  //           e: e?.e,
+  //           label: e?.label,
+  //           value: e?.value,
+  //         },
+  //         unit: e?.e?.unit_name,
+  //         quantity: e?.e?.quantity,
+  //         price: e?.e?.price,
+  //         discount: e?.e?.discount_percent,
+  //         price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
+  //         tax: {
+  //           label: e?.e?.tax_name,
+  //           value: e?.e?.tax_id,
+  //           tax_rate: e?.e?.tax_rate,
+  //         },
+  //         price_after_tax:
+  //           +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
+  //         total_amount:
+  //           +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
+  //         note: e?.e?.note_item,
+  //         delivery_date: null,
+  //       }))
+  //     )
+  //   } else if (typeOrder === '1' && quote === null) {
+  //     isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
+  //   }
+  // }
 
-  const _HandleDeleteAll = () => {
-    setItemsAll([])
-    setOption([])
-    //new
-  }
+  // const _HandleDeleteAll = () => {
+  //   setItemsAll([])
+  //   setOption([])
+  //   //new
+  // }
 
-  const MenuList = (props) => {
-    return (
-      <components.MenuList {...props}>
-        {allItems?.length > 0 && (
-          <div className="grid items-center grid-cols-2 cursor-pointer">
-            <div
-              className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
-              onClick={_HandleSelectAll.bind(this)}
-            >
-              Chọn tất cả
-            </div>
-            <div
-              className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
-              onClick={_HandleDeleteAll.bind(this)}
-            >
-              Bỏ chọn tất cả
-            </div>
-          </div>
-        )}
-        {props.children}
-      </components.MenuList>
-    )
-  }
+  // const MenuList = (props) => {
+  //   return (
+  //     <components.MenuList {...props}>
+  //       {allItems?.length > 0 && (
+  //         <div className="grid items-center grid-cols-2 cursor-pointer">
+  //           <div
+  //             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
+  //             onClick={_HandleSelectAll.bind(this)}
+  //           >
+  //             Chọn tất cả
+  //           </div>
+  //           <div
+  //             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
+  //             onClick={_HandleDeleteAll.bind(this)}
+  //           >
+  //             Bỏ chọn tất cả
+  //           </div>
+  //         </div>
+  //       )}
+  //       {props.children}
+  //     </components.MenuList>
+  //   )
+  // }
 
   // render option item in formatGroupLabel Item
-  const selectItemsLabel = (option) => {
-    return (
-      <div className="flex items-center justify-between">
-        <div className="flex items-center ">
-          <div>
-            {option.e?.images !== null ? (
-              <img
-                src={option.e?.images}
-                alt="Product Image"
-                className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] text-[8px] object-cover rounded mr-1"
-              />
-            ) : (
-              <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
-                <img
-                  src="/icon/noimagelogo.png"
-                  alt="Product Image"
-                  className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
-                />
-              </div>
-            )}
-          </div>
-          <div>
-            <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
-              {option.e?.name}
-            </h3>
 
-            <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
-              <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-                {option.e?.product_variation}
-              </h5>
-            </div>
+  // const selectItemsLabel = (option) => {
+  //   return (
+  //     <div className="flex items-center justify-between">
+  //       <div className="flex items-center ">
+  //         <div>
+  //           {option.e?.images !== null ? (
+  //             <img
+  //               src={option.e?.images}
+  //               alt="Product Image"
+  //               className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] text-[8px] object-cover rounded mr-1"
+  //             />
+  //           ) : (
+  //             <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
+  //               <img
+  //                 src="/icon/noimagelogo.png"
+  //                 alt="Product Image"
+  //                 className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
+  //               />
+  //             </div>
+  //           )}
+  //         </div>
+  //         <div>
+  //           <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
+  //             {option.e?.name}
+  //           </h3>
 
-            <div className="flex gap-1 3xl:gap-4 2xl:gap-3 xl:gap-3">
-              <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                {dataLang[option.e?.text_type]}
-              </h5>
+  //           <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
+  //             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
+  //               {option.e?.product_variation}
+  //             </h5>
+  //           </div>
 
-              <div className="flex items-center">
-                <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                  {dataLang?.purchase_survive || 'purchase_survive'} :
-                </h5>
+  //           <div className="flex gap-1 3xl:gap-4 2xl:gap-3 xl:gap-3">
+  //             <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+  //               {dataLang[option.e?.text_type]}
+  //             </h5>
 
-                <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-                  {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  //             <div className="flex items-center">
+  //               <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+  //                 {dataLang?.purchase_survive || 'purchase_survive'} :
+  //               </h5>
+
+  //               <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
+  //                 {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+  //               </h5>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   // render option formatGroupLabel tax
+
   const taxRateLabel = (option) => {
     return (
       <div className="flex items-center justify-start">
@@ -1344,8 +1355,7 @@ const SalesOrderForm = (props) => {
             <Breadcrumb items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
           </React.Fragment>
         )}
-
-        <h2 className="3xl:text-[28px] text-xl text-typo-gray-5 capitalize font-medium mt-1 !mb-5">
+        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-typo-gray-5 capitalize font-medium mt-1 2xl:!mb-5 lg:!mb-3">
           {id
             ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
             : dataLang?.sales_product_add_order || 'sales_product_add_order'}
@@ -1354,7 +1364,7 @@ const SalesOrderForm = (props) => {
           {/* Cột trái */}
           <div className="w-3/4">
             {/* Thông tin mặt hàng */}
-            <div className="h-full bg-white border border-[#919EAB3D] rounded-2xl p-4">
+            <div className="min-h-full max-h-[1132px] flex flex-col bg-white border border-[#919EAB3D] rounded-2xl p-4">
               <div className="flex justify-between items-center">
                 {/* Heading */}
                 <h2 className="w-full 3xl:text-[20px] font-medium 2xl:text-[16px] xl:text-[15px] text-[14px] text-brand-color capitalize">
@@ -1366,7 +1376,7 @@ const SalesOrderForm = (props) => {
                   options={typeOrder === '1' && quote === null ? [] : allItems}
                   formatNumber={formatNumber}
                   selectedOptions={itemsAll}
-                  flag={option}
+                  idProductSale={idProductSale}
                   onChange={(value) => {
                     handleOnChangeInput('itemAll', value)
                   }}
@@ -1387,246 +1397,284 @@ const SalesOrderForm = (props) => {
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-center truncate font-[400]">
                       {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
                     </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
-                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
-                    </h4>
-                     {/* <Dropdown overlay={menu} trigger={['click']}>
+                    {/* Chọn hoàng loạt % chiết khấu */}
+                    <Dropdown
+                      overlay={
+                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                            Chọn hoàng loạt % chiết khấu
+                          </p>
+                          <div className="flex items-center justify-center col-span-1 text-center">
+                            <InPutNumericFormat
+                              value={totalDiscount}
+                              onValueChange={handleOnChangeInput.bind(this, 'totaldiscount')}
+                              className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
+                              isAllowed={isAllowedDiscount}
+                            />
+                          </div>
+                        </div>
+                      }
+                      trigger={['click']}
+                      placement="bottomLeft"
+                      arrow
+                    >
+                      <div className="inline-flex items-center justify-between cursor-pointer">
                         <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
-                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
-                    </h4>
-                    </Dropdown> */}
+                          {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
+                        </h4>
+                        <ArrowDown2 size={16} />
+                      </div>
+                    </Dropdown>
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start font-[400] whitespace-nowrap">
                       {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
                     </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
-                      {dataLang?.sales_product_tax || 'sales_product_tax'}
-                    </h4>
+                    {/* Chọn hoàng loạt % thuế */}
+                    <Dropdown
+                      overlay={
+                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg relative z-0 group min-h-auto focus-within:min-h-[270px]">
+                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                            Chọn hoàng loạt % thuế
+                          </p>
+                          <SelectComponent
+                            options={taxOptions}
+                            onChange={(value) => handleOnChangeInput('total_tax', value)}
+                            value={totalTax ? '' : ''}
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center justify-start gap-1">
+                                <h2>{option?.label}</h2>
+                                <h2>{`(${option?.tax_rate})`}</h2>
+                              </div>
+                            )}
+                            placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
+                            hideSelectedOptions={false}
+                            className={`3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 w-full bg-white rounded text-typo-gray-5 font-normal outline-none`}
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                            closeMenuOnSelect={true}
+                            menuPlacement="auto"
+                            menuPosition="fixed"
+                            styles={{
+                              placeholder: (base) => ({
+                                ...base,
+                                color: '#cbd5e1',
+                              }),
+                              menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                              }),
+                              control: (base, state) => ({
+                                ...base,
+                                boxShadow: 'none',
+                                padding: '2.7px',
+                                ...(state.isFocused && {
+                                  border: '0 0 0 1px #92BFF7',
+                                }),
+                              }),
+                            }}
+                          />
+                        </div>
+                      }
+                      trigger={['click']}
+                      placement="bottomLeft"
+                      arrow
+                    >
+                      <div className="inline-flex items-center justify-between cursor-pointer">
+                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                          {dataLang?.sales_product_tax || 'sales_product_tax'}
+                        </h4>
+                        <ArrowDown2 size={16} />
+                      </div>
+                    </Dropdown>
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
                       {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                     </h4>
                   </div>
                   {/* Thông tin mặt hàng Body */}
-                  <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2">
-                    <div className="h-full divide-y divide-slate-200">
-                      {sortedArr.map((e) => (
-                        <div className="grid items-center grid-cols-8 gap-1 py-1" key={e?.id}>
-                          {/* Mặt hàng */}
-                          <div className="col-span-2">
-                            <div className="max-w-sm flex">
-                              <div className="w-16 h-16 flex items-center justify-center">
-                                <img src={e?.item?.e?.images} alt={e?.item?.e?.name} className="w-10 h-10 rounded-lg" />
-                              </div>
-                              <div className="flex-1">
-                                <h2 className="3xl:text-sm text-[10px] font-semibold text-brand-color mb-1 line-clamp-1">
-                                  {e?.item?.e?.name}
-                                </h2>
-                                <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal mb-1">
-                                  Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
-                                  <span>
-                                    {e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}
-                                  </span>
-                                </p>
-                                <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal">
-                                  ĐVT: <span>{e?.unit}</span> - Tồn:{' '}
-                                  <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          {/* Số lượng */}
-                          <div className="flex items-center justify-center col-span-1">
-                            <div className="flex items-center justify-center p-2 border border-border-gray-2 rounded-3xl">
-                              <button
-                                onClick={() => handleDecrease(e?.id)}
-                                className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
-                              >
-                                <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                              </button>
-                              <InPutNumericFormat
-                                value={e?.quantity}
-                                onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
-                                isAllowed={({ floatValue }) => {
-                                  if (floatValue == 0) {
-                                    return true
-                                  } else {
-                                    return true
-                                  }
-                                }}
-                                allowNegative={false}
-                                className={`${
-                                  (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                                } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal xl:w-[30px] w-[22px] focus:outline-none`}
+                  <div className="scroll-bar-products-sale overflow-y-auto flex-1 pr-4 divide-slate-200">
+                    {sortedArr.map((e) => (
+                      <div className="grid items-center grid-cols-8 gap-1 py-1" key={e?.id}>
+                        {/* Mặt hàng */}
+                        <div className="col-span-2">
+                          <div className="max-w-sm flex">
+                            <div className="w-16 h-16 flex items-center justify-center">
+                              <img
+                                src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
+                                alt={e?.item?.e?.name}
+                                className="w-10 h-10 rounded-lg"
                               />
-                              <button
-                                onClick={() => handleIncrease(e.id)}
-                                className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
-                              >
-                                <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                              </button>
+                            </div>
+                            <div className="flex-1">
+                              <h2 className="3xl:text-sm text-[10px] font-semibold text-brand-color mb-1 line-clamp-1">
+                                {e?.item?.e?.name}
+                              </h2>
+                              <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal mb-1">
+                                Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
+                                <span>
+                                  {e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}
+                                </span>
+                              </p>
+                              <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal">
+                                ĐVT: <span>{e?.unit}</span> - Tồn:
+                                <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
+                              </p>
+                              <div className="flex items-center justify-center col-span-1">
+                                <FaPencilAlt size={10} />
+                                <input
+                                  value={e?.note}
+                                  onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
+                                  name="optionEmail"
+                                  placeholder="Ghi chú"
+                                  type="text"
+                                  className="focus:border-[#92BFF7] 2xl:h-7 xl:h-5 mt-1 py-0 px-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
+                                />
+                              </div>
                             </div>
                           </div>
-                          {/* Đơn giá */}
-                          <div className="flex items-center justify-center col-span-1 text-center">
-                            <InPutMoneyFormat
-                              value={e?.price}
-                              onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
-                              isAllowed={isAllowedNumber}
-                              allowNegative={false}
-                              className={`price-input-number ${
-                                (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                              } cursor-default appearance-none text-end 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 3xl:p-2 m-1 p-1 focus:outline-none border rounded-lg border-gray-200`}
-                            />
-                          </div>
-                          {/* % Chiết khấu */}
-                          <div className="flex items-center justify-start col-span-1 text-center">
-                            <InPutNumericFormat
-                              value={e?.discount}
-                              onValueChange={(value) => {
-                                console.log(value)
-                                handleOnChangeInputOption(e?.id, 'discount', value)
-                              }}
-                              className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
-                              isAllowed={isAllowedDiscount}
-                              isNumericString={true}
-                            />
-                          </div>
-                          {/* Đơn giá sau chiết khấu */}
-                          <div className="flex items-center justify-start col-span-1 text-right">
-                            <h3
-                              className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] text-black-color`}
-                            >
-                              {formatNumber(e?.price_after_discount)}
-                            </h3>
-                          </div>
-                          {/* % Thuế */}
-                          <div className="w-full col-span-1 3xl:px-2 px-0">
-                            <SelectComponent
-                              options={taxOptions}
-                              onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
-                              value={
-                                e?.tax
-                                  ? {
-                                      label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
-                                      value: e?.tax?.value,
-                                      tax_rate: e?.tax?.tax_rate,
-                                    }
-                                  : null
-                              }
-                              placeholder={'Chọn % thuế'}
-                              hideSelectedOptions={false}
-                              formatOptionLabel={taxRateLabel}
-                              className={`border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
-                              isSearchable={true}
-                              noOptionsMessage={() => 'Không có dữ liệu'}
-                              menuPortalTarget={document.body}
-                              closeMenuOnSelect={true}
-                              styles={{
-                                placeholder: (base) => ({
-                                  ...base,
-                                  color: '#cbd5e1',
-                                }),
-                                menuPortal: (base) => ({
-                                  ...base,
-                                  zIndex: 20,
-                                }),
-                                control: (base) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding: '0px',
-                                  margin: '0px',
-                                  borderRadius: '8px',
-                                }),
-                              }}
-                            />
-                          </div>
-                          {/* Thành tiền */}
-                          <div className="flex items-center justify-between col-span-1 text-right">
-                            <h3
-                              className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] text-black-color`}
-                            >
-                              {formatMoney(e?.total_amount)}
-                            </h3>
-                            {/* Nút xoá */}
-                            <div className="flex items-center justify-center">
-                              <button
-                                onClick={_HandleDelete.bind(this, e?.id)}
-                                type="button"
-                                title="Xóa"
-                                className="transition w-6 h-6 bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                              >
-                                <MdClear />
-                              </button>
-                            </div>
-                          </div>
-                          {/* <div className="flex items-center justify-center col-span-1">
-                          <input
-                            value={e?.note}
-                            onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
-                            name="optionEmail"
-                            placeholder="Ghi chú"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] h-10 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none"
-                          />
-                        </div> */}
                         </div>
-                      ))}
-                    </div>
-                  </Customscrollbar>
+                        {/* Số lượng */}
+                        <div className="flex items-center justify-center col-span-1">
+                          <div className="flex items-center justify-center p-2 border border-border-gray-2 rounded-3xl">
+                            <button
+                              onClick={() => handleDecrease(e?.id)}
+                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                            >
+                              <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                            </button>
+                            <InPutNumericFormat
+                              value={e?.quantity}
+                              onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
+                              isAllowed={({ floatValue }) => {
+                                if (floatValue == 0) {
+                                  return true
+                                } else {
+                                  return true
+                                }
+                              }}
+                              allowNegative={false}
+                              className={`${
+                                (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
+                              } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal xl:w-[30px] w-[22px] focus:outline-none`}
+                            />
+                            <button
+                              onClick={() => handleIncrease(e.id)}
+                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                            >
+                              <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                            </button>
+                          </div>
+                        </div>
+                        {/* Đơn giá */}
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <InPutMoneyFormat
+                            value={e?.price}
+                            onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
+                            isAllowed={isAllowedNumber}
+                            allowNegative={false}
+                            className={`price-input-number ${
+                              (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
+                            } cursor-default appearance-none text-end 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 3xl:p-2 m-1 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                          />
+                        </div>
+                        {/* % Chiết khấu */}
+                        <div className="flex items-center justify-start col-span-1 text-center">
+                          <InPutNumericFormat
+                            value={e?.discount}
+                            onValueChange={(value) => {
+                              console.log(value)
+                              handleOnChangeInputOption(e?.id, 'discount', value)
+                            }}
+                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
+                            isAllowed={isAllowedDiscount}
+                            isNumericString={true}
+                          />
+                        </div>
+                        {/* Đơn giá sau chiết khấu */}
+                        <div className="flex items-center justify-start col-span-1 text-right">
+                          <h3
+                            className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] text-black-color`}
+                          >
+                            {formatNumber(e?.price_after_discount)}
+                          </h3>
+                        </div>
+                        {/* % Thuế */}
+                        <div className="w-full col-span-1 3xl:px-2 px-0">
+                          <SelectComponent
+                            options={taxOptions}
+                            onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
+                            value={
+                              e?.tax
+                                ? {
+                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                    value: e?.tax?.value,
+                                    tax_rate: e?.tax?.tax_rate,
+                                  }
+                                : null
+                            }
+                            placeholder={'Chọn % thuế'}
+                            hideSelectedOptions={false}
+                            formatOptionLabel={taxRateLabel}
+                            className={`border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                            menuPortalTarget={document.body}
+                            closeMenuOnSelect={true}
+                            styles={{
+                              placeholder: (base) => ({
+                                ...base,
+                                color: '#cbd5e1',
+                              }),
+                              menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 20,
+                              }),
+                              control: (base) => ({
+                                ...base,
+                                boxShadow: 'none',
+                                padding: '0px',
+                                margin: '0px',
+                                borderRadius: '8px',
+                              }),
+                            }}
+                          />
+                        </div>
+                        {/* Thành tiền và nút xoá */}
+                        <div className="flex items-center justify-between col-span-1 text-right">
+                          <h3
+                            className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] text-black-color`}
+                          >
+                            {formatMoney(e?.total_amount)}
+                          </h3>
+                          {/* Nút xoá */}
+                          <div className="flex items-center justify-center">
+                            <button
+                              onClick={() => {
+                                setIdProductSale(e?.item?.value)
+                                _HandleDelete.bind(this, e?.id)()
+                              }}
+                              type="button"
+                              title="Xóa"
+                              className="transition w-6 h-6 bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                            >
+                              <MdClear />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </React.Fragment>
               )}
             </div>
           </div>
-          {/* <div className="flex items-center col-span-3 gap-2">
-            <h2 className="3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px]">
-              {dataLang?.sales_product_tax || 'sales_product_tax'}
-            </h2>
-            <SelectComponent
-              classParent={'w-[80%]'}
-              options={taxOptions}
-              onChange={(value) => handleOnChangeInput('total_tax', value)}
-              value={totalTax ? '' : ''}
-              formatOptionLabel={(option) => (
-                <div className="flex items-center justify-start gap-1 ">
-                  <h2>{option?.label}</h2>
-                  <h2>{`(${option?.tax_rate})`}</h2>
-                </div>
-              )}
-              placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
-              hideSelectedOptions={false}
-              className={` 3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 xl:w-[70%] w-[60%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-              isSearchable={true}
-              noOptionsMessage={() => 'Không có dữ liệu'}
-              dangerouslySetInnerHTML={{
-                __html: option.label,
-              }}
-              menuPortalTarget={document.body}
-              closeMenuOnSelect={true}
-              styles={{
-                placeholder: (base) => ({
-                  ...base,
-                  color: '#cbd5e1',
-                }),
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 20,
-                }),
-                control: (base, state) => ({
-                  ...base,
-                  boxShadow: 'none',
-                  padding: '2.7px',
-                  ...(state.isFocused && {
-                    border: '0 0 0 1px #92BFF7',
-                  }),
-                }),
-              }}
-            />
-          </div> */}
           {/* Cột phải */}
           <div className="w-1/4">
             <div className="flex flex-col gap-y-6">
               {/* Cột thông tin chung */}
               <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="3xl:text-[20px] xxl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">Thông tin</h2>
+                <h2 className="3xl:text-[20px] xxl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">
+                  Thông tin
+                </h2>
+                {/* Tabs */}
                 <div className="w-full">
                   {/* Tab header */}
                   <div className="w-full flex items-center space-x-2 bg-blue-100 p-1 mb-6 rounded-xl relative">
@@ -1641,7 +1689,7 @@ const SalesOrderForm = (props) => {
                         )}
                         <button
                           onClick={() => handleTabClick(tab.key)}
-                          className={`relative w-full py-2 3xl:text-base xxl:text-sm xlg:text-[12px] font-normal rounded-lg z-10 transition-all duration-300
+                          className={`relative w-full py-2 3xl:text-base xl:text-sm font-normal rounded-lg z-10 transition-all duration-300
                             ${activeTab === tab.key ? 'text-white' : 'text-gray-800'}
                           `}
                         >
@@ -1656,7 +1704,7 @@ const SalesOrderForm = (props) => {
                       <div className="relative">
                         {/* Số đơn hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <h4 className="w-full text-secondary-color-text">
+                          <h4 className="w-full text-sm text-secondary-color-text">
                             {dataLang?.sales_product_code || 'sales_product_code'}
                           </h4>
                           <div className="w-full relative">
@@ -1669,13 +1717,13 @@ const SalesOrderForm = (props) => {
                               name="fname"
                               type="text"
                               placeholder={dataLang?.system_default || 'system_default'}
-                              className={`3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none`}
+                              className={`3xl:text-sm xl:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
                             />
                           </div>
                         </div>
                         {/* Ngày tạo đơn */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <h4 className="w-full text-secondary-color-text">
+                          <h4 className="w-full text-sm text-secondary-color-text">
                             {'Ngày tạo đơn' || dataLang?.sales_product_date}
                           </h4>
                           <div className="w-full">
@@ -1703,7 +1751,7 @@ const SalesOrderForm = (props) => {
                               /> */}
                               <ConfigProvider locale={viVN}>
                                 <DatePicker
-                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled"
+                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
                                   placeholder="Chọn ngày"
                                   format="DD/MM/YYYY HH:mm"
                                   showTime={{
@@ -1727,8 +1775,9 @@ const SalesOrderForm = (props) => {
                                     onClick={() => handleClearDate('startDate')}
                                   />
                                 </>
-                              )} */}
+                              )}
                               <BsCalendarEvent className="absolute left-0 3xl:translate-x-[3280%] 3xl:translate-y-[70%] translate-x-[2880%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
+                             */}
                             </div>
                           </div>
 
@@ -1740,7 +1789,7 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Ngày cần hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <h4 className="w-full text-secondary-color-text">
+                          <h4 className="w-full text-sm text-secondary-color-text">
                             {dataLang?.sales_product_item_date || 'sales_product_item_date'}
                           </h4>
                           <div className="w-full">
@@ -1750,7 +1799,7 @@ const SalesOrderForm = (props) => {
                               </span>
                               <ConfigProvider locale={viVN}>
                                 <DatePicker
-                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled"
+                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
                                   placeholder="Chọn ngày"
                                   format="DD/MM/YYYY"
                                   suffixIcon={null}
@@ -1779,18 +1828,22 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Khách hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <h4 className="w-full text-secondary-color-text">{'Khách hàng' || dataLang?.customer}</h4>
-                          <div className="w-full relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                              <LuBriefcase color="#7a7a7a" />
-                            </span>
-                            <SelectWithSort
-                              title="Khách hàng"
-                              placeholderText="Chọn khách hàng"
-                              options={!!flagStateChange ? [] : dataCustomer}
-                              value={selectedCustomer}
-                              onChange={(value) => setSelectedCustomer(value)}
-                            />
+                          <h4 className="w-full text-sm text-secondary-color-text">
+                            {'Khách hàng' || dataLang?.selectedCustomer}
+                          </h4>
+                          <div className="w-full">
+                            <div className="relative flex flex-row">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                                <LuBriefcase color="#7a7a7a" />
+                              </span>
+                              <SelectWithSort
+                                title="Khách hàng"
+                                placeholderText="Chọn khách hàng"
+                                options={!!flagStateChange ? [] : dataCustomer}
+                                value={selectedCustomer}
+                                onChange={(value) => setSelectedCustomer(value)}
+                              />
+                            </div>
                             {errCustomer && (
                               <label className="text-sm text-red-500">
                                 {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
@@ -1812,20 +1865,22 @@ const SalesOrderForm = (props) => {
                               <React.Fragment>
                                 {/* Chi nhánh */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-secondary-color-text">
+                                  <h4 className="w-full text-sm text-secondary-color-text">
                                     {'Chi nhánh' || dataLang?.branch}
                                   </h4>
-                                  <div className="w-full relative">
-                                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                      <PiMapPinLight color="#7a7a7a" />
+                                  <div className="w-full">
+                                    <div className="relative flex flex-row">
+                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                        <PiMapPinLight color="#7a7a7a" />
+                                      </div>
+                                      <SelectWithSort
+                                        title="Chi nhánh"
+                                        placeholderText="Chọn chi nhánh"
+                                        options={dataBranch}
+                                        value={selectedBranch}
+                                        onChange={(value) => setSelectedBranch(value)}
+                                      />
                                     </div>
-                                    <SelectWithSort
-                                      title="Chi nhánh"
-                                      placeholderText="Chọn chi nhánh"
-                                      options={dataBranch}
-                                      value={selectedBranch}
-                                      onChange={(value) => setSelectedBranch(value)}
-                                    />
                                     {errBranch && (
                                       <label className="text-sm text-red-500">
                                         {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
@@ -1835,7 +1890,7 @@ const SalesOrderForm = (props) => {
                                 </div>
                                 {/* Người liên lạc */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-secondary-color-text">
+                                  <h4 className="w-full text-sm text-secondary-color-text">
                                     {'Người liên lạc' || dataLang?.contact_person}
                                   </h4>
                                   <div className="w-full relative">
@@ -1853,20 +1908,22 @@ const SalesOrderForm = (props) => {
                                 </div>
                                 {/* Nhân viên */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-secondary-color-text">
+                                  <h4 className="w-full text-sm text-secondary-color-text">
                                     {'Nhân viên' || dataLang?.sales_product_staff_in_charge}
                                   </h4>
-                                  <div className="w-full relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                      <FiUser color="#7a7a7a" />
-                                    </span>
-                                    <SelectWithSort
-                                      title="Nhân viên"
-                                      placeholderText="Chọn nhân viên"
-                                      options={!!flagStateChange ? [] : dataStaffs}
-                                      value={selectedStaff}
-                                      onChange={(value) => setSelectedStaff(value)}
-                                    />
+                                  <div className="w-full">
+                                    <div className="relative flex flex-row">
+                                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                        <FiUser color="#7a7a7a" />
+                                      </span>
+                                      <SelectWithSort
+                                        title="Nhân viên"
+                                        placeholderText="Chọn nhân viên"
+                                        options={!!flagStateChange ? [] : dataStaffs}
+                                        value={selectedStaff}
+                                        onChange={(value) => setSelectedStaff(value)}
+                                      />
+                                    </div>
                                     {errStaff && (
                                       <label className="text-sm text-red-500">
                                         {dataLang?.sales_product_err_staff_in_charge ||
@@ -1963,11 +2020,11 @@ const SalesOrderForm = (props) => {
           </div>
         </div>
         {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-10 w-full 3xl:h-20 h-16 bg-white border-t border-gray-color p-4 flex justify-end space-x-2 shadow-lg">
+        <div className="fixed bottom-0 left-0 z-[999] w-full 3xl:h-20 h-16 bg-white border-t border-gray-color p-4 flex justify-end space-x-2 shadow-lg">
           <button
             onClick={() => router.push(routerSalesOrder.home)}
             dataLang={dataLang}
-            className="3xl:px-6 3xl:py-3 px-4 py-2 bg-[#F2F3F5] 3xxl:text-base text-[10px] font-normal rounded-lg"
+            className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 bg-[#F2F3F5] 2xl:text-base xl:text-sm font-normal rounded-lg"
           >
             Thoát
           </button>
@@ -1975,7 +2032,7 @@ const SalesOrderForm = (props) => {
             onClick={handleSubmitValidate.bind(this)}
             dataLang={dataLang}
             loading={onSending}
-            className="sale-order-btn-submit h-auto 3xl:px-6 3xl:py-3 px-4 py-2 bg-light-blue-color text-white 3xxl:text-base text-[10px] font-medium rounded-lg"
+            className="sale-order-btn-submit 2xl:p-5 xl:pt-[10px] xl:pb-[30px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
           >
             Lưu
           </Button>
