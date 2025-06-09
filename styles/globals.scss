@@ -39,10 +39,10 @@ body {
   font-size: 12px;
   font-weight: 500;
 }
-.tippy-popper[x-placement^="bottom"] [x-arrow] {
+.tippy-popper[x-placement^='bottom'] [x-arrow] {
   border-bottom: 7px solid #555f6d !important;
 }
-.tippy-popper[x-placement^="top"] [x-arrow] {
+.tippy-popper[x-placement^='top'] [x-arrow] {
   border-top: 7px solid #555f6d !important;
 }
 
@@ -175,7 +175,7 @@ body {
 .popup-overlay {
   background: rgba(0, 0, 0, 0.5);
 }
-[data-popup="tooltip"].popup-overlay {
+[data-popup='tooltip'].popup-overlay {
   background: transparent;
 }
 
@@ -318,7 +318,7 @@ body {
 }
 
 @property --angle {
-  syntax: "<angle>";
+  syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
@@ -338,35 +338,25 @@ body {
   border: none; /* Đảm bảo không có border mặc định */
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: radial-gradient(
-      50% 93.75% at 50% 6.25%,
-      #a3eed6 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
+    background: radial-gradient(50% 93.75% at 50% 6.25%, #a3eed6 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 1;
 
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor; /* hoặc destination-out */
     transition: background 0.5s ease-in-out;
   }
 
   &:hover::before {
-    background: conic-gradient(
-      from var(--angle),
-      #a3eed6,
-      rgba(255, 255, 255, 0),
-      #a3eed6
-    );
+    background: conic-gradient(from var(--angle), #a3eed6, rgba(255, 255, 255, 0), #a3eed6);
     padding: 2px;
     animation: borderMove 1.5s linear infinite;
   }
@@ -419,7 +409,7 @@ body {
 //   }
 
 .i::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 0px;
   height: 0px;
@@ -519,8 +509,7 @@ body {
 .CircularProgressbar .CircularProgressbar-background {
   fill: #d6d6d6;
 }
-.CircularProgressbar.CircularProgressbar-inverted
-  .CircularProgressbar-background {
+.CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-background {
   fill: #3e98c7;
 }
 .CircularProgressbar.CircularProgressbar-inverted .CircularProgressbar-text {
@@ -707,8 +696,8 @@ body {
 }
 
 .page-item.active a {
-  color: #11315B;
-  background-color: #E2F0FE;
+  color: #11315b;
+  background-color: #e2f0fe;
   padding: 8px 14px;
   font-size: 14px;
   border-radius: 8px;
@@ -741,7 +730,7 @@ body {
   .react-datepicker__close-icon::after {
     background-color: transparent !important;
     color: transparent !important;
-    content: url("/icon/new/X.svg") !important;
+    content: url('/icon/new/X.svg') !important;
 
     // vertical-align: middle;
     @apply size-4 absolute top-1/2 -translate-y-1/2 right-2 cursor-pointer;
@@ -942,7 +931,7 @@ body {
 
 // Search bar trong component form sales-export-product
 .input-searchbar {
-  font-family: "Lexend Deca", "sans-serif";
+  font-family: 'Lexend Deca', 'sans-serif';
   font-size: 14px;
   outline-offset: 0px;
   outline: none;
@@ -950,20 +939,21 @@ body {
 }
 
 .input-searchbar:hover {
-  border: 1px solid #003DA0;
+  border: 1px solid #003da0;
 }
 
 .sale-order-btn-submit {
-  background: #0375F3 !important;
+  background: #0375f3 !important;
 }
 
 .sale-order-btn-submit:hover {
   color: #ffff !important;
   border-color: #4096ff !important;
-  background: #003DA0 !important;
+  background: #003da0 !important;
 }
 
-.select-with-sort, .sales-product-date {
+.select-with-sort,
+.sales-product-date {
   width: 100%;
   height: 42px;
   border-radius: 8px;
@@ -973,25 +963,29 @@ body {
   border-radius: 8px;
 }
 
+.select-with-sort .ant-select-selector .ant-select-selection-wrap .ant-select-selection-search input {
+  cursor: pointer;
+}
+
 .select-with-sort .ant-select-selector:hover {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
   border-radius: 8px;
 }
 
 .select-with-sort .ant-select-selector:focus {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
 .select-with-sort .ant-select-selector:focus-visible {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
-.select-with-sort .ant-select-selection-wrap{
+.select-with-sort .ant-select-selection-wrap {
   margin-left: 20px;
 }
 
 .select-with-sort .ant-select-selection-placeholder {
-  color: #919EAB;
+  color: #919eab;
   font-weight: 400;
   font-family: 'Lexend Deca';
 }
@@ -1001,7 +995,7 @@ body {
 }
 
 .select-with-sort.ant-select-focused .ant-select-selector {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
 .select-with-sort .option-content:last-child {
@@ -1009,15 +1003,16 @@ body {
 }
 
 .ant-picker-outlined:hover {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
-.ant-picker-outlined:focus, .ant-picker-outlined:focus-within {
-  border-color: #003DA0 !important;
+.ant-picker-outlined:focus,
+.ant-picker-outlined:focus-within {
+  border-color: #003da0 !important;
 }
 
 .ant-picker .ant-picker-input input::placeholder {
-  color: #919EAB;
+  color: #919eab;
   font-weight: 400;
   font-size: 14px;
   line-height: 28px;
@@ -1025,7 +1020,7 @@ body {
 }
 
 .select-by-search {
-  font-family: "Lexend Deca", "sans-serif";
+  font-family: 'Lexend Deca', 'sans-serif';
   font-size: 14px;
   outline-offset: 0px;
   outline: none;
@@ -1036,12 +1031,13 @@ body {
 }
 
 .select-by-search .ant-select-selector:hover {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
-.select-by-search .ant-select-selector:focus, .select-by-search .ant-select-selector:focus-within {
+.select-by-search .ant-select-selector:focus,
+.select-by-search .ant-select-selector:focus-within {
   border: 2px solid;
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
 .select-by-search .ant-select-clear {
@@ -1067,13 +1063,51 @@ body {
 }
 
 .ant-input-number-outlined:hover {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
 .ant-input-number-outlined:focus {
-  border-color: #003DA0 !important;
+  border-color: #003da0 !important;
 }
 
 .react-select-2-placeholder {
   font-size: 10px;
+}
+
+/* scroll-bar-products-sale */
+.scroll-bar-products-sale {
+  scrollbar-width: thin; /* Dành cho Firefox */
+  scrollbar-color: #e1e7ef transparent; /* Thumb và track */
+}
+
+/* Scrollbar cho Chrome/Edge/Safari */
+.scroll-bar-products-sale::-webkit-scrollbar {
+  width: 10px; /* Chiều rộng thanh cuộn */
+  height: 10px; /* Chiều cao (nếu cuộn ngang) */
+}
+
+/* Thumb (thanh kéo) */
+.scroll-bar-products-sale::-webkit-scrollbar-thumb {
+  background-color: #94a3b8; /* Màu chính */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Tạo viền trong suốt */
+  background-clip: content-box; /* Giới hạn màu trong phần content */
+  transition: background-color 0.3s; /* Hiệu ứng mượt khi hover */
+}
+
+/* Thumb khi hover */
+.scroll-bar-products-sale::-webkit-scrollbar-thumb:hover {
+  background-color: #64748b; /* Màu đậm hơn khi di chuột qua */
+  border: 2px solid #f1f5f9; /* Thêm viền trắng để nổi bật */
+}
+
+/* Track (nền thanh cuộn) */
+.scroll-bar-products-sale::-webkit-scrollbar-track {
+  background: transparent; /* Trong suốt */
+  margin: 4px 0; /* Tạo khoảng trống xung quanh */
+}
+
+/* Corner (góc giữa scrollbar dọc và ngang) */
+.scroll-bar-products-sale::-webkit-scrollbar-corner {
+  background: transparent; /* Ẩn góc */
 }
