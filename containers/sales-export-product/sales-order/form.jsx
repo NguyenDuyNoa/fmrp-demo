@@ -1,13 +1,9 @@
 import apiSalesOrder from '@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder'
-//import ButtonBack from '@/components/UI/button/buttonBack'
-//import ButtonSubmit from '@/components/UI/button/buttonSubmit'
 import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
 import { Container } from '@/components/UI/common/layout'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
-//import Loading from '@/components/UI/loading/loading'
-import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
 import { optionsQuery } from '@/configs/optionsQuery'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
@@ -24,26 +20,23 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Add, Trash as IconDelete, Minus, ArrowDown2, ArrowUp2 } from 'iconsax-react'
-import { debounce } from 'lodash'
+import { Add, Minus, ArrowDown2, ArrowUp2 } from 'iconsax-react'
 import moment from 'moment'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-//import DatePicker from 'react-datepicker'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 import { FiUser } from 'react-icons/fi'
 import { MdClear } from 'react-icons/md'
-import { FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt } from 'react-icons/fa'
 import { components } from 'react-select'
 import { v4 as uuidv4 } from 'uuid'
 import { useSalesOrderQuotaByBranch } from './hooks/useSalesOrderQuotaByBranch'
 import { useClientComboboxByBranch } from '@/hooks/common/useClients'
 import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
 import { useTaxList } from '@/hooks/common/useTaxs'
-//import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 
 // Optimize UI
@@ -60,16 +53,10 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 dayjs.locale('vi')
 
-// const disabledDate = (current) => {
-//   return current && current < dayjs().endOf('day')
-// }
-
 const SalesOrderForm = (props) => {
   // State
   const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [activeTab, setActiveTab] = useState('info')
-  //const [isOpenDiscount, setIsOpenDiscount] = useState(false)
-  //const [isOpenTax, setIsOpenTax] = useState(false)
   const [idProductSale, setIdProductSale] = useState(null)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedBranch, setSelectedBranch] = useState(null)
@@ -112,9 +99,9 @@ const SalesOrderForm = (props) => {
     } else {
       setFlagStateChange(false)
     }
-    //setSelectedCustomer(null)
-    //setSelectedStaff(null)
-    //setSelectedPersonalContact(null)
+    setSelectedCustomer(null)
+    setSelectedStaff(null)
+    setSelectedPersonalContact(null)
   }, [selectedBranch])
 
   // Reset state của ô "người liên lạc" khi ô "khách hàng" thay đổi, để đổ dữ liệu mới (khi có)
@@ -201,8 +188,6 @@ const SalesOrderForm = (props) => {
 
   const [errBranch, setErrBranch] = useState(false)
 
-  const [hidden, setHidden] = useState(false)
-
   const [typeOrder, setTypeOrder] = useState('0')
 
   const [itemsAll, setItemsAll] = useState([])
@@ -219,8 +204,6 @@ const SalesOrderForm = (props) => {
     'filter[branch_id]': selectedBranch !== null ? +selectedBranch : null,
     'filter[client_id]': selectedCustomer !== null ? +selectedCustomer : null,
   }
-
-  const { data: dataQuotes, refetch: refetchQuote } = useSalesOrderQuotaByBranch(params)
 
   useEffect(() => {
     router.query && setErrDate(false)
@@ -442,39 +425,6 @@ const SalesOrderForm = (props) => {
     setErrStaff(false)
   }, [selectedStaff != null])
 
-  // search api
-  const _HandleSeachApi = debounce(async (inputValue) => {
-    if (selectedBranch == null) return
-
-    let form = new FormData()
-
-    if (selectedBranch != null) {
-      ;[+selectedBranch].forEach((e, index) => form.append(`branch_id[${index}]`, e))
-    }
-
-    form.append('term', inputValue)
-
-    if (typeOrder === '1' && quote && +quote.value) {
-      const {
-        data: { result },
-      } = await apiSalesOrder.apiQuotaItems({
-        data: {
-          term: inputValue,
-        },
-        params: {
-          'filter[quote_id]': quote ? +quote?.value : null,
-        },
-      })
-      setDataItems(result)
-    }
-    if (typeOrder === '0') {
-      const {
-        data: { result },
-      } = await apiSalesOrder.apiItems(form)
-      setDataItems(result)
-    }
-  }, 500)
-
   // format number
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
@@ -652,74 +602,6 @@ const SalesOrderForm = (props) => {
     }
   }
 
-  // const handleAddParent = (value) => {
-  //   const checkData = option?.some((e) => e?.item?.value === value?.value)
-  //   if (!checkData) {
-  //     let money = 0
-  //     if (value.e?.tax?.tax_rate == undefined) {
-  //       money = Number(1) * (1 + Number(0) / 100) * Number(value?.e?.quantity)
-  //     } else {
-  //       money =
-  //         Number(value?.e?.affterDiscount) * (1 + Number(value?.e?.tax?.tax_rate) / 100) * Number(value?.e?.quantity)
-  //     }
-  //     if (typeOrder === '0') {
-  //       const newData = {
-  //         id: uuidv4(),
-  //         item: value,
-  //         unit: value?.e?.unit_name,
-  //         quantity: 1,
-  //         price: value?.e?.price_sell,
-  //         discount: totalDiscount ? totalDiscount : 0,
-  //         price_after_discount: 1,
-  //         tax: null,
-  //         price_after_tax: 1,
-  //         total_amount: Number(money.toFixed(2)),
-  //         note: '',
-  //         delivery_date: null,
-  //       }
-  //       setOption([newData, ...option])
-  //     }
-  //     if (typeOrder === '1' && quote !== null) {
-  //       const newData = {
-  //         id: uuidv4(),
-  //         item: {
-  //           e: value?.e,
-  //           label: value?.label,
-  //           value: value?.value,
-  //         },
-  //         unit: value?.e?.unit_name,
-  //         quantity: value?.e?.quantity,
-  //         price: value?.e?.price_sell,
-  //         discount: value?.e?.discount_percent,
-  //         price_after_discount: +value?.e?.price_sell * (1 - +value?.e?.discount_percent / 100),
-  //         tax: {
-  //           label: value?.e?.tax_name,
-  //           value: value?.e?.tax_id,
-  //           tax_rate: value?.e?.tax_rate,
-  //         },
-  //         price_after_tax:
-  //           +value?.e?.price_sell *
-  //           value?.e?.quantity *
-  //           (1 - +value?.e?.discount_percent / 100) *
-  //           (1 + value?.e?.tax_rate / 100),
-  //         total_amount:
-  //           +value?.e?.price_sell *
-  //           (1 - +value?.e?.discount_percent / 100) *
-  //           (1 + +value?.e?.tax_rate / 100) *
-  //           +value?.e?.quantity,
-  //         note: value?.e?.note_item,
-  //         delivery_date: null,
-  //       }
-  //       setOption([newData, ...option])
-  //     } else if (typeOrder === '1' && quote === null) {
-  //       isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
-  //     }
-  //   } else {
-  //     isShow('error', `Mặt hàng đã được chọn`)
-  //   }
-  // }
-
-  // change items
   const handleOnChangeInputOption = (id, type, value) => {
     var index = option.findIndex((x) => x.id === id)
 
@@ -840,42 +722,6 @@ const SalesOrderForm = (props) => {
     const newOption = option.filter((x) => x.id !== id) // loại bỏ phần tử cần xóa
     setOption(newOption) // cập nhật lại mảng
   }
-
-  // const _HandleChangeValue = (parentId, value) => {
-  //   const checkData = option?.some((e) => e?.item?.value === value?.value)
-
-  //   if (!checkData) {
-  //     const newData = option?.map((e, index) => {
-  //       if (e?.id === parentId) {
-  //         return {
-  //           ...e,
-  //           id: uuidv4(),
-  //           item: {
-  //             e: value?.e,
-  //             label: value?.label,
-  //             value: value?.value,
-  //           },
-  //           unit: value.unit_name,
-  //           quantity: 1,
-  //           sortIndex: index,
-  //           price: 1,
-  //           discount: 0,
-  //           price_after_discount: 1,
-  //           tax: 0,
-  //           price_after_tax: 1,
-  //           total_amount: 1,
-  //           note: '',
-  //           delivery_date: null,
-  //         }
-  //       } else {
-  //         return e
-  //       }
-  //     })
-  //     setOption([...newData])
-  //   } else {
-  //     isShow('error', `${'Mặt hàng đã được chọn'}`)
-  //   }
-  // }
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
 
@@ -1059,255 +905,7 @@ const SalesOrderForm = (props) => {
     onSending && handleSubmit()
   }, [onSending])
 
-  // const handleClearDate = (type, id) => {
-  //   if (type === 'deliveryDate') {
-  //     setDeliveryDate(null)
-  //   }
-  //   if (type === 'startDate') {
-  //     setStartDate(dayjs())
-  //   }
-  // }
-
-  // codeProduct new
-  //const hiddenOptions = quote?.length > 3 ? quote?.slice(0, 3) : []
-  //const fakeDataQuotes = branch != null ? dataQuotes?.filter((x) => !hiddenOptions.includes(x.value)) : []
-
-  // const optionsItem = dataItems?.map(e => ({ label: `${e.name} <span style={{display: none}}>${e.codeProduct}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`, value: e.id, e }))
-
   const allItems = [...options]
-
-  // const _HandleSelectAll = () => {
-  //   if (typeOrder === '0') {
-  //     const data = allItems?.map((e, index) => ({
-  //       id: uuidv4(),
-  //       item: {
-  //         e: e?.e,
-  //         label: e?.label,
-  //         value: e?.value,
-  //       },
-  //       unit: e?.e?.unit_name,
-  //       quantity: 1,
-  //       sortIndex: index,
-  //       price: 1,
-  //       discount: 0,
-  //       price_after_discount: 1,
-  //       tax: 0,
-  //       price_after_tax: 1,
-  //       total_amount: 1,
-  //       note: '',
-  //       delivery_date: null,
-  //     }))
-
-  //     setOption(data)
-  //     //new
-  //     setItemsAll(
-  //       allItems?.map((e, index) => ({
-  //         id: uuidv4(),
-  //         item: {
-  //           e: e?.e,
-  //           label: e?.label,
-  //           value: e?.value,
-  //         },
-  //         unit: e?.e?.unit_name,
-  //         quantity: 1,
-  //         sortIndex: index,
-  //         price: 1,
-  //         discount: 0,
-  //         price_after_discount: 1,
-  //         tax: 0,
-  //         price_after_tax: 1,
-  //         total_amount: 1,
-  //         note: '',
-  //         delivery_date: null,
-  //       }))
-  //     )
-  //     setOption(
-  //       allItems?.map((e, index) => ({
-  //         id: uuidv4(),
-  //         item: {
-  //           e: e?.e,
-  //           label: e?.label,
-  //           value: e?.value,
-  //         },
-  //         unit: e?.e?.unit_name,
-  //         quantity: 1,
-  //         sortIndex: index,
-  //         price: 1,
-  //         discount: 0,
-  //         price_after_discount: 1,
-  //         tax: 0,
-  //         price_after_tax: 1,
-  //         total_amount: 1,
-  //         note: '',
-  //         delivery_date: null,
-  //       }))
-  //     )
-  //   }
-  //   if (typeOrder === '1' && quote !== null) {
-  //     const data = allItems?.map((e, index) => ({
-  //       id: uuidv4(),
-  //       item: {
-  //         e: e?.e,
-  //         label: e?.label,
-  //         value: e?.value,
-  //       },
-  //       unit: e?.e?.unit_name,
-  //       quantity: 1,
-  //       sortIndex: index,
-  //       price: 1,
-  //       discount: 0,
-  //       price_after_discount: 1,
-  //       tax: 0,
-  //       price_after_tax: 1,
-  //       total_amount: 1,
-  //       note: '',
-  //       delivery_date: null,
-  //     }))
-  //     setOption(data)
-  //     //new
-  //     setItemsAll(
-  //       allItems?.map((e, index) => ({
-  //         id: uuidv4(),
-  //         item: {
-  //           e: e?.e,
-  //           label: e?.label,
-  //           value: e?.value,
-  //         },
-  //         unit: e?.e?.unit_name,
-  //         quantity: e?.e?.quantity,
-  //         price: e?.e?.price,
-  //         discount: e?.e?.discount_percent,
-  //         price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-  //         tax: {
-  //           label: e?.e?.tax_name,
-  //           value: e?.e?.tax_id,
-  //           tax_rate: e?.e?.tax_rate,
-  //         },
-  //         price_after_tax:
-  //           +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-  //         total_amount:
-  //           +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
-  //         note: e?.e?.note_item,
-  //         delivery_date: null,
-  //       }))
-  //     )
-  //     setOption(
-  //       allItems?.map((e, index) => ({
-  //         id: uuidv4(),
-  //         item: {
-  //           e: e?.e,
-  //           label: e?.label,
-  //           value: e?.value,
-  //         },
-  //         unit: e?.e?.unit_name,
-  //         quantity: e?.e?.quantity,
-  //         price: e?.e?.price,
-  //         discount: e?.e?.discount_percent,
-  //         price_after_discount: +e?.e?.price * (1 - +e?.e?.discount_percent / 100),
-  //         tax: {
-  //           label: e?.e?.tax_name,
-  //           value: e?.e?.tax_id,
-  //           tax_rate: e?.e?.tax_rate,
-  //         },
-  //         price_after_tax:
-  //           +e?.e?.price * e?.e?.quantity * (1 - +e?.e?.discount_percent / 100) * (1 + e?.e?.tax_rate / 100),
-  //         total_amount:
-  //           +e?.e?.price * (1 - +e?.e?.discount_percent / 100) * (1 + +e?.e?.tax_rate / 100) * +e?.e?.quantity,
-  //         note: e?.e?.note_item,
-  //         delivery_date: null,
-  //       }))
-  //     )
-  //   } else if (typeOrder === '1' && quote === null) {
-  //     isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
-  //   }
-  // }
-
-  // const _HandleDeleteAll = () => {
-  //   setItemsAll([])
-  //   setOption([])
-  //   //new
-  // }
-
-  // const MenuList = (props) => {
-  //   return (
-  //     <components.MenuList {...props}>
-  //       {allItems?.length > 0 && (
-  //         <div className="grid items-center grid-cols-2 cursor-pointer">
-  //           <div
-  //             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
-  //             onClick={_HandleSelectAll.bind(this)}
-  //           >
-  //             Chọn tất cả
-  //           </div>
-  //           <div
-  //             className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
-  //             onClick={_HandleDeleteAll.bind(this)}
-  //           >
-  //             Bỏ chọn tất cả
-  //           </div>
-  //         </div>
-  //       )}
-  //       {props.children}
-  //     </components.MenuList>
-  //   )
-  // }
-
-  // render option item in formatGroupLabel Item
-
-  // const selectItemsLabel = (option) => {
-  //   return (
-  //     <div className="flex items-center justify-between">
-  //       <div className="flex items-center ">
-  //         <div>
-  //           {option.e?.images !== null ? (
-  //             <img
-  //               src={option.e?.images}
-  //               alt="Product Image"
-  //               className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] text-[8px] object-cover rounded mr-1"
-  //             />
-  //           ) : (
-  //             <div className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover flex items-center justify-center rounded xl:mr-1 mx-0.5">
-  //               <img
-  //                 src="/icon/noimagelogo.png"
-  //                 alt="Product Image"
-  //                 className="3xl:max-w-[30px] 3xl:h-[30px] 2xl:max-w-[30px] 2xl:h-[20px] xl:max-w-[30px] xl:h-[20px] max-w-[20px] h-[20px] object-cover rounded mr-1"
-  //               />
-  //             </div>
-  //           )}
-  //         </div>
-  //         <div>
-  //           <h3 className="font-bold 3xl:text-[14px] 2xl:text-[11px] xl:text-[10px] text-[10px] whitespace-pre-wrap">
-  //             {option.e?.name}
-  //           </h3>
-
-  //           <div className="flex gap-1 3xl:gap-2 2xl:gap-1 xl:gap-1">
-  //             <h5 className="3xl:text-[14px] 2xl:text-[11px] xl:text-[8px] text-[7px]">
-  //               {option.e?.product_variation}
-  //             </h5>
-  //           </div>
-
-  //           <div className="flex gap-1 3xl:gap-4 2xl:gap-3 xl:gap-3">
-  //             <h5 className="text-gray-400 3xl:min-w-[90px] 2xl:min-w-[85px] xl:min-w-[55px] min-w-[45px] 3xl:text-[14px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-  //               {dataLang[option.e?.text_type]}
-  //             </h5>
-
-  //             <div className="flex items-center">
-  //               <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-  //                 {dataLang?.purchase_survive || 'purchase_survive'} :
-  //               </h5>
-
-  //               <h5 className=" font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[6.5px]">
-  //                 {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
-  //               </h5>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // render option formatGroupLabel tax
 
   const taxRateLabel = (option) => {
     return (
@@ -1671,7 +1269,7 @@ const SalesOrderForm = (props) => {
             <div className="flex flex-col gap-y-6">
               {/* Cột thông tin chung */}
               <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="3xl:text-[20px] xxl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">
+                <h2 className="2xl:text-[20px] xl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">
                   Thông tin
                 </h2>
                 {/* Tabs */}
@@ -1731,24 +1329,6 @@ const SalesOrderForm = (props) => {
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                                 <BsCalendarEvent color="#7a7a7a" />
                               </span>
-                              {/* <DatePicker
-                                blur
-                                fixedHeight
-                                showTimeSelect
-                                selected={startDate}
-                                onSelect={(date) => {
-                                  setStartDate(date)
-                                }}
-                                onChange={(e) => {
-                                  setStartDate(e)
-                                }}
-                                placeholderText="Chọn ngày"
-                                dateFormat="dd/MM/yyyy h:mm:ss aa"
-                                timeInputLabel={'Time: '}
-                                className={`border ${
-                                  errDate ? 'border-red-500' : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                                } pl-8 3xl:text-sm 2xl:text-[13px] xl:text-[12px] text-[11px] w-full bg-[#ffffff] rounded-lg placeholder:text-secondary-color-text-disabled font-normal px-4 py-2 outline-none cursor-pointer relative`}
-                              /> */}
                               <ConfigProvider locale={viVN}>
                                 <DatePicker
                                   className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
@@ -1768,16 +1348,6 @@ const SalesOrderForm = (props) => {
                                   }}
                                 />
                               </ConfigProvider>
-                              {/* {startDate && (
-                                <>
-                                  <MdClear
-                                    className="absolute 3xl:translate-x-[2700%] 3xl:-translate-y-[2%] translate-x-[2400%] translate-y-[4%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                    onClick={() => handleClearDate('startDate')}
-                                  />
-                                </>
-                              )}
-                              <BsCalendarEvent className="absolute left-0 3xl:translate-x-[3280%] 3xl:translate-y-[70%] translate-x-[2880%] translate-y-[80%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                             */}
                             </div>
                           </div>
 
@@ -1814,15 +1384,6 @@ const SalesOrderForm = (props) => {
                                   }}
                                 />
                               </ConfigProvider>
-                              {/* <DatePicker
-                                selected={deliveryDate}
-                                onChange={(date) => handleOnChangeInput('total_delivery_date', date)}
-                                blur
-                                placeholderText="Chọn ngày"
-                                dateFormat="dd/MM/yyyy"
-                                onSelect={(date) => setDeliveryDate(date)}
-                                className={`pl-8 3xl:h-11 h-10 3xl:w-full w-full 2xl:text-[14px] xl:text-[14px] text-[11px] placeholder:text-secondary-color-text-disabled bg-[#ffffff] font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
-                              /> */}
                             </div>
                           </div>
                         </div>
@@ -2032,7 +1593,7 @@ const SalesOrderForm = (props) => {
             onClick={handleSubmitValidate.bind(this)}
             dataLang={dataLang}
             loading={onSending}
-            className="sale-order-btn-submit 2xl:p-5 xl:pt-[10px] xl:pb-[30px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
+            className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
           >
             Lưu
           </Button>
