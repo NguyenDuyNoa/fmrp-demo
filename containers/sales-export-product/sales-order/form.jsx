@@ -982,7 +982,7 @@ const SalesOrderForm = (props) => {
             <div className="min-h-full max-h-[1132px] flex flex-col bg-white border border-[#919EAB3D] rounded-2xl p-4">
               <div className="flex justify-between items-center">
                 {/* Heading */}
-                <h2 className="w-full 3xl:text-[20px] font-medium 2xl:text-[16px] xl:text-[15px] text-[14px] text-brand-color capitalize">
+                <h2 className="w-full 2xl:text-[20px] xl:text-lg font-medium text-brand-color capitalize">
                   {dataLang?.item_information || 'item_information'}
                 </h2>
                 {/* Search Bar */}
@@ -1121,16 +1121,16 @@ const SalesOrderForm = (props) => {
                               />
                             </div>
                             <div className="flex-1">
-                              <h2 className="3xl:text-sm text-[10px] font-semibold text-brand-color mb-1 line-clamp-1">
+                              <h2 className="responsive-text-sm font-semibold text-brand-color mb-1 line-clamp-1">
                                 {e?.item?.e?.name}
                               </h2>
-                              <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal mb-1">
+                              <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal mb-1">
                                 Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
                                 <span>
                                   {e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}
                                 </span>
                               </p>
-                              <p className="text-typo-gray-2 3xl:text-[10px] text-[8px] font-normal">
+                              <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
                                 ĐVT: <span>{e?.unit}</span> - Tồn:
                                 <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
                               </p>
@@ -1150,7 +1150,7 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Số lượng */}
                         <div className="flex items-center justify-center col-span-1">
-                          <div className="flex items-center justify-center p-2 border border-border-gray-2 rounded-3xl">
+                          <div className="flex items-center justify-center 3xl:p-2 p-1 border border-border-gray-2 rounded-3xl">
                             <button
                               onClick={() => handleDecrease(e?.id)}
                               className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
@@ -1170,7 +1170,7 @@ const SalesOrderForm = (props) => {
                               allowNegative={false}
                               className={`${
                                 (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                              } cursor-default appearance-none text-center 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal xl:w-[30px] w-[22px] focus:outline-none`}
+                              } cursor-default appearance-none text-center responsive-text-sm font-normal xl:w-[30px] w-[22px] focus:outline-none`}
                             />
                             <button
                               onClick={() => handleIncrease(e.id)}
@@ -1189,7 +1189,7 @@ const SalesOrderForm = (props) => {
                             allowNegative={false}
                             className={`price-input-number ${
                               (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                            } cursor-default appearance-none text-end 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 3xl:p-2 m-1 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                            } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 m-1 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
                           />
                         </div>
                         {/* % Chiết khấu */}
@@ -1200,16 +1200,14 @@ const SalesOrderForm = (props) => {
                               console.log(value)
                               handleOnChangeInputOption(e?.id, 'discount', value)
                             }}
-                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200`}
+                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
                             isAllowed={isAllowedDiscount}
                             isNumericString={true}
                           />
                         </div>
                         {/* Đơn giá sau chiết khấu */}
                         <div className="flex items-center justify-start col-span-1 text-right">
-                          <h3
-                            className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] text-black-color`}
-                          >
+                          <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm text-black-color`}>
                             {formatNumber(e?.price_after_discount)}
                           </h3>
                         </div>
@@ -1230,7 +1228,7 @@ const SalesOrderForm = (props) => {
                             placeholder={'Chọn % thuế'}
                             hideSelectedOptions={false}
                             formatOptionLabel={taxRateLabel}
-                            className={`border-transparent placeholder:text-slate-300 h-10 w-full 3xl:text-[13px] 2xl:text-[12px] xl:text-[11px] text-[10px] bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
+                            className={`border-transparent w-full bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
                             isSearchable={true}
                             noOptionsMessage={() => 'Không có dữ liệu'}
                             menuPortalTarget={document.body}
@@ -1257,7 +1255,7 @@ const SalesOrderForm = (props) => {
                         {/* Thành tiền và nút xoá */}
                         <div className="flex items-center justify-between col-span-1 text-right">
                           <h3
-                            className={`cursor-text px-2 3xl:text-sm 3xl:font-semibold 2xl:text-[13px] xl:text-[12px] text-[11px] z-[99] text-black-color`}
+                            className={`cursor-text px-2 3xl:font-semibold responsive-text-sm z-[99] text-black-color`}
                           >
                             {formatMoney(e?.total_amount)}
                           </h3>
@@ -1270,7 +1268,7 @@ const SalesOrderForm = (props) => {
                               }}
                               type="button"
                               title="Xóa"
-                              className="transition w-6 h-6 bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                              className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
                             >
                               <MdClear />
                             </button>
@@ -1288,7 +1286,7 @@ const SalesOrderForm = (props) => {
             <div className="flex flex-col gap-y-6">
               {/* Cột thông tin chung */}
               <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="2xl:text-[20px] xl:text-base font-medium text-brand-color mt-6 mb-4 capitalize">
+                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mt-6 mb-4 capitalize">
                   Thông tin
                 </h2>
                 {/* Tabs */}
@@ -1584,7 +1582,7 @@ const SalesOrderForm = (props) => {
               </div>
               {/* Cột tổng cộng */}
               <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="3xl:text-2xl xxl:text-lg font-medium text-brand-color mb-6 capitalize">
+                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mb-6 capitalize">
                   {'Tổng cộng' || dataLang?.price_quote_total}
                 </h2>
                 {/* Tổng tiền */}
