@@ -1,12 +1,26 @@
-import React, { useState, useEffect } from 'react'
-import { Select, Empty } from 'antd'
+import useToast from '@/hooks/useToast'
+import { Empty, Select } from 'antd'
+import { useEffect, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
 
 const { Option } = Select
 
-const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOptions = [], idProductSale, onChange }) => {
+const SelectBySearch = ({
+  placeholderText,
+  allItems,
+  formatNumber,
+  selectedOptions = [],
+  idProductSale,
+  onChange,
+  handleIncrease,
+  options,
+}) => {
   // Khởi tạo selectedItems bằng selectedOptions từ props
   const [_, setSelectedItems] = useState(selectedOptions)
+
+  const [open, setOpen] = useState(false)
+
+  const isShow = useToast()
 
   // Theo dõi thay đổi từ component cha và cập nhật state
   useEffect(() => {
@@ -33,11 +47,16 @@ const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOption
     setSelectedItems((prevItems) => {
       // Nếu đã tồn tại thì giữ nguyên
       if (prevItems.find((o) => o.value === newOption.value)) {
+        isShow('success', 'Cập nhật số lượng thành công')
+        const updatedItem = options.find((o) => o.item.value === newOption.value)
+        if (updatedItem) {
+          handleIncrease(updatedItem.id) // Gọi hàm tăng số lượng nếu có
+        }
         return prevItems
       }
 
       // Nếu chưa tồn tại thì thêm vào
-      const updatedItems = [...prevItems, newOption]
+      const updatedItems = [newOption, ...prevItems]
       onChange?.(updatedItems) // Gọi callback với mảng mới
       return updatedItems
     })
@@ -46,6 +65,9 @@ const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOption
   return (
     <div className="relative w-full">
       <Select
+        open={open}
+        onClick={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
         className="select-by-search w-full h-14 truncate placeholder:text-secondary-color-text-disabled px-0 py-2"
         showSearch
         placeholder={placeholderText}
@@ -56,8 +78,9 @@ const SelectBySearch = ({ placeholderText, options, formatNumber, selectedOption
         notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
         optionLabelProp="label"
         suffixIcon={null}
+        listHeight={420}
       >
-        {options.map((opt) => {
+        {allItems.map((opt) => {
           const e = opt.e
           return (
             <Option key={opt.value} value={opt.value} label={e.name} option={opt}>

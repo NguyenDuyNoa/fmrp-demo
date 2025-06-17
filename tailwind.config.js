@@ -202,7 +202,7 @@ module.exports = {
         },
       });
     },
-    function({ addComponents }) {
+    function ({ addComponents }) {
       addComponents({
         '.responsive-text-xs': {
           fontSize: '9px',
@@ -251,7 +251,23 @@ module.exports = {
             fontSize: '1rem', /* text-base */
             lineHeight: '1.5rem'
           }
-        }
+        },
+        '.responsive-text-lg': {
+          fontSize: '15px',
+          lineHeight: '22px',
+          '@screen xl': {
+            fontSize: '1rem', /* text-base */
+            lineHeight: '1.5rem'
+          },
+          '@screen 2xl': {
+            fontSize: '17px', /* text-lg */
+            lineHeight: '24px'
+          },
+          '@screen 3xl': {
+            fontSize: '18px', /* text-xl */
+            lineHeight: '28px'
+          }
+        },
       })
     }
   ],

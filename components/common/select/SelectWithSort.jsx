@@ -1,12 +1,11 @@
-import React from 'react'
-import { Select, Radio, Empty } from 'antd'
+import { Empty, Radio, Select } from 'antd'
 
 const { Option } = Select
 
-const SelectWithSort = ({ title, placeholderText, options, value, onChange, onClear, disabled }) => {
+const SelectWithSort = ({ title, placeholderText, options, value, onChange, onClear, disabled, isError = false }) => {
   return (
     <Select
-      className="select-with-sort 3xl:min-w-[330px] w-full truncate placeholder:text-secondary-color-text-disabled cursor-pointer"
+      className="select-with-sort 3xl:min-w-[330px] w-full truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-base cursor-pointer"
       showSearch
       placeholder={placeholderText}
       allowClear
@@ -18,16 +17,17 @@ const SelectWithSort = ({ title, placeholderText, options, value, onChange, onCl
       notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
       dropdownRender={(menu) => (
         <>
-          <div className="px-3 text-lg font-semibold font-deca py-4">{title}</div>
+          <div className="px-3 responsive-text-lg font-semibold font-deca py-4">{title}</div>
           <div>{menu}</div>
         </>
       )}
       optionLabelProp="label"
+      status={isError ? 'error' : ''}
     >
       {options.map((opt, index) => (
         <Option key={opt.value} value={opt.value} label={opt.label}>
           <div
-            className={`flex items-center py-2 gap-x-2 ${
+            className={`flex items-center py-2 gap-x-2 responsive-text-base ${
               index !== options.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
