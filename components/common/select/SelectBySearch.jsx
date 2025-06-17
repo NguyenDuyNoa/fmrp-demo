@@ -68,7 +68,7 @@ const SelectBySearch = ({
         open={open}
         onClick={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="select-by-search w-full h-14 truncate placeholder:text-secondary-color-text-disabled px-0 py-2"
+        className="select-by-search w-full 3xl:h-14 h-12 truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-sm px-0 py-2"
         showSearch
         placeholder={placeholderText}
         allowClear
@@ -91,8 +91,8 @@ const SelectBySearch = ({
                     alt={e.name}
                     className="w-10 h-10 object-cover rounded-md"
                   />
-                  <div className="flex flex-col text-xs overflow-hidden w-full">
-                    <div className="font-semibold text-sm truncate text-black">{e.name}</div>
+                  <div className="flex flex-col 3xl:text-[10px] text-[9px] overflow-hidden w-full">
+                    <div className="font-semibold responsive-text-sm truncate text-black">{e.name}</div>
                     {(e.product_variation || e.product_variation_1) && (
                       <div className="text-blue-600 truncate">
                         {e.product_variation && `Màu sắc: ${e.product_variation} `}
@@ -104,7 +104,7 @@ const SelectBySearch = ({
                     </div>
                   </div>
                 </div>
-                <div className="text-red-500 text-sm min-w-[80px] text-right whitespace-nowrap">
+                <div className="text-red-500 responsive-text-sm min-w-[80px] text-right whitespace-nowrap">
                   {formatNumber(e.price_sell)}
                 </div>
               </div>
@@ -114,7 +114,7 @@ const SelectBySearch = ({
       </Select>
 
       <div className="absolute 3xl:right-3 right-2 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
-        <CiSearch className="text-white text-lg" size={16} />
+        <CiSearch className="text-white responsive-text-lg" />
       </div>
     </div>
   )
