@@ -1,4 +1,5 @@
 import apiSalesOrder from '@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder'
+import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
 import { Container } from '@/components/UI/common/layout'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
@@ -9,7 +10,10 @@ import { optionsQuery } from '@/configs/optionsQuery'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
+import { useClientComboboxByBranch } from '@/hooks/common/useClients'
 import { useContactCombobox } from '@/hooks/common/useContacts'
+import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
+import { useTaxList } from '@/hooks/common/useTaxs'
 import useSetingServer from '@/hooks/useConfigNumber'
 import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
@@ -20,36 +24,30 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Add, Minus, ArrowDown2, ArrowUp2 } from 'iconsax-react'
+import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
 import moment from 'moment'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { BsCalendarEvent } from 'react-icons/bs'
-import { LuBriefcase } from 'react-icons/lu'
-import { PiMapPinLight } from 'react-icons/pi'
-import { FiUser } from 'react-icons/fi'
-import { MdClear } from 'react-icons/md'
 import { FaPencilAlt } from 'react-icons/fa'
-import { components } from 'react-select'
+import { FiUser } from 'react-icons/fi'
+import { LuBriefcase } from 'react-icons/lu'
+import { MdClear } from 'react-icons/md'
+import { PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
-import { useSalesOrderQuotaByBranch } from './hooks/useSalesOrderQuotaByBranch'
-import { useClientComboboxByBranch } from '@/hooks/common/useClients'
-import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
-import { useTaxList } from '@/hooks/common/useTaxs'
-import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 
 // Optimize UI
-import { motion, AnimatePresence } from 'framer-motion'
-import NoData from './noData'
-import { Button, DatePicker, ConfigProvider, Dropdown } from 'antd'
-import SelectWithSort from '@/components/common/select/SelectWithSort'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
-import { useSelector } from 'react-redux'
+import SelectWithSort from '@/components/common/select/SelectWithSort'
+import { Button, ConfigProvider, DatePicker, Dropdown } from 'antd'
+import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
-import viVN from 'antd/lib/locale/vi_VN'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useSelector } from 'react-redux'
+import NoData from './noData'
 dayjs.extend(customParseFormat)
 dayjs.locale('vi')
 
@@ -241,18 +239,32 @@ const SalesOrderForm = (props) => {
         total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
         delivery_date: moment(e?.delivery_date).toDate(),
       }))
+      console.log('rResult', rResult)
 
       setOption(items)
       setCodeProduct(rResult?.code)
+
       setContactPerson(
         rResult?.contact_name !== null && rResult?.contact_name !== '0'
           ? { label: rResult?.contact_name, value: rResult?.contact_id }
           : null
       )
+      setSelectedPersonalContact(
+        rResult?.contact_id !== null && rResult?.contact_id !== '0' ? rResult?.contact_id : null
+      )
+
       setBranch({ label: rResult?.branch_name, value: rResult?.branch_id })
+      setSelectedBranch(rResult?.branch_id)
+
       setStaff({ label: rResult?.staff_name, value: rResult?.staff_id })
+      setSelectedStaff(rResult?.staff_id)
+
       setCustomer({ label: rResult?.client_name, value: rResult?.client_id })
+      setSelectedCustomer(rResult?.client_id)
+
       setStartDate(moment(rResult?.date).toDate())
+      setDeliveryDate(moment(rResult?.items[0]?.delivery_date).toDate())
+
       setNote(rResult?.note)
 
       if (rResult?.quote_id !== '0' && rResult?.quote_code !== null) {
@@ -596,7 +608,7 @@ const SalesOrderForm = (props) => {
 
           setOption([...newData])
         } else if (typeOrder === '1' && quote === null) {
-          isShow('error', `Vui lòng chọn phiếu báo giá rồi mới chọn mặt hàng !`)
+          isShow('error', `${dataLang?.N_quote_selection_required}`)
         }
       }
     }
@@ -787,6 +799,10 @@ const SalesOrderForm = (props) => {
     e.preventDefault()
     let deliveryDateInOption = option.some((e) => e?.delivery_date === null)
 
+    if (selectedBranch === null || selectedStaff === null) {
+      setShowMoreInfo(true)
+    }
+
     if (typeOrder === '0') {
       if (
         startDate == null ||
@@ -800,7 +816,7 @@ const SalesOrderForm = (props) => {
         selectedBranch == null && setErrBranch(true)
         selectedStaff == null && setErrStaff(true)
         deliveryDateInOption === true && setErrDeliveryDate(true)
-        // deliveryDate == null && setErrDeliveryDate(true)
+        deliveryDate == null && setErrDeliveryDate(true)
         isShow('error', `${dataLang?.required_field_null}`)
       } else {
         setOnSending(true)
@@ -926,6 +942,7 @@ const SalesOrderForm = (props) => {
     },
     {
       label: `${dataLang?.sales_product_list || 'sales_product_list'}`,
+      href: '/sales-export-product/sales-order',
     },
     {
       label: `${
@@ -971,13 +988,15 @@ const SalesOrderForm = (props) => {
                 {/* Search Bar */}
                 <SelectBySearch
                   placeholderText="Tìm kiếm mặt hàng"
-                  options={typeOrder === '1' && quote === null ? [] : allItems}
+                  allItems={typeOrder === '1' && quote === null ? [] : allItems}
                   formatNumber={formatNumber}
                   selectedOptions={itemsAll}
                   idProductSale={idProductSale}
                   onChange={(value) => {
                     handleOnChangeInput('itemAll', value)
                   }}
+                  options={option}
+                  handleIncrease={handleIncrease}
                 />
               </div>
 
@@ -1020,7 +1039,7 @@ const SalesOrderForm = (props) => {
                         <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
                           {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
                         </h4>
-                        <ArrowDown2 size={16} />
+                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start font-[400] whitespace-nowrap">
@@ -1080,7 +1099,7 @@ const SalesOrderForm = (props) => {
                         <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
                           {dataLang?.sales_product_tax || 'sales_product_tax'}
                         </h4>
-                        <ArrowDown2 size={16} />
+                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
@@ -1123,7 +1142,7 @@ const SalesOrderForm = (props) => {
                                   name="optionEmail"
                                   placeholder="Ghi chú"
                                   type="text"
-                                  className="focus:border-[#92BFF7] 2xl:h-7 xl:h-5 mt-1 py-0 px-1 3xl:text-[13px] 2xl:text-[12px] xl:text-[10px] text-[10px] placeholder:text-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
+                                  className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
                                 />
                               </div>
                             </div>
@@ -1287,11 +1306,11 @@ const SalesOrderForm = (props) => {
                         )}
                         <button
                           onClick={() => handleTabClick(tab.key)}
-                          className={`relative w-full py-2 3xl:text-base xl:text-sm font-normal rounded-lg z-10 transition-all duration-300
+                          className={`relative w-full py-2 responsive-text-sm font-normal rounded-lg z-10 transition-all duration-300
                             ${activeTab === tab.key ? 'text-white' : 'text-gray-800'}
                           `}
                         >
-                          {tab.label}
+                          <span className="lg:px-1">{tab.label}</span>
                         </button>
                       </div>
                     ))}
@@ -1302,7 +1321,7 @@ const SalesOrderForm = (props) => {
                       <div className="relative">
                         {/* Số đơn hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <h4 className="w-full text-sm text-secondary-color-text">
+                          <h4 className="w-full responsive-text-base text-secondary-color-text">
                             {dataLang?.sales_product_code || 'sales_product_code'}
                           </h4>
                           <div className="w-full relative">
@@ -1315,15 +1334,18 @@ const SalesOrderForm = (props) => {
                               name="fname"
                               type="text"
                               placeholder={dataLang?.system_default || 'system_default'}
-                              className={`3xl:text-sm xl:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
+                              className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
                             />
                           </div>
                         </div>
                         {/* Ngày tạo đơn */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <h4 className="w-full text-sm text-secondary-color-text">
-                            {'Ngày tạo đơn' || dataLang?.sales_product_date}
-                          </h4>
+                          <div className="flex items-center gap-x-1 w-full">
+                            <span className="text-red-500">*</span>
+                            <h4 className="w-full responsive-text-base text-secondary-color-text">
+                              {'Ngày tạo đơn' || dataLang?.sales_product_date}
+                            </h4>
+                          </div>
                           <div className="w-full">
                             <div className="relative w-full flex flex-row custom-date-picker">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1332,6 +1354,7 @@ const SalesOrderForm = (props) => {
                               <ConfigProvider locale={viVN}>
                                 <DatePicker
                                   className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                                  status={errDate ? 'error' : ''}
                                   placeholder="Chọn ngày"
                                   format="DD/MM/YYYY HH:mm"
                                   showTime={{
@@ -1359,9 +1382,12 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Ngày cần hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <h4 className="w-full text-sm text-secondary-color-text">
-                            {dataLang?.sales_product_item_date || 'sales_product_item_date'}
-                          </h4>
+                          <div className="flex items-center gap-x-1 w-full">
+                            <span className="text-red-500">*</span>
+                            <h4 className="w-full responsive-text-base text-secondary-color-text">
+                              {dataLang?.sales_product_item_date || 'sales_product_item_date'}
+                            </h4>
+                          </div>
                           <div className="w-full">
                             <div className="relative flex flex-row custom-date-picker">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1382,16 +1408,25 @@ const SalesOrderForm = (props) => {
                                       setDeliveryDate(null) // Xử lý khi user xóa date
                                     }
                                   }}
+                                  status={errDeliveryDate ? 'error' : ''}
                                 />
                               </ConfigProvider>
                             </div>
+                            {errDeliveryDate && (
+                              <label className="text-sm text-red-500">
+                                {dataLang?.sales_product_err_delivery_date || 'Vui lòng chọn ngày giao hàng'}
+                              </label>
+                            )}
                           </div>
                         </div>
                         {/* Khách hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <h4 className="w-full text-sm text-secondary-color-text">
-                            {'Khách hàng' || dataLang?.selectedCustomer}
-                          </h4>
+                          <div className="flex items-center gap-x-1 w-full">
+                            <span className="text-red-500">*</span>
+                            <h4 className="w-full responsive-text-base text-secondary-color-text">
+                              {'Khách hàng' || dataLang?.selectedCustomer}
+                            </h4>
+                          </div>
                           <div className="w-full">
                             <div className="relative flex flex-row">
                               <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
@@ -1403,6 +1438,7 @@ const SalesOrderForm = (props) => {
                                 options={!!flagStateChange ? [] : dataCustomer}
                                 value={selectedCustomer}
                                 onChange={(value) => setSelectedCustomer(value)}
+                                isError={errCustomer}
                               />
                             </div>
                             {errCustomer && (
@@ -1426,9 +1462,12 @@ const SalesOrderForm = (props) => {
                               <React.Fragment>
                                 {/* Chi nhánh */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-sm text-secondary-color-text">
-                                    {'Chi nhánh' || dataLang?.branch}
-                                  </h4>
+                                  <div className="flex items-center gap-x-1 w-full">
+                                    <span className="text-red-500">*</span>
+                                    <h4 className="w-full responsive-text-base text-secondary-color-text">
+                                      {'Chi nhánh' || dataLang?.branch}
+                                    </h4>
+                                  </div>
                                   <div className="w-full">
                                     <div className="relative flex flex-row">
                                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1440,6 +1479,7 @@ const SalesOrderForm = (props) => {
                                         options={dataBranch}
                                         value={selectedBranch}
                                         onChange={(value) => setSelectedBranch(value)}
+                                        isError={errBranch}
                                       />
                                     </div>
                                     {errBranch && (
@@ -1451,7 +1491,7 @@ const SalesOrderForm = (props) => {
                                 </div>
                                 {/* Người liên lạc */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-sm text-secondary-color-text">
+                                  <h4 className="w-full responsive-text-base text-secondary-color-text">
                                     {'Người liên lạc' || dataLang?.contact_person}
                                   </h4>
                                   <div className="w-full relative">
@@ -1462,16 +1502,19 @@ const SalesOrderForm = (props) => {
                                       title="Người liên lạc"
                                       placeholderText="Chọn người liên lạc"
                                       options={!!flagStateChange ? [] : dataPersonContact}
-                                      value={selectedPersonalContact}
+                                      value={selectedPersonalContact || contactPerson}
                                       onChange={(value) => setSelectedPersonalContact(value)}
                                     />
                                   </div>
                                 </div>
                                 {/* Nhân viên */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full text-sm text-secondary-color-text">
-                                    {'Nhân viên' || dataLang?.sales_product_staff_in_charge}
-                                  </h4>
+                                  <div className="flex items-center gap-x-1 w-full">
+                                    <span className="text-red-500">*</span>
+                                    <h4 className="w-full responsive-text-base text-secondary-color-text">
+                                      {'Nhân viên' || dataLang?.sales_product_staff_in_charge}
+                                    </h4>
+                                  </div>
                                   <div className="w-full">
                                     <div className="relative flex flex-row">
                                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1483,6 +1526,7 @@ const SalesOrderForm = (props) => {
                                         options={!!flagStateChange ? [] : dataStaffs}
                                         value={selectedStaff}
                                         onChange={(value) => setSelectedStaff(value)}
+                                        isError={errStaff}
                                       />
                                     </div>
                                     {errStaff && (
@@ -1520,7 +1564,7 @@ const SalesOrderForm = (props) => {
                     )}
                     {activeTab === 'note' && (
                       <div className="w-full mx-auto">
-                        <h4 className="text-base font-normal text-secondary-color-text mb-3 capitalize">
+                        <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
                           {dataLang?.sales_product_note || 'sales_product_note'}
                         </h4>
                         <div className="w-full pb-6">
@@ -1530,7 +1574,7 @@ const SalesOrderForm = (props) => {
                             onChange={handleOnChangeInput.bind(this, 'note')}
                             name="fname"
                             type="text"
-                            className="focus:border-brand-color border-gray-200 placeholder:text-secondary-color-text-disabled w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] text-sm font-normal px-3 py-2 border outline-none"
+                            className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
                           />
                         </div>
                       </div>
@@ -1544,17 +1588,17 @@ const SalesOrderForm = (props) => {
                   {'Tổng cộng' || dataLang?.price_quote_total}
                 </h2>
                 {/* Tổng tiền */}
-                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-black-color">
+                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
                   <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
                   <span>{isTotalMoney.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
                 </div>
                 {/* Tiền chiết khấu */}
-                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
                   <span>{isTotalMoney.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
                 </div>
                 {/* Tiền sau chiết khấu */}
-                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
                   <h4 className="w-full">
                     {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
                   </h4>
@@ -1563,16 +1607,16 @@ const SalesOrderForm = (props) => {
                   </span>
                 </div>
                 {/* Tiền thuế */}
-                <div className="flex justify-between items-center mb-4 3xl:text-base xlg:text-sm font-normal text-secondary-color-text">
+                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
                   <span>{isTotalMoney.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
                 </div>
                 {/* Thành tiền */}
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="w-full text-black 3xl:text-base xlg:text-sm font-semibold">
+                <div className="flex justify-between responsive-text-base items-center mb-4">
+                  <h4 className="w-full text-black font-semibold">
                     {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                   </h4>
-                  <span className="text-blue-color 3xl:text-base xlg:text-sm font-semibold">
+                  <span className="text-blue-color font-semibold">
                     {isTotalMoney.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
                   </span>
                 </div>
@@ -1581,22 +1625,25 @@ const SalesOrderForm = (props) => {
           </div>
         </div>
         {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-[999] w-full 3xl:h-20 h-16 bg-white border-t border-gray-color p-4 flex justify-end space-x-2 shadow-lg">
-          <button
-            onClick={() => router.push(routerSalesOrder.home)}
-            dataLang={dataLang}
-            className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 bg-[#F2F3F5] 2xl:text-base xl:text-sm font-normal rounded-lg"
-          >
-            Thoát
-          </button>
-          <Button
-            onClick={handleSubmitValidate.bind(this)}
-            dataLang={dataLang}
-            loading={onSending}
-            className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
-          >
-            Lưu
-          </Button>
+        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-6 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
+          <div className="w-3/4"></div>
+          <div className="w-1/4 flex justify-end items-center gap-2 py-4 3xl:px-5 px-3">
+            <button
+              onClick={() => router.push(routerSalesOrder.home)}
+              dataLang={dataLang}
+              className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 px-2 h-full bg-[#F2F3F5] 2xl:text-base text-sm font-normal rounded-lg"
+            >
+              Thoát
+            </button>
+            <Button
+              onClick={handleSubmitValidate.bind(this)}
+              dataLang={dataLang}
+              loading={onSending}
+              className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
+            >
+              Lưu
+            </Button>
+          </div>
         </div>
       </Container>
       <PopupConfim
