@@ -15,7 +15,7 @@ const SelectWithSort = ({ title, placeholderText, options, value, onChange, onCl
       disabled={disabled}
       filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
       notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-      dropdownRender={(menu) => (
+      popupRender={(menu) => (
         <>
           <div className="px-3 responsive-text-lg font-semibold font-deca py-4">{title}</div>
           <div>{menu}</div>
