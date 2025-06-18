@@ -5,7 +5,7 @@ const { Option } = Select
 const SelectWithSort = ({ title, placeholderText, options, value, onChange, onClear, disabled, isError = false }) => {
   return (
     <Select
-      className="select-with-sort 3xl:min-w-[330px] w-full truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-base cursor-pointer"
+      className="select-with-sort 3xl:min-w-[330px] w-full truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer"
       showSearch
       placeholder={placeholderText}
       allowClear
