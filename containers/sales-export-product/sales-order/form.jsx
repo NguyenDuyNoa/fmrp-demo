@@ -1035,7 +1035,7 @@ const SalesOrderForm = (props) => {
                       placement="bottomLeft"
                       arrow
                     >
-                      <div className="inline-flex items-center justify-between cursor-pointer">
+                      <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
                         <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
                           {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
                         </h4>
@@ -1181,7 +1181,7 @@ const SalesOrderForm = (props) => {
                           </div>
                         </div>
                         {/* Đơn giá */}
-                        <div className="flex items-center justify-center col-span-1 text-center">
+                        <div className="flex items-center justify-end col-span-1 text-center">
                           <InPutMoneyFormat
                             value={e?.price}
                             onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
@@ -1193,7 +1193,7 @@ const SalesOrderForm = (props) => {
                           />
                         </div>
                         {/* % Chiết khấu */}
-                        <div className="flex items-center justify-end col-span-1 text-center">
+                        <div className="flex items-center justify-center col-span-1 text-center">
                           <InPutNumericFormat
                             value={e?.discount}
                             onValueChange={(value) => {
