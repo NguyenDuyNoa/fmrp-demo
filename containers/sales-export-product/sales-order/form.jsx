@@ -86,6 +86,7 @@ const SalesOrderForm = (props) => {
   useEffect(() => {
     if (dataStaffs.length > 0 && authState?.staff_id) {
       const staff = dataStaffs.find((e) => e.value === authState?.staff_id)
+
       setSelectedStaff(staff?.value)
     }
   }, [dataStaffs, authState?.staff_id])
@@ -239,8 +240,14 @@ const SalesOrderForm = (props) => {
         total_amount: +e?.price_after_discount * (1 + +e?.tax_rate / 100) * +e?.quantity,
         delivery_date: moment(e?.delivery_date).toDate(),
       }))
-      console.log('rResult', rResult)
 
+      setItemsAll(
+        rResult?.items?.map((e) => ({
+          label: `${e.item?.item_name} <span style={{display: none}}>${e.item?.code}</span><span style={{display: none}}>${e.item?.product_variation} </span><span style={{display: none}}>${e.item?.text_type} ${e.item?.unit_name} </span>`,
+          value: e.item?.id,
+          e: e.item,
+        }))
+      )
       setOption(items)
       setCodeProduct(rResult?.code)
 
@@ -567,7 +574,7 @@ const SalesOrderForm = (props) => {
               price_after_tax: 1,
               total_amount: Number(money.toFixed(2)),
               note: '',
-              delivery_date: null,
+              delivery_date: deliveryDate || null,
             }
           })
           setOption([...newData])
@@ -601,7 +608,7 @@ const SalesOrderForm = (props) => {
                   (1 + +e?.e?.tax_rate / 100) *
                   +e?.e?.quantity,
                 note: e?.e?.note_item,
-                delivery_date: null,
+                delivery_date: deliveryDate || null,
               }
             })
             .sort((a, b) => b.sortIndex - a.sortIndex)
@@ -816,7 +823,7 @@ const SalesOrderForm = (props) => {
         selectedBranch == null && setErrBranch(true)
         selectedStaff == null && setErrStaff(true)
         deliveryDateInOption === true && setErrDeliveryDate(true)
-        deliveryDate == null && setErrDeliveryDate(true)
+        // deliveryDate == null && setErrDeliveryDate(true)
         isShow('error', `${dataLang?.required_field_null}`)
       } else {
         setOnSending(true)
@@ -954,7 +961,7 @@ const SalesOrderForm = (props) => {
   ]
 
   return (
-    <React.Fragment className="overflow-hidden">
+    <div className="overflow-hidden">
       <Head>
         <title>
           {id
@@ -1004,14 +1011,14 @@ const SalesOrderForm = (props) => {
               {sortedArr.length > 0 && (
                 <React.Fragment>
                   {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-8 gap-1 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-2 text-left truncate font-[400]">
+                  <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-left truncate font-[400]">
                       {dataLang?.sales_product_item || 'sales_product_item'}
                     </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-center truncate font-[400]">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
                       {dataLang?.sales_product_quantity || 'sales_product_quantity'}
                     </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-center truncate font-[400]">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
                       {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
                     </h4>
                     {/* Chọn hoàng loạt % chiết khấu */}
@@ -1036,13 +1043,13 @@ const SalesOrderForm = (props) => {
                       arrow
                     >
                       <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
-                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
                           {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
                         </h4>
                         <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start font-[400] whitespace-nowrap">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start font-[400] whitespace-nowrap">
                       {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
                     </h4>
                     {/* Chọn hoàng loạt % thuế */}
@@ -1102,16 +1109,19 @@ const SalesOrderForm = (props) => {
                         <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
                       {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                     </h4>
                   </div>
                   {/* Thông tin mặt hàng Body */}
                   <div className="scroll-bar-products-sale overflow-y-auto pr-4 divide-slate-200">
                     {sortedArr.map((e) => (
-                      <div className="grid items-center grid-cols-8 gap-1 py-1" key={e?.id}>
+                      <div
+                        className="grid items-center grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 py-1"
+                        key={e?.id}
+                      >
                         {/* Mặt hàng */}
-                        <div className="col-span-2">
+                        <div className="">
                           <div className="flex">
                             <div className="w-16 h-16 flex items-center justify-center">
                               <img
@@ -1149,7 +1159,7 @@ const SalesOrderForm = (props) => {
                           </div>
                         </div>
                         {/* Số lượng */}
-                        <div className="flex items-center justify-center col-span-1">
+                        <div className="flex items-center justify-center">
                           <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
                             <button
                               onClick={() => handleDecrease(e?.id)}
@@ -1170,7 +1180,7 @@ const SalesOrderForm = (props) => {
                               allowNegative={false}
                               className={`${
                                 (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                              } cursor-default appearance-none text-center responsive-text-sm font-normal xl:w-[70px] w-[54px] focus:outline-none`}
+                              } cursor-default appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
                             />
                             <button
                               onClick={() => handleIncrease(e.id)}
@@ -1181,7 +1191,7 @@ const SalesOrderForm = (props) => {
                           </div>
                         </div>
                         {/* Đơn giá */}
-                        <div className="flex items-center justify-end col-span-1 text-center">
+                        <div className="flex items-center justify-center text-center">
                           <InPutMoneyFormat
                             value={e?.price}
                             onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
@@ -1189,30 +1199,30 @@ const SalesOrderForm = (props) => {
                             allowNegative={false}
                             className={`price-input-number ${
                               (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                            } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal 2xl:w-28 xl:w-[90px] w-[63px] 3xl:m-2 m-1 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                            } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal w-full 3xl:my-2 my-1 mx-0 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
                           />
                         </div>
                         {/* % Chiết khấu */}
-                        <div className="flex items-center justify-center col-span-1 text-center">
+                        <div className="flex items-center justify-center text-center">
                           <InPutNumericFormat
                             value={e?.discount}
                             onValueChange={(value) => {
                               console.log(value)
                               handleOnChangeInputOption(e?.id, 'discount', value)
                             }}
-                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[70%] focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
+                            className={`cursor-text appearance-none text-end 3xl:my-2 my-1 3xl:p-2 p-1 font-normal w-full focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
                             isAllowed={isAllowedDiscount}
                             isNumericString={true}
                           />
                         </div>
                         {/* Đơn giá sau chiết khấu */}
-                        <div className="flex items-center justify-start col-span-1 text-right">
+                        <div className="flex items-center justify-start text-right">
                           <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm text-black-color`}>
                             {formatNumber(e?.price_after_discount)}
                           </h3>
                         </div>
                         {/* % Thuế */}
-                        <div className="w-full col-span-1 3xl:px-2 px-0">
+                        <div className="w-full 3xl:px-2 px-0">
                           <SelectComponent
                             options={taxOptions}
                             onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
@@ -1253,7 +1263,7 @@ const SalesOrderForm = (props) => {
                           />
                         </div>
                         {/* Thành tiền và nút xoá */}
-                        <div className="flex items-center justify-between col-span-1 text-right">
+                        <div className="flex items-center justify-between text-right">
                           <h3
                             className={`cursor-text px-2 3xl:font-semibold responsive-text-sm z-[99] text-black-color`}
                           >
@@ -1655,7 +1665,7 @@ const SalesOrderForm = (props) => {
         save={resetValue}
         cancel={() => handleQueryId({ status: false })}
       />
-    </React.Fragment>
+    </div>
   )
 }
 

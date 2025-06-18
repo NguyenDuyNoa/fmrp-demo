@@ -47,11 +47,11 @@ const SelectBySearch = ({
     setSelectedItems((prevItems) => {
       // Nếu đã tồn tại thì giữ nguyên
       if (prevItems.find((o) => o.value === newOption.value)) {
-        isShow('success', 'Cập nhật số lượng thành công')
         const updatedItem = options.find((o) => o.item.value === newOption.value)
         if (updatedItem) {
           handleIncrease(updatedItem.id) // Gọi hàm tăng số lượng nếu có
         }
+        isShow('success', 'Cập nhật số lượng thành công')
         return prevItems
       }
 
