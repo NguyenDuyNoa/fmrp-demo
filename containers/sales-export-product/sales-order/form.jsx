@@ -975,7 +975,7 @@ const SalesOrderForm = (props) => {
             ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
             : dataLang?.sales_product_add_order || 'sales_product_add_order'}
         </h2>
-        <div className="flex w-full gap-x-6 items-stretch pb-40 relative">
+        <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-40 relative">
           {/* Cột trái */}
           <div className="w-3/4">
             {/* Thông tin mặt hàng */}
@@ -1004,7 +1004,7 @@ const SalesOrderForm = (props) => {
               {sortedArr.length > 0 && (
                 <React.Fragment>
                   {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-8 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                  <div className="grid grid-cols-8 gap-1 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
                     <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-2 text-left truncate font-[400]">
                       {dataLang?.sales_product_item || 'sales_product_item'}
                     </h4>
@@ -1107,12 +1107,12 @@ const SalesOrderForm = (props) => {
                     </h4>
                   </div>
                   {/* Thông tin mặt hàng Body */}
-                  <div className="scroll-bar-products-sale overflow-y-auto flex-1 pr-4 divide-slate-200">
+                  <div className="scroll-bar-products-sale overflow-y-auto pr-4 divide-slate-200">
                     {sortedArr.map((e) => (
                       <div className="grid items-center grid-cols-8 gap-1 py-1" key={e?.id}>
                         {/* Mặt hàng */}
                         <div className="col-span-2">
-                          <div className="max-w-sm flex">
+                          <div className="flex">
                             <div className="w-16 h-16 flex items-center justify-center">
                               <img
                                 src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
@@ -1150,7 +1150,7 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Số lượng */}
                         <div className="flex items-center justify-center col-span-1">
-                          <div className="flex items-center justify-center 3xl:p-2 p-1 border border-border-gray-2 rounded-3xl">
+                          <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
                             <button
                               onClick={() => handleDecrease(e?.id)}
                               className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
@@ -1170,7 +1170,7 @@ const SalesOrderForm = (props) => {
                               allowNegative={false}
                               className={`${
                                 (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                              } cursor-default appearance-none text-center responsive-text-sm font-normal xl:w-[30px] w-[22px] focus:outline-none`}
+                              } cursor-default appearance-none text-center responsive-text-sm font-normal xl:w-[70px] w-[54px] focus:outline-none`}
                             />
                             <button
                               onClick={() => handleIncrease(e.id)}
@@ -1193,14 +1193,14 @@ const SalesOrderForm = (props) => {
                           />
                         </div>
                         {/* % Chiết khấu */}
-                        <div className="flex items-center justify-start col-span-1 text-center">
+                        <div className="flex items-center justify-end col-span-1 text-center">
                           <InPutNumericFormat
                             value={e?.discount}
                             onValueChange={(value) => {
                               console.log(value)
                               handleOnChangeInputOption(e?.id, 'discount', value)
                             }}
-                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[80%] focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
+                            className={`cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-1 font-normal w-[70%] focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
                             isAllowed={isAllowedDiscount}
                             isNumericString={true}
                           />
@@ -1280,6 +1280,7 @@ const SalesOrderForm = (props) => {
                 </React.Fragment>
               )}
             </div>
+            <></>
           </div>
           {/* Cột phải */}
           <div className="w-1/4">
