@@ -13,7 +13,6 @@ import { useCostComboboxByBranch, useVoucherListVoucher, useVoucherPayTypeVouche
 import { usePayment } from "@/hooks/common/usePayment";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatNumber from "@/utils/helpers/formatnumber";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
@@ -22,10 +21,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Add, Trash as IconDelete } from "iconsax-react";
 import { debounce } from "lodash";
 import moment from "moment/moment";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { BiEdit } from "react-icons/bi";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
@@ -112,11 +110,15 @@ const Popup_dspc = (props) => {
         },
     ]);
 
-    const slicedArr = option.slice(1);
-
-    const sortedArr = slicedArr.sort((a, b) => b.id - a.id);
-
-    sortedArr.unshift(option[0]);
+    // Sử dụng useMemo để tính toán sortedArr mỗi khi option thay đổi
+    const sortedArr = useMemo(() => {
+        // Trả về tất cả các chi phí, đảm bảo rằng các giá trị null được chuyển thành 0
+        // để tránh trường hợp giá trị null khi hiển thị và tính toán
+        return option.map(item => ({
+            ...item,
+            price: item.price === null || item.price === undefined || isNaN(item.price) ? 0 : item.price
+        }));
+    }, [option]);
 
     const { data: listPayment = [] } = usePayment()
 
@@ -158,7 +160,7 @@ const Popup_dspc = (props) => {
         sNote("");
         sNote("");
         sError(inistError);
-        sOption([{ id: Date.now(), expense: "", price: null }]);
+        sOption([{ id: Date.now(), expense: "", price: 0 }]); // Đặt giá trị là 0 thay vì null
         sData(inistArrr);
     };
 
@@ -271,6 +273,25 @@ const Popup_dspc = (props) => {
         }
     };
     const showToat = useToast();
+    // Lưu trữ giá trị floatValue từ InPutMoneyFormat để sử dụng cho so sánh
+    const [currentFloatValue, setCurrentFloatValue] = useState(0);
+    
+    // Theo dõi khi currentFloatValue thay đổi để cập nhật lại các chi phí
+    useEffect(() => {
+        if (currentFloatValue > 0 && option.length > 0) {
+            // Phân bổ toàn bộ số tiền vào chi phí đầu tiên và reset các chi phí khác
+            const newOptions = option.map((item, index) => {
+                if (index === 0) {
+                    return { ...item, price: currentFloatValue };
+                } else {
+                    return { ...item, price: 0 }; // Đặt giá trị là 0 thay vì null
+                }
+            });
+            
+            sOption(newOptions);
+        }
+    }, [currentFloatValue]);
+    
     const _HandleChangeInput = (type, value) => {
         if (type == "date") {
             sDate(value);
@@ -282,13 +303,14 @@ const Popup_dspc = (props) => {
             sBranch(value);
             sListObject(null);
             sPrice(null);
+            setCurrentFloatValue(0);
             sListTypeOfDocument([]);
             sTypeOfDocument(null);
             const updatedOptions = option.map((item) => {
                 return {
                     ...item,
                     expense: "",
-                    price: "",
+                    price: 0, // Đặt giá trị là 0 thay vì ""
                 };
             });
             sOption(updatedOptions);
@@ -298,9 +320,10 @@ const Popup_dspc = (props) => {
             sTypeOfDocument(null);
             sListTypeOfDocument([]);
             sPrice(null);
+            setCurrentFloatValue(0);
             sOption((prevOption) => {
                 const newOption = prevOption.map((item, index) => {
-                    return { ...item, price: "" };
+                    return { ...item, price: 0 }; // Đặt giá trị là 0 thay vì ""
                 });
                 return newOption;
             });
@@ -310,9 +333,10 @@ const Popup_dspc = (props) => {
             sTypeOfDocument(value);
             sListTypeOfDocument([]);
             sPrice(null);
+            setCurrentFloatValue(0);
             sOption((prevOption) => {
                 const newOption = prevOption.map((item, index) => {
-                    return { ...item, price: "" };
+                    return { ...item, price: 0 }; // Đặt giá trị là 0 thay vì ""
                 });
                 return newOption;
             });
@@ -321,67 +345,131 @@ const Popup_dspc = (props) => {
             if (value && value.length > 0) {
                 const totalMoney = value.reduce((total, item) => total + parseFloat(item.money || 0), 0);
                 const formattedTotal = parseFloat(totalMoney);
+                
+                // Cập nhật đồng thời cả price và currentFloatValue
                 sPrice(formattedTotal);
-                sOption((prevOption) => {
-                    const newOption = prevOption.map((item, index) => {
-                        if (index === 0) {
-                            return { ...item, price: formattedTotal };
-                        } else {
-                            return { ...item, price: null };
-                        }
+                setCurrentFloatValue(formattedTotal);
+                
+                // Cập nhật chi phí - chỉ giữ lại chi phí đầu tiên với giá trị mới
+                if (option.length > 0) {
+                    const firstOptionId = option[0].id;
+                    const firstOptionExpense = option[0].expense;
+                    
+                    sOption(prevOptions => {
+                        return [{
+                            id: firstOptionId,
+                            expense: firstOptionExpense,
+                            price: formattedTotal
+                        }];
                     });
-                    return newOption;
-                });
+                }
             } else if (value && value.length == 0) {
                 sPrice(null);
-                sOption((prevOption) => {
-                    const newOption = prevOption.map((item, index) => {
-                        return { ...item, price: "" };
+                setCurrentFloatValue(0);
+                
+                // Cập nhật chi phí - chỉ giữ lại chi phí đầu tiên với giá trị 0
+                if (option.length > 0) {
+                    const firstOptionId = option[0].id;
+                    const firstOptionExpense = option[0].expense;
+                    
+                    sOption(prevOptions => {
+                        return [{
+                            id: firstOptionId,
+                            expense: firstOptionExpense,
+                            price: 0 // Đặt giá trị là 0 thay vì null
+                        }];
                     });
-                    return newOption;
-                });
+                }
             }
         } else if (type === "price") {
-            let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
+            let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money || 0), 0);
             const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
             let isExceedTotal = false; // Biến flag để kiểm tra trạng thái vượt quá giá trị
+            
             if (!isNaN(priceChange)) {
-                if (listTypeOfDocument?.length > 0) {
+                if (listTypeOfDocument?.length > 0 && object?.value != "other") {
                     if (priceChange > totalMoney) {
                         // Giá nhập vượt quá tổng số tiền, trả về tổng ban đầu
                         showToat("error", `${dataLang?.payment_err_aler || "payment_err_aler"}`);
-                        sPrice(totalMoney);
                         isExceedTotal = true; // Đánh dấu trạng thái vượt quá giá trị
-                    } else {
                     }
-                    sPrice(priceChange);
-                } else {
-                    sPrice(priceChange);
                 }
-            }
-            sOption((prevOption) => {
-                if (isExceedTotal) {
-                    return prevOption.map((item, index) => {
-                        if (index === 0) {
-                            return { ...item, price: totalMoney };
-                        } else {
-                            return { ...item, price: null };
+                
+                // Cập nhật giá trị price - đảm bảo luôn cập nhật giá trị mới
+                const newPriceValue = isExceedTotal ? totalMoney : priceChange;
+                
+                // Kiểm tra xem tổng tiền mới có nhỏ hơn tổng tiền hiện tại không
+                const isTotalDecreased = currentFloatValue > 0 && newPriceValue < currentFloatValue;
+                
+                // Cập nhật cả price và currentFloatValue để đảm bảo nhất quán
+                sPrice(newPriceValue);
+                setCurrentFloatValue(newPriceValue);
+                
+                // Tính tổng chi phí hiện tại (trước khi cập nhật)
+                const currentTotalExpenses = option.reduce((total, item) => {
+                    return total + parseFloat(item.price || 0);
+                }, 0);
+                
+                // Nếu đang giảm tổng tiền và tổng tiền mới nhỏ hơn tổng chi phí hiện tại
+                if (isTotalDecreased && newPriceValue < currentTotalExpenses) {
+                    showToat("warning", `Tổng tiền giảm từ ${currentFloatValue.toLocaleString('en')} xuống ${newPriceValue.toLocaleString('en')}. Chi phí đầu tiên sẽ được giữ lại và các chi phí khác sẽ được đặt về 0.`, 4000);
+                    
+                    // Cập nhật chi phí - giữ chi phí đầu tiên với tổng tiền mới
+                    // và đặt tất cả chi phí khác về 0 (không xóa chúng)
+                    sOption(prevOptions => {
+                        if (prevOptions.length <= 1) {
+                            return [{
+                                id: prevOptions[0].id,
+                                expense: prevOptions[0].expense,
+                                price: newPriceValue
+                            }];
                         }
+                        
+                        // Cập nhật chi phí đầu tiên với tổng tiền mới
+                        // và đặt tất cả chi phí khác về 0
+                        return prevOptions.map((item, index) => {
+                            if (index === 0) {
+                                return {
+                                    ...item,
+                                    price: newPriceValue
+                                };
+                            } else {
+                                return {
+                                    ...item,
+                                    price: 0
+                                };
+                            }
+                        });
                     });
                 } else {
-                    return prevOption.map((item, index) => {
-                        if (index === 0) {
-                            return { ...item, price: priceChange };
-                        } else {
-                            return { ...item, price: null };
+                    // Nếu không phải là giảm tổng tiền hoặc tổng tiền mới vẫn đủ,
+                    // thì thực hiện xử lý như trước (xóa hết chi phí khác)
+                    if (option.length > 0) {
+                        // Hiển thị thông báo trước khi thực hiện xóa
+                        if (option.length > 1) {
+                            showToat("warning", "Khi thay đổi tổng số tiền, chi phí đầu tiên sẽ nhận toàn bộ giá trị và các chi phí khác sẽ bị xóa.", 3000);
                         }
-                    });
+                        
+                        // Tạo ra một chi phí mới với giá trị mới
+                        const firstOptionId = option[0].id;
+                        const firstOptionExpense = option[0].expense;
+                        
+                        // Sử dụng functional update để đảm bảo state được cập nhật đúng
+                        sOption(prevOptions => {
+                            // Chỉ giữ lại phần tử đầu tiên và cập nhật giá trị
+                            return [{
+                                id: firstOptionId,
+                                expense: firstOptionExpense,
+                                price: newPriceValue
+                            }];
+                        });
+                        
+                        // Hiển thị thông báo nếu đã xóa các chi phí
+                        if (option.length > 1) {
+                            isShow("info", "Số tiền đã được cập nhật và các chi phí khác đã bị xóa khỏi danh sách", 3000);
+                        }
+                    }
                 }
-            });
-
-            if (isExceedTotal) {
-                // Trở về giá trị ban đầu nếu cố tình nhập tiếp
-                sPrice(totalMoney);
             }
         } else if (type == "method") {
             sMethod(value);
@@ -392,10 +480,20 @@ const Popup_dspc = (props) => {
 
     const _HandleSubmit = (e) => {
         e.preventDefault();
+        
         const hasNullLabel = option.some((item) => item.expense === "");
-        const hasNullSotien = option.some((item) => item.price === "" || item.price === null);
-        const totalSotienErr = option.reduce((total, item) => total + item.price, 0);
-        if (branch == null || object == null || listObject == null || price == null || method == null || hasNullLabel || hasNullSotien || totalSotienErr < price || (typeOfDocument != null && listTypeOfDocument?.length == 0)) {
+        const hasNullSotien = option.some((item) => item.price === "" || item.price === null || item.price === undefined);
+        
+        // Đảm bảo tính toán tổng chi phí một cách chính xác bằng cách parse mỗi giá trị thành số
+        const totalSotienErr = option.reduce((total, item) => {
+            const itemPrice = parseFloat(item.price || 0);
+            return total + (isNaN(itemPrice) ? 0 : itemPrice);
+        }, 0);
+        
+        // Cập nhật kiểm tra để yêu cầu tổng chi phí bằng đúng currentFloatValue (không lớn hơn hoặc nhỏ hơn)
+        const isExpensesDifferent = Math.abs(totalSotienErr - currentFloatValue) > 0.01; // Cho phép sai số nhỏ
+        
+        if (branch == null || object == null || listObject == null || price == null || method == null || hasNullLabel || hasNullSotien || isExpensesDifferent || (typeOfDocument != null && listTypeOfDocument?.length == 0)) {
             sError((e) => ({
                 ...e,
                 errBranch: branch == null,
@@ -404,10 +502,31 @@ const Popup_dspc = (props) => {
                 errPrice: typeOfDocument?.value == "import" && (price == 0 || price == null) ? true : price == 0 || price == null,
                 errMethod: method == null,
                 errCosts: hasNullLabel,
-                errSotien: hasNullSotien,
+                errSotien: hasNullSotien || isExpensesDifferent, // Thêm lỗi khi tổng chi phí không bằng currentFloatValue
                 errListTypeDoc: typeOfDocument != null && listTypeOfDocument?.length == 0,
             }));
-            isShow("error", `${totalSotienErr < price ? props?.dataLang.payment_err_alerTotalThan || "payment_err_alerTotalThan" : props.dataLang?.required_field_null || "required_field_null"}`);
+            
+            // Nếu lỗi duy nhất là tổng chi phí khác tổng tiền, hiển thị tùy chọn tự động cân bằng
+            if (!hasNullLabel && !hasNullSotien && isExpensesDifferent && 
+                branch != null && object != null && listObject != null && price != null && method != null && 
+                !(typeOfDocument != null && listTypeOfDocument?.length == 0)) {
+                
+                if (totalSotienErr < currentFloatValue) {
+                    const remainingAmount = currentFloatValue - totalSotienErr;
+                    
+                    isShow("error", `Tổng chi phí (${totalSotienErr.toLocaleString('en')}) phải bằng tổng số tiền (${currentFloatValue.toLocaleString('en')}). Còn ${remainingAmount.toLocaleString('en')} chưa được phân bổ.`, 3000);
+                    
+                    if (window.confirm(`Tổng chi phí (${totalSotienErr.toLocaleString('en')}) chưa bằng tổng số tiền (${currentFloatValue.toLocaleString('en')}). \n\nBạn có muốn tự động phân bổ ${remainingAmount.toLocaleString('en')} còn lại không?`)) {
+                        _AutoBalanceRemainingAmount();
+                        return; // Dừng lại, không hiển thị thông báo lỗi
+                    }
+                } else if (totalSotienErr > currentFloatValue) {
+                    const excessAmount = totalSotienErr - currentFloatValue;
+                    isShow("error", `Tổng chi phí (${totalSotienErr.toLocaleString('en')}) vượt quá tổng số tiền (${currentFloatValue.toLocaleString('en')}) ${excessAmount.toLocaleString('en')}. Vui lòng giảm bớt chi phí.`, 3000);
+                }
+            } else {
+                isShow("error", props.dataLang?.required_field_null || "required_field_null");
+            }
         } else {
             sFetch((e) => ({ ...e, onSending: true }));
         }
@@ -445,26 +564,151 @@ const Popup_dspc = (props) => {
                 option[index].expense = value;
             }
         } else if (type === "price") {
-            option[index].price = parseFloat(value?.value);
-            const totalSotien = option.reduce((sum, opt) => sum + parseFloat(opt.price || 0), 0);
-            if (totalSotien > parseFloat(price)) {
-                option.forEach((opt, optIndex) => {
-                    const currentValue = option[optIndex].price; // Lưu giá trị hiện tại
-                    option[optIndex].price = "";
-                    if (optIndex === index) {
-                        option[optIndex].price = currentValue; // Gán lại giá trị hiện tại
-                    }
-                });
-                isShow("error", `${props?.dataLang?.payment_err_alerExeeds || "payment_err_alerExeeds"}`);
-            } else {
-                option[index].price = parseFloat(value?.value);
+            // Parse giá trị mới nhập vào
+            const newPrice = parseFloat(value?.value);
+            
+            // Bước 1: Kiểm tra nếu số tiền tổng là 0 hoặc không có
+            if (currentFloatValue <= 0) {
+                isShow("error", "Vui lòng nhập tổng số tiền trước khi phân bổ chi phí");
+                return;
             }
+            
+            // Bước 2: Kiểm tra giá trị mới của chi phí đơn lẻ có vượt quá tổng không
+            if (newPrice > currentFloatValue) {
+                isShow("error", `Giá trị vượt quá tổng số tiền. Giá trị tối đa có thể nhập là ${currentFloatValue.toLocaleString("en")}`);
+                
+                // Tự động điều chỉnh về giá trị tối đa
+                if (index === 0 && option.length === 1) {
+                    // Nếu đây là chi phí duy nhất, đặt giá trị bằng tổng số tiền
+                    option[index].price = currentFloatValue;
+                    sOption([...option]);
+                    return;
+                }
+            }
+            
+            // Bước 3: Tính tổng chi phí hiện tại của tất cả các chi phí khác
+            const totalOtherExpenses = option.reduce((sum, opt, i) => {
+                if (i !== index) {
+                    return sum + parseFloat(opt.price || 0);
+                }
+                return sum;
+            }, 0);
+            
+            // Bước 4: Tính số tiền còn lại có thể sử dụng
+            const remainingBudget = currentFloatValue - totalOtherExpenses;
+            
+            // Bước 5: Kiểm tra xem giá trị mới có vượt quá số tiền còn lại không
+            if (newPrice > remainingBudget) {
+                // Hiển thị thông báo giá trị tối đa có thể nhập
+                isShow("error", `Giá trị vượt quá số tiền còn lại. Giá trị tối đa có thể nhập là ${remainingBudget.toLocaleString("en")}`, 3000);
+                
+                // Tự động điều chỉnh về giá trị tối đa có thể nhập
+                option[index].price = remainingBudget > 0 ? remainingBudget : 0;
+                sOption([...option]);
+                return;
+            }
+            
+            // Nếu hợp lệ, cập nhật giá trị
+            option[index].price = newPrice;
         }
         sOption([...option]);
     };
 
+    const _AutoBalanceRemainingAmount = () => {
+        if (currentFloatValue <= 0) {
+            isShow("warning", "Không có số tiền để phân bổ.");
+            return;
+        }
+        
+        // Tính tổng chi phí hiện tại
+        const totalExpenses = option.reduce((total, item) => {
+            return total + parseFloat(item.price || 0);
+        }, 0);
+        
+        // Kiểm tra nếu đã sử dụng hết ngân sách
+        if (totalExpenses >= currentFloatValue) {
+            isShow("info", "Tổng chi phí đã bằng tổng số tiền. Không cần phân bổ thêm.", 3000);
+            return;
+        }
+        
+        // Tính số tiền còn lại cần phân bổ
+        const remainingAmount = currentFloatValue - totalExpenses;
+        
+        // Tìm các chi phí chưa có giá trị (null hoặc 0)
+        const emptyExpenses = option.filter(item => 
+            (item.price === null || item.price === 0 || item.price === "") && 
+            item.expense !== "" && 
+            item.expense !== null
+        );
+        
+        // Nếu không có chi phí nào chưa có giá trị nhưng có loại chi phí
+        if (emptyExpenses.length === 0) {
+            // Kiểm tra xem có chi phí nào đã có giá trị nhưng cũng có loại chi phí
+            const validExpenses = option.filter(item => 
+                item.price !== null && 
+                item.price !== 0 && 
+                item.expense !== "" && 
+                item.expense !== null
+            );
+            
+            if (validExpenses.length === 0) {
+                isShow("warning", "Không có chi phí hợp lệ để phân bổ. Vui lòng chọn loại chi phí trước.", 3000);
+                return;
+            }
+            
+            // Chia đều số tiền còn lại cho các chi phí đã có giá trị
+            const amountPerExpense = remainingAmount / validExpenses.length;
+            
+            // Cập nhật giá trị cho các chi phí
+            const updatedOptions = option.map(item => {
+                if (item.expense !== "" && item.expense !== null && item.price !== null && item.price !== 0) {
+                    return {
+                        ...item,
+                        price: parseFloat(item.price) + amountPerExpense
+                    };
+                }
+                return item;
+            });
+            
+            sOption(updatedOptions);
+            isShow("success", `Đã phân bổ ${remainingAmount.toLocaleString("en")} vào ${validExpenses.length} chi phí hiện có.`, 3000);
+        } else {
+            // Nếu có chi phí chưa có giá trị và có loại chi phí, chia đều số tiền còn lại
+            const amountPerExpense = remainingAmount / emptyExpenses.length;
+            
+            // Cập nhật giá trị cho các chi phí
+            const updatedOptions = option.map(item => {
+                if ((item.price === null || item.price === 0 || item.price === "") && item.expense !== "" && item.expense !== null) {
+                    return {
+                        ...item,
+                        price: amountPerExpense
+                    };
+                }
+                return item;
+            });
+            
+            sOption(updatedOptions);
+            isShow("success", `Đã phân bổ ${remainingAmount.toLocaleString("en")} vào ${emptyExpenses.length} chi phí chưa có giá trị.`, 3000);
+        }
+    };
+
     const _HandleAddNew = () => {
-        sOption([...option, { id: uuidv4(), expense: "", price: null }]);
+        // Kiểm tra tổng chi phí hiện tại
+        const totalExpenses = option.reduce((total, item) => {
+            return total + parseFloat(item.price || 0);
+        }, 0);
+        
+        // Kiểm tra nếu đã sử dụng hết ngân sách
+        if (currentFloatValue > 0 && totalExpenses >= currentFloatValue) {
+            isShow("error", "Tổng số tiền chi phí đã đạt mức tối đa. Vui lòng điều chỉnh các chi phí hiện có trước khi thêm mới.", 3000);
+            return;
+        }
+        
+        // Tính toán số tiền còn lại có thể sử dụng
+        const remainingAmount = currentFloatValue - totalExpenses;
+        
+        // Thêm mới nếu còn ngân sách
+        sOption([...option, { id: uuidv4(), expense: "", price: 0 }]);
     };
 
     const _HandleDelete = (id) => {
@@ -476,40 +720,68 @@ const Popup_dspc = (props) => {
     };
 
     const handleSelectAll = () => {
+        // Hiển thị thông báo nếu có nhiều chi phí sẽ bị xóa
+        if (option.length > 1) {
+            showToat("warning", "Khi chọn tất cả chứng từ, chi phí đầu tiên sẽ nhận toàn bộ giá trị và các chi phí khác sẽ bị xóa.", 3000);
+        }
+        
+        // Lấy tổng số tiền từ tất cả các chứng từ
+        const totalMoney = dataListTypeofDoc.reduce((total, item) => {
+            if (!isNaN(parseFloat(item.money))) {
+                return total + parseFloat(item.money);
+            } else {
+                return total;
+            }
+        }, 0);
+        
+        // Cập nhật danh sách chứng từ
         sListTypeOfDocument(dataListTypeofDoc);
-        Promise.resolve().then(() => {
-            const totalMoney = dataListTypeofDoc.reduce((total, item) => {
-                if (!isNaN(parseFloat(item.money))) {
-                    return total + parseFloat(item.money);
-                } else {
-                    return total;
-                }
-            }, 0);
-            return totalMoney;
-        }).then((formattedTotal) => {
-            sPrice(formattedTotal);
-            sOption((prevOption) => {
-                const newOption = prevOption.map((item, index) => {
-                    if (index === 0) {
-                        return { ...item, price: formattedTotal };
-                    } else {
-                        return { ...item, price: null };
-                    }
-                });
-                return newOption;
+        
+        // Cập nhật giá trị
+        sPrice(totalMoney);
+        setCurrentFloatValue(totalMoney);
+        
+        // Cập nhật chi phí - chỉ giữ lại chi phí đầu tiên với giá trị mới
+        if (option.length > 0) {
+            const firstOptionId = option[0].id;
+            const firstOptionExpense = option[0].expense;
+            
+            sOption(prevOptions => {
+                return [{
+                    id: firstOptionId,
+                    expense: firstOptionExpense,
+                    price: totalMoney
+                }];
             });
-        });
+        }
     };
 
     const handleDeselectAll = () => {
+        // Hiển thị thông báo nếu có nhiều chi phí sẽ bị xóa
+        if (option.length > 1) {
+            showToat("warning", "Khi bỏ chọn tất cả chứng từ, tất cả chi phí sẽ được reset và chỉ giữ lại chi phí đầu tiên.", 3000);
+        }
+        
+        // Cập nhật danh sách chứng từ
         sListTypeOfDocument([]);
+        
+        // Cập nhật giá trị
         sPrice(null);
-        sOption((prevOption) => {
-            const newOption = prevOption.map((item) => {
-                return { ...item, price: null };
+        setCurrentFloatValue(0);
+        
+        // Cập nhật chi phí - chỉ giữ lại chi phí đầu tiên với giá trị rỗng
+        if (option.length > 0) {
+            const firstOptionId = option[0].id;
+            const firstOptionExpense = option[0].expense;
+            
+            sOption(prevOptions => {
+                return [{
+                    id: firstOptionId,
+                    expense: firstOptionExpense,
+                    price: 0 // Đặt giá trị là 0 thay vì null
+                }];
             });
-            return newOption;
-        });
+        }
     };
 
     const MenuList = (props) => {
@@ -549,7 +821,7 @@ const Popup_dspc = (props) => {
         formData.append("branch_id", branch?.value);
         formData.append("objects", object?.value);
         formData.append("type_vouchers", typeOfDocument ? typeOfDocument?.value : "");
-        formData.append("total", price);
+        formData.append("total", currentFloatValue); // Sử dụng currentFloatValue thay vì price
         formData.append("payment_modes", method?.value);
         if (object?.value == "other") {
             formData.append("objects_text", listObject?.value);
@@ -677,7 +949,7 @@ const Popup_dspc = (props) => {
                                         onChange={_HandleChangeInput.bind(this, "code")}
                                         placeholder={props.dataLang?.payment_systemDefaul || "payment_systemDefaul"}
                                         type="text"
-                                        className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none "
+                                        className={`focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-2.5 border outline-none `}
                                     />
                                 </div>
                                 <div className="col-span-6">
@@ -1004,7 +1276,7 @@ const Popup_dspc = (props) => {
                                         className={`${error.errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0
                                             ? "border-red-500"
                                             : "border-transparent"
-                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E]  font-normal outline-none border `}
+                                            } 2xl:text-[12px] xl:text-[13px] text-[12px] placeholder:text-slate-300 w-full rounded text-[#52575E]  font-normal outline-none border `}
                                     />
                                     {error.errListTypeDoc && typeOfDocument != null && listTypeOfDocument?.length == 0 && (
                                         <label className="2xl:text-[12px] xl:text-[13px] text-[12px] text-red-500">
@@ -1061,25 +1333,29 @@ const Popup_dspc = (props) => {
                                     </label>
                                     <InPutMoneyFormat
                                         value={price}
-                                        disabled={object === null || listObject === null}
-                                        onChange={_HandleChangeInput.bind(this, "price")}
+                                        onChange={(e) => {
+                                            console.log("Raw input value:", e.target.value);
+                                            _HandleChangeInput("price", e);
+                                        }}
                                         placeholder={((object == null || listObject == null) && (props.dataLang?.payment_errObList || "payment_errObList")) || (object != null && props.dataLang?.payment_amountOfMoney) || "payment_amountOfMoney"}
                                         isAllowed={(values) => {
                                             if (!values.value) return true;
-                                            const { floatValue } = values;
-                                            if (object?.value && listTypeOfDocument?.length > 0) {
-                                                if (object?.value != "other") {
-                                                    let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money), 0);
-                                                    if (floatValue > totalMoney) {
-                                                        isShow("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${totalMoney.toLocaleString("en")}`);
-                                                    }
+                                            const { floatValue, formattedValue } = values;
+                                            console.log("Kiểm tra giá trị nhập:", floatValue, "giá trị hiện tại:", price);
+                                            
+                                            // Vẫn kiểm tra không cho nhập giá trị lớn hơn tổng số tiền ban đầu
+                                            if (object?.value && listTypeOfDocument?.length > 0 && object?.value != "other") {
+                                                let totalMoney = listTypeOfDocument.reduce((total, item) => total + parseFloat(item.money || 0), 0);
+                                                if (floatValue > totalMoney) {
+                                                    isShow("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${totalMoney.toLocaleString("en")}`);
                                                     return false;
-                                                } else {
-                                                    return true;
                                                 }
-                                            } else {
-                                                return true;
                                             }
+                                            
+                                            // Chỉ cập nhật floatValue khi giá trị hợp lệ
+                                            console.log("Giá trị hợp lệ, cập nhật currentFloatValue =", floatValue);
+                                            setCurrentFloatValue(floatValue);
+                                            return true;
                                         }}
                                         className={`${error.errPrice && price == null
                                             ? "border-red-500"
@@ -1129,7 +1405,8 @@ const Popup_dspc = (props) => {
                                     </h4>
                                 </div>
                                 <Customscrollbar className="min-h-[100px] max-h-[100px]">
-                                    {sortedArr.map((e, index) => (
+                                    {sortedArr
+                                        .map((e, index) => (
                                         <div className="grid items-center grid-cols-12 gap-1 py-1 " key={e?.id}>
                                             <div className="col-span-6 my-auto ">
                                                 <SelectCore
@@ -1176,24 +1453,49 @@ const Popup_dspc = (props) => {
                                             <div className="flex items-center justify-center col-span-4 text-center">
                                                 <InPutMoneyFormat
                                                     value={e?.price}
-                                                    disabled={price == null}
                                                     placeholder={price == null && (props.dataLang?.payment_errAmountAbove || "payment_errAmountAbove")}
                                                     onValueChange={_HandleChangeInputOption.bind(this, e?.id, "price")}
                                                     isAllowed={(values) => {
                                                         if (!values.value) return true;
                                                         const { floatValue } = values;
-                                                        if (object?.value != "other") {
-                                                            if (floatValue > price) {
-                                                                isShow("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${price.toLocaleString("en")}`);
-                                                            }
+                                                        
+                                                        // Nếu tổng tiền chưa được nhập
+                                                        if (currentFloatValue <= 0) {
+                                                            isShow("error", "Vui lòng nhập tổng số tiền trước khi phân bổ chi phí");
                                                             return false;
-                                                        } else {
-                                                            return true;
                                                         }
+                                                        
+                                                        // Kiểm tra nếu giá trị vượt quá tổng số tiền
+                                                        if (floatValue > currentFloatValue) {
+                                                            isShow("error", `Giá trị không được vượt quá tổng số tiền ${currentFloatValue.toLocaleString("en")}`);
+                                                            return false;
+                                                        }
+                                                        
+                                                        // Tính tổng chi phí của các chi phí khác
+                                                        const index = option.findIndex((x) => x.id === e?.id);
+                                                        const totalOtherExpenses = option.reduce((sum, opt, i) => {
+                                                            if (i !== index) {
+                                                                return sum + parseFloat(opt.price || 0);
+                                                            }
+                                                            return sum;
+                                                        }, 0);
+                                                        
+                                                        // Tính số tiền còn lại có thể sử dụng
+                                                        const remainingBudget = currentFloatValue - totalOtherExpenses;
+                                                        
+                                                        // Kiểm tra nếu giá trị vượt quá số tiền còn lại
+                                                        if (floatValue > remainingBudget) {
+                                                            isShow("error", `Giá trị tối đa có thể nhập là ${remainingBudget.toLocaleString("en")}`);
+                                                            return false;
+                                                        }
+                                                        
+                                                        return true;
                                                     }}
                                                     className={`${error.errSotien && (e?.price === "" || e?.price === null)
                                                         ? "border-b-red-500"
-                                                        : " border-gray-200"
+                                                        : e?.price === null || e?.price === undefined || isNaN(e?.price) 
+                                                          ? "border-b-orange-500" 
+                                                          : "border-b-green-500"
                                                         } placeholder:text-[10px] border-b-2 appearance-none 2xl:text-[12px] xl:text-[13px] text-[12px] text-center py-1 px-1 font-normal w-[90%] focus:outline-none `}
                                                 />
                                             </div>
