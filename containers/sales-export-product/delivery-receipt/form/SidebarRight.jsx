@@ -1,6 +1,8 @@
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
+import useSetingServer from '@/hooks/useConfigNumber'
+import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
@@ -13,6 +15,10 @@ import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 
 const SidebarRight = ({ dataLang }) => {
+  // Call hook
+  const dataSeting = useSetingServer()
+
+  // State management
   const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [isTotalMoney, setIsTotalMoney] = useState({
     totalPrice: 0,
@@ -274,24 +280,30 @@ const SidebarRight = ({ dataLang }) => {
         {/* Tổng tiền */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
           <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
-          <span>{isTotalMoney.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
+          <span>{isTotalMoney.totalPrice ? formatMoneyConfig(+isTotalMoney.totalPrice, dataSeting) : '-'}</span>
         </div>
         {/* Tiền chiết khấu */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
-          <span>{isTotalMoney.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
+          <span>
+            {isTotalMoney.totalDiscountPrice ? formatMoneyConfig(+isTotalMoney.totalDiscountPrice, dataSeting) : '-'}
+          </span>
         </div>
         {/* Tiền sau chiết khấu */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">
             {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
           </h4>
-          <span>{isTotalMoney.totalDiscountAfterPrice ? formatMoney(isTotalMoney.totalDiscountAfterPrice) : '-'}</span>
+          <span>
+            {isTotalMoney.totalDiscountAfterPrice
+              ? formatMoneyConfig(+isTotalMoney.totalDiscountAfterPrice, dataSeting)
+              : '-'}
+          </span>
         </div>
         {/* Tiền thuế */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
-          <span>{isTotalMoney.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
+          <span>{isTotalMoney.totalTax ? formatMoneyConfig(+isTotalMoney.totalTax, dataSeting) : '-'}</span>
         </div>
         {/* Thành tiền */}
         <div className="flex justify-between responsive-text-base items-center mb-4">
@@ -299,7 +311,7 @@ const SidebarRight = ({ dataLang }) => {
             {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
           </h4>
           <span className="text-blue-color font-semibold">
-            {isTotalMoney.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
+            {isTotalMoney.totalAmount ? formatMoneyConfig(+isTotalMoney.totalAmount, dataSeting) : '-'}
           </span>
         </div>
       </div>
