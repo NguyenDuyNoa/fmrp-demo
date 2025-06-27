@@ -1,8 +1,8 @@
 import Image from 'next/image'
 
-const NoData = () => {
+const EmptyData = () => {
   return (
-    <div className='w-full min-h-[78vh] flex flex-col justify-center items-center select-none'>
+    <div className="w-full min-h-[78vh] flex flex-col justify-center items-center select-none">
       <Image
         src={'/data-not-found.png'}
         alt="No Data"
@@ -13,9 +13,9 @@ const NoData = () => {
         loading="lazy"
         crossOrigin="anonymous"
       ></Image>
-      <p className='text-sm font-normal mt-2'>Chưa có mặt hàng. Bắt đầu thêm mặt hàng tại khung tìm kiếm ngay!</p>
+      <p className="text-sm font-normal mt-2">Chưa có mặt hàng. Bắt đầu thêm mặt hàng tại khung tìm kiếm ngay!</p>
     </div>
   )
 }
 
-export default NoData
+export default EmptyData
