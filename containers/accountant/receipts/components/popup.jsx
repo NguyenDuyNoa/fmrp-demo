@@ -14,7 +14,6 @@ import { usePayment } from "@/hooks/common/usePayment";
 import useSetingServer from "@/hooks/useConfigNumber";
 import useActionRole from "@/hooks/useRole";
 import useToast from "@/hooks/useToast";
-import ToatstNotifi from "@/utils/helpers/alerNotification";
 import { formatMoment } from "@/utils/helpers/formatMoment";
 import formatMoneyConfig from "@/utils/helpers/formatMoney";
 import { CreatableSelectCore } from "@/utils/lib/CreatableSelect";
@@ -26,7 +25,6 @@ import moment from "moment/moment";
 import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { BiEdit } from "react-icons/bi";
 import { BsCalendarEvent } from "react-icons/bs";
 import { MdClear } from "react-icons/md";
 import { useSelector } from "react-redux";
@@ -55,6 +53,7 @@ const inistialValue = {
     listObject: null,
     typeOfDocument: null,
     listTypeOfDocument: [],
+    adjustedDocuments: [],
     price: null,
     method: null,
     note: null,
@@ -83,6 +82,8 @@ const Popup_dspt = (props) => {
     const [fetch, sFetch] = useState(inistialFetch);
 
     const [listValue, sListValue] = useState(inistialValue);
+
+    const [currentFloatValue, setCurrentFloatValue] = useState(0);
 
     const _ToggleModal = (e) => sOpen(e);
 
@@ -119,6 +120,7 @@ const Popup_dspt = (props) => {
     const initstialState = () => {
         sListValue(inistialValue);
         sError(inistialError);
+        setCurrentFloatValue(0);
     };
 
     const formatNumber = (number) => {
@@ -179,6 +181,7 @@ const Popup_dspt = (props) => {
             price: "",
             listTypeOfDocument: [],
             typeOfDocument: null,
+            adjustedDocuments: [],
         };
 
         switch (type) {
@@ -216,12 +219,18 @@ const Popup_dspt = (props) => {
                         value.reduce((total, item) => total + parseFloat(item.money || 0), 0)
                     );
                     updateListValue({ price: formattedTotal });
+                    
+                    // Khởi tạo adjustedDocuments với giá trị ban đầu giống với money
+                    const initialAdjustedDocs = value.map(item => ({
+                        ...item,
+                        adjustedMoney: parseFloat(item.money || 0)
+                    }));
+                    updateListValue({ adjustedDocuments: initialAdjustedDocs });
                 } else {
-                    updateListValue({ price: "" });
+                    updateListValue({ price: "", adjustedDocuments: [] });
                 }
                 break;
             case "price":
-                // const priceChange = parseFloat(value?.target.value.replace(/,/g, ""));
                 const priceChange = value?.target.value;
                 if (priceChange) {
                     if (listValue.listTypeOfDocument.length > 0 && priceChange > totalMoney) {
@@ -269,6 +278,7 @@ const Popup_dspt = (props) => {
             });
             showToat("error", `${props.dataLang?.required_field_null || "required_field_null"}`);
         } else {
+            updateListValue({ price: currentFloatValue });
             updateFetch({ onSending: true });
         }
     };
@@ -355,9 +365,18 @@ const Popup_dspt = (props) => {
         } else {
             formData.append("objects_id", listValue.listObject?.value);
         }
-        listValue.listTypeOfDocument?.forEach((e, index) => {
+        
+        // Sử dụng adjustedDocuments nếu có, nếu không thì sử dụng listTypeOfDocument
+        const documentsToSend = listValue.adjustedDocuments?.length > 0 ? listValue.adjustedDocuments : listValue.listTypeOfDocument;
+        
+        documentsToSend.forEach((e, index) => {
             formData.append(`voucher_id[${index}]`, e?.value);
+            // Gửi thêm thông tin về số tiền đã điều chỉnh nếu có
+            if (e.adjustedMoney !== undefined) {
+                formData.append(`voucher_money[${index}]`, e.adjustedMoney);
+            }
         });
+        
         formData.append("note", listValue.note ? listValue.note : "");
 
         handingReceip.mutate(formData, {
@@ -394,17 +413,10 @@ const Popup_dspt = (props) => {
                         }}
                         className="group rounded-lg w-full p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer hover:border-[#064E3B] hover:bg-[#064E3B]/10"
                     >
-                        {/* <BiEdit
-                            size={20}
-                            className="group-hover:text-sky-500 group-hover:scale-110 group-hover:shadow-md "
-                        /> */}
                         <EditIcon
                             color="#064E3B"
                             className="size-5"
                         />
-                        {/* <p className="group-hover:text-sky-500">
-                            {props.dataLang?.payment_editVotes || "payment_editVotes"}
-                        </p> */}
                     </div>
                 ) :
                     <div onClick={() => {
@@ -681,20 +693,41 @@ const Popup_dspt = (props) => {
                                             if (listValue.object?.value && listValue.listTypeOfDocument?.length > 0) {
                                                 if (listValue.object?.value != "other") {
                                                     let totalMoney = listValue.listTypeOfDocument.reduce(
-                                                        (total, item) => total + parseFloat(item.money),
+                                                        (total, item) => total + parseFloat(item.money || 0),
                                                         0
                                                     );
                                                     if (floatValue > totalMoney) {
                                                         isShow("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${formatNumber(totalMoney)}`);
+                                                        return false;
                                                     }
-                                                    return false;
-                                                    // return floatValue <= totalMoney;
-                                                } else {
-                                                    return true;
                                                 }
-                                            } else {
-                                                return true;
                                             }
+                                            setCurrentFloatValue(floatValue);
+                                            
+                                            // Cập nhật tỷ lệ số tiền cho từng chứng từ khi tổng số tiền thay đổi
+                                            if (listValue.listTypeOfDocument?.length > 0) {
+                                                const originalTotal = listValue.listTypeOfDocument.reduce(
+                                                    (total, item) => total + parseFloat(item.money || 0),
+                                                    0
+                                                );
+                                                
+                                                if (originalTotal > 0 && floatValue > 0) {
+                                                    const ratio = floatValue / originalTotal;
+                                                    
+                                                    // Tạo bản sao mới của listTypeOfDocument với số tiền đã điều chỉnh
+                                                    const updatedListTypeOfDocument = listValue.listTypeOfDocument.map(item => ({
+                                                        ...item,
+                                                        adjustedMoney: parseFloat((parseFloat(item.money) * ratio).toFixed(2))
+                                                    }));
+                                                    
+                                                    // Cập nhật state
+                                                    updateListValue({ 
+                                                        adjustedDocuments: updatedListTypeOfDocument
+                                                    });
+                                                }
+                                            }
+                                            
+                                            return true;
                                         }}
                                         className={`${error.errPrice && (listValue.price == null || listValue.price == "")
                                             ? "border-red-500"
@@ -737,7 +770,7 @@ const Popup_dspt = (props) => {
                             {listValue.listTypeOfDocument.length > 0 && (
                                 <div className="col-span-12 transition-all duration-200 ease-linear border border-b-0 rounded">
                                     <div className={`${listValue.listTypeOfDocument.length > 5 ? " h-[170px] overflow-auto" : ""} scrollbar-thin cursor-pointer scrollbar-thumb-slate-300 scrollbar-track-slate-100`}  >
-                                        {listValue.listTypeOfDocument.map((e, index) => {
+                                        {(listValue.adjustedDocuments?.length > 0 ? listValue.adjustedDocuments : listValue.listTypeOfDocument).map((e, index) => {
                                             return (
                                                 <div
                                                     key={e.value}
@@ -754,7 +787,7 @@ const Popup_dspt = (props) => {
                                                         </span>
                                                     </h1>
                                                     <h1 className="col-span-5 p-2 text-xs text-right">
-                                                        {formatNumber(e.money)}
+                                                        {formatNumber(e.adjustedMoney !== undefined ? e.adjustedMoney : e.money)}
                                                     </h1>
                                                 </div>
                                             );

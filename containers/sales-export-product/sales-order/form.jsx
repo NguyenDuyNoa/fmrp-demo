@@ -38,8 +38,11 @@ import { PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
+import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
+import EmptyData from '@/components/UI/emptyData'
 import { Button, ConfigProvider, DatePicker, Dropdown } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
@@ -47,14 +50,13 @@ import 'dayjs/locale/vi'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
-import NoData from './noData'
+
 dayjs.extend(customParseFormat)
 dayjs.locale('vi')
 
 const SalesOrderForm = (props) => {
   // State
   const [showMoreInfo, setShowMoreInfo] = useState(false)
-  const [activeTab, setActiveTab] = useState('info')
   const [idProductSale, setIdProductSale] = useState(null)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedBranch, setSelectedBranch] = useState(null)
@@ -107,25 +109,6 @@ const SalesOrderForm = (props) => {
   useEffect(() => {
     setSelectedPersonalContact(null)
   }, [selectedCustomer])
-
-  // Tab items
-  const tabItems = [
-    {
-      key: 'info',
-      label: 'Thông tin chung',
-      //children: <div>Thông tin chung content</div>,
-    },
-    {
-      key: 'note',
-      label: 'Ghi chú',
-      //children: <div>Ghi chú content</div>,
-    },
-  ]
-
-  // handle chọn tab
-  const handleTabClick = (key) => {
-    setActiveTab(key)
-  }
 
   // End Optimize UI
 
@@ -345,14 +328,6 @@ const SalesOrderForm = (props) => {
       } catch (error) {}
     }
   }
-
-  const options = dataItems?.map((e) => {
-    return {
-      label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-      value: e.id,
-      e,
-    }
-  })
 
   // tổng thay đổi
   useEffect(() => {
@@ -928,8 +903,6 @@ const SalesOrderForm = (props) => {
     onSending && handleSubmit()
   }, [onSending])
 
-  const allItems = [...options]
-
   const taxRateLabel = (option) => {
     return (
       <div className="flex items-center justify-start">
@@ -945,11 +918,10 @@ const SalesOrderForm = (props) => {
   const breadcrumbItems = [
     {
       label: `${dataLang?.returnSales_title || 'returnSales_title'}`,
-      // href: "/",
     },
     {
       label: `${dataLang?.sales_product_list || 'sales_product_list'}`,
-      href: '/sales-export-product/sales-order',
+      href: routerSalesOrder.home,
     },
     {
       label: `${
@@ -995,7 +967,7 @@ const SalesOrderForm = (props) => {
                 {/* Search Bar */}
                 <SelectBySearch
                   placeholderText="Tìm kiếm mặt hàng"
-                  allItems={typeOrder === '1' && quote === null ? [] : allItems}
+                  allItems={typeOrder === '1' && quote === null ? [] : dataItems}
                   formatNumber={formatNumber}
                   selectedOptions={itemsAll}
                   idProductSale={idProductSale}
@@ -1007,7 +979,7 @@ const SalesOrderForm = (props) => {
                 />
               </div>
 
-              {sortedArr.length <= 0 && <NoData />}
+              {sortedArr.length <= 0 && <EmptyData />}
               {sortedArr.length > 0 && (
                 <React.Fragment>
                   {/* Thông tin mặt hàng Header */}
@@ -1141,7 +1113,7 @@ const SalesOrderForm = (props) => {
                                 </span>
                               </p>
                               <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
-                                ĐVT: <span>{e?.unit}</span> - Tồn:
+                                ĐVT: <span>{e?.unit}</span> - Tồn:{' '}
                                 <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
                               </p>
                               <div className="flex items-center justify-center col-span-1">
@@ -1290,7 +1262,6 @@ const SalesOrderForm = (props) => {
                 </React.Fragment>
               )}
             </div>
-            <></>
           </div>
           {/* Cột phải */}
           <div className="w-1/4">
@@ -1301,38 +1272,13 @@ const SalesOrderForm = (props) => {
                   Thông tin
                 </h2>
                 {/* Tabs */}
-                <div className="w-full">
-                  {/* Tab header */}
-                  <div className="w-full flex items-center space-x-2 bg-blue-100 p-1 mb-6 rounded-xl relative">
-                    {tabItems.map((tab) => (
-                      <div className="w-full relative" key={tab.key}>
-                        {activeTab === tab.key && (
-                          <motion.div
-                            layoutId="active-tab-bg"
-                            className="absolute inset-0 bg-blue-color rounded-lg"
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                          />
-                        )}
-                        <button
-                          onClick={() => handleTabClick(tab.key)}
-                          className={`relative w-full py-2 responsive-text-sm font-normal rounded-lg z-10 transition-all duration-300
-                            ${activeTab === tab.key ? 'text-white' : 'text-gray-800'}
-                          `}
-                        >
-                          <span className="lg:px-1">{tab.label}</span>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Tab Content */}
-                  <div className="mt-4">
-                    {activeTab === 'info' && (
+                <OrderFormTabs
+                  Info={() => {
+                    return (
                       <div className="relative">
                         {/* Số đơn hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <h4 className="w-full responsive-text-base text-secondary-color-text">
-                            {dataLang?.sales_product_code || 'sales_product_code'}
-                          </h4>
+                          <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
                           <div className="w-full relative">
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">
                               #
@@ -1349,12 +1295,7 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Ngày tạo đơn */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <div className="flex items-center gap-x-1 w-full">
-                            <span className="text-red-500">*</span>
-                            <h4 className="w-full responsive-text-base text-secondary-color-text">
-                              {'Ngày tạo đơn' || dataLang?.sales_product_date}
-                            </h4>
-                          </div>
+                          <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
                           <div className="w-full">
                             <div className="relative w-full flex flex-row custom-date-picker">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1391,12 +1332,10 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Ngày cần hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <div className="flex items-center gap-x-1 w-full">
-                            <span className="text-red-500">*</span>
-                            <h4 className="w-full responsive-text-base text-secondary-color-text">
-                              {dataLang?.sales_product_item_date || 'sales_product_item_date'}
-                            </h4>
-                          </div>
+                          <InfoFormLabel
+                            isRequired
+                            label={dataLang?.sales_product_item_date || 'sales_product_item_date'}
+                          />
                           <div className="w-full">
                             <div className="relative flex flex-row custom-date-picker">
                               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1430,12 +1369,7 @@ const SalesOrderForm = (props) => {
                         </div>
                         {/* Khách hàng */}
                         <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <div className="flex items-center gap-x-1 w-full">
-                            <span className="text-red-500">*</span>
-                            <h4 className="w-full responsive-text-base text-secondary-color-text">
-                              {'Khách hàng' || dataLang?.selectedCustomer}
-                            </h4>
-                          </div>
+                          <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
                           <div className="w-full">
                             <div className="relative flex flex-row">
                               <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
@@ -1471,12 +1405,7 @@ const SalesOrderForm = (props) => {
                               <React.Fragment>
                                 {/* Chi nhánh */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <div className="flex items-center gap-x-1 w-full">
-                                    <span className="text-red-500">*</span>
-                                    <h4 className="w-full responsive-text-base text-secondary-color-text">
-                                      {'Chi nhánh' || dataLang?.branch}
-                                    </h4>
-                                  </div>
+                                  <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
                                   <div className="w-full">
                                     <div className="relative flex flex-row">
                                       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1498,32 +1427,12 @@ const SalesOrderForm = (props) => {
                                     )}
                                   </div>
                                 </div>
-                                {/* Người liên lạc */}
-                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <h4 className="w-full responsive-text-base text-secondary-color-text">
-                                    {'Người liên lạc' || dataLang?.contact_person}
-                                  </h4>
-                                  <div className="w-full relative">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                      <FiUser color="#7a7a7a" />
-                                    </span>
-                                    <SelectWithSort
-                                      title="Người liên lạc"
-                                      placeholderText="Chọn người liên lạc"
-                                      options={!!flagStateChange ? [] : dataPersonContact}
-                                      value={selectedPersonalContact || contactPerson}
-                                      onChange={(value) => setSelectedPersonalContact(value)}
-                                    />
-                                  </div>
-                                </div>
                                 {/* Nhân viên */}
                                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <div className="flex items-center gap-x-1 w-full">
-                                    <span className="text-red-500">*</span>
-                                    <h4 className="w-full responsive-text-base text-secondary-color-text">
-                                      {'Nhân viên' || dataLang?.sales_product_staff_in_charge}
-                                    </h4>
-                                  </div>
+                                  <InfoFormLabel
+                                    isRequired
+                                    label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
+                                  />
                                   <div className="w-full">
                                     <div className="relative flex flex-row">
                                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
@@ -1544,6 +1453,22 @@ const SalesOrderForm = (props) => {
                                           'sales_product_err_staff_in_charge'}
                                       </label>
                                     )}
+                                  </div>
+                                </div>
+                                {/* Người liên lạc */}
+                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                                  <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
+                                  <div className="w-full relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                      <FiUser color="#7a7a7a" />
+                                    </span>
+                                    <SelectWithSort
+                                      title="Người liên lạc"
+                                      placeholderText="Chọn người liên lạc"
+                                      options={!!flagStateChange ? [] : dataPersonContact}
+                                      value={selectedPersonalContact || contactPerson}
+                                      onChange={(value) => setSelectedPersonalContact(value)}
+                                    />
                                   </div>
                                 </div>
                               </React.Fragment>
@@ -1570,8 +1495,10 @@ const SalesOrderForm = (props) => {
                           </button>
                         </div>
                       </div>
-                    )}
-                    {activeTab === 'note' && (
+                    )
+                  }}
+                  Note={() => {
+                    return (
                       <div className="w-full mx-auto">
                         <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
                           {dataLang?.sales_product_note || 'sales_product_note'}
@@ -1587,9 +1514,9 @@ const SalesOrderForm = (props) => {
                           />
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
+                    )
+                  }}
+                />
               </div>
               {/* Cột tổng cộng */}
               <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
