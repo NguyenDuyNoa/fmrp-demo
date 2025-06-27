@@ -62,6 +62,14 @@ const SelectBySearch = ({
     })
   }
 
+  const itemsMap = allItems.map((e) => {
+    return {
+      label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+      value: e.id,
+      e,
+    }
+  })
+
   return (
     <div className="relative w-full">
       <Select
@@ -80,7 +88,7 @@ const SelectBySearch = ({
         suffixIcon={null}
         listHeight={420}
       >
-        {allItems.map((opt) => {
+        {itemsMap.map((opt) => {
           const e = opt.e
           return (
             <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
@@ -100,12 +108,12 @@ const SelectBySearch = ({
                       </div>
                     )}
                     <div className="text-gray-500">
-                      DVT: {e.unit_name} - Tồn: {formatNumber(e.qty_warehouse)}
+                      ĐVT: {e.unit_name} - Tồn: {formatNumber(e.qty_warehouse)}
                     </div>
                   </div>
                 </div>
                 <div className="text-red-500 responsive-text-sm min-w-[80px] text-right whitespace-nowrap">
-                  {formatNumber(e.price_sell)}
+                  {formatNumber(e.price_sell || e.price)} đ
                 </div>
               </div>
             </Option>

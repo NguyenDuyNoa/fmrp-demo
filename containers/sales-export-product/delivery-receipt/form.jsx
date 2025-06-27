@@ -1,36 +1,28 @@
 import apiDeliveryReceipt from '@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt'
-import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
-import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
-import { Container } from '@/components/UI/common/layout'
+import LayoutSalesPurchaseManager from '@/components/UI/common/LayoutSalesPurchase'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
 import { useClientComboboxByFilterBranch } from '@/hooks/common/useClients'
-import { useStaffComboboxByBranch, useStaffOptions } from '@/hooks/common/useStaffs'
+import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
 import { useTaxList } from '@/hooks/common/useTaxs'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
-import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { formatMoment } from '@/utils/helpers/formatMoment'
-import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Button } from 'antd'
 import moment from 'moment/moment'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import SidebarLeft from './form/SidebarLeft'
 import SidebarRight from './form/SidebarRight'
 import { useDeliveryReceipItemAll } from './hooks/useDeliveryReceipItemAll'
-import { useDeliveryReceipPerson } from './hooks/useDeliveryReceipPerson'
 
 const DeliveryReceiptForm = (props) => {
   const router = useRouter()
@@ -44,10 +36,6 @@ const DeliveryReceiptForm = (props) => {
   const isShow = useToast()
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
-
-  const statusExprired = useStatusExprired()
-
-  const authState = useSelector((state) => state.auth)
 
   // State
   const [onFetchingProductOrder, sOnFetchingProductOrder] = useState(false)
@@ -70,6 +58,7 @@ const DeliveryReceiptForm = (props) => {
 
   const [date, sDate] = useState(moment().format(FORMAT_MOMENT.DATE_TIME_LONG))
 
+  // Đơn Hàng Bán
   const [dataProductOrder, sDataProductOrder] = useState([])
 
   const [dataAddress, sDataAddress] = useState([])
@@ -121,32 +110,43 @@ const DeliveryReceiptForm = (props) => {
   const [generalSelectInfo, sGeneralSelectInfo] = useState({
     selectedBranch: null,
     selectedStaff: null,
+    selectedClient: null,
+    selectedProductOrder: null,
+    selectedAddress: null,
   })
+
+  const [isTotalMoney, setIsTotalMoney] = useState({
+    totalPrice: 0,
+    totalDiscountPrice: 0,
+    totalDiscountAfterPrice: 0,
+    totalTax: 0,
+    totalAmount: 0,
+  })
+  const [selectedSearchItems, setSelectedSearchItems] = useState([])
+  const [tableItems, setTableItems] = useState([])
 
   // Data Fetching
   const { data: dataTasxes = [] } = useTaxList()
 
   const { data: dataBranch = [] } = useBranchList()
 
-  const { data: dataStaff = [] } = useStaffOptions({ 'filter[branch_id]': idBranch !== null ? +idBranch?.value : null })
   const { data: dataStaffs = [] } = useStaffComboboxByBranch({
     branch_id: generalSelectInfo.selectedBranch != null ? [+generalSelectInfo.selectedBranch]?.map((e) => e) : null,
   })
 
-  const { data: dataContactPerson = [] } = useDeliveryReceipPerson({
-    'filter[client_id]': idClient != null ? idClient.value : null,
-  })
-
-  const { data: dataClient = [] } = useClientComboboxByFilterBranch(idBranch, {
-    'filter[branch_id]': idBranch != null ? idBranch.value : null,
+  const { data: dataClient = [] } = useClientComboboxByFilterBranch(generalSelectInfo.selectedBranch, {
+    'filter[branch_id]': generalSelectInfo.selectedBranch != null ? generalSelectInfo.selectedBranch : null,
   })
 
   const { data: dataItems } = useDeliveryReceipItemAll({
-    'filter[order_id]': idProductOrder !== null ? +idProductOrder.value : null,
+    'filter[order_id]':
+      generalSelectInfo.selectedProductOrder !== null ? +generalSelectInfo.selectedProductOrder : null,
     'filter[delivery_id]': id ? id : '',
   })
 
-  // Gán chi nhánh đầu tiên vào state selectedBranch khi render
+  const [isFirstRender, setIsFirstRender] = useState(true)
+
+  // Gắn chi nhánh đầu tiên vào state selectedBranch khi render
   useEffect(() => {
     if (dataBranch.length > 0 && dataBranch[0]?.value)
       sGeneralSelectInfo((prev) => ({
@@ -155,45 +155,124 @@ const DeliveryReceiptForm = (props) => {
       }))
   }, [dataBranch])
 
-  // Gán nhân viên theo staff_id từ authState lọc từ mảng dataStaffs
+  // Gắn nhân viên đầu tiên vào state selectedStaff khi render
   useEffect(() => {
-    if (dataStaffs.length > 0 && authState?.staff_id) {
-      const staff = dataStaffs.find((e) => e.value === authState?.staff_id)
-
+    if (dataStaffs.length > 0 && dataStaffs[0]?.value && isFirstRender) {
       sGeneralSelectInfo((prev) => ({
         ...prev,
-        selectedStaff: staff,
+        selectedStaff: dataStaffs[0].value,
       }))
+      setIsFirstRender(false)
     }
-  }, [dataStaffs, authState?.staff_id])
+  }, [dataStaffs])
 
   // fetch items
-  const handleFetchingAllSearchItems = async () => {
-    let form = new FormData()
-    if (selectedBranch != null) {
-      ;[+selectedBranch].forEach((e, index) => form.append(`branch_id[${index}]`, e))
-    }
+  const handleFetchingProductOrder = async () => {
+    let data = new FormData()
+    const idBranch = generalSelectInfo?.selectedBranch
+    const idClient = generalSelectInfo?.selectedClient
 
-    // try {
-    //   const {
-    //     data: { result },
-    //   } = await apiDeliveryReceipt.(form)
+    data.append('branch_id', idBranch !== null ? +idBranch : null)
+    data.append('client_id', idClient !== null ? +idClient : null)
 
-    //   sAllSearchItems(result)
-    // } catch (_error) {}
+    id && data.append('filter[delivery_id]', id ? id : '')
+
+    try {
+      const { results } = await apiDeliveryReceipt.apiSearchOrdersToCustomer(data)
+
+      sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })))
+
+      sOnFetchingProductOrder(false)
+    } catch (error) {}
   }
+
+  const handleFetchingAddress = async () => {
+    let data = new FormData()
+    const idClient = generalSelectInfo?.selectedClient
+
+    data.append('client_id', idClient !== null ? +idClient : null)
+    try {
+      const rResult = await apiDeliveryReceipt.apiGetShippingClient(data)
+
+      sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })))
+
+      sOnFetchingAddress(false)
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    if (!generalSelectInfo.selectedBranch) {
+      sGeneralSelectInfo((prev) => ({
+        ...prev,
+        selectedClient: null,
+        selectedStaff: null,
+      }))
+    }
+  }, [generalSelectInfo.selectedBranch])
+
+  useEffect(() => {
+    if (generalSelectInfo.selectedBranch && generalSelectInfo.selectedClient) {
+      handleFetchingProductOrder()
+      handleFetchingAddress()
+    } else if (!generalSelectInfo.selectedClient) {
+      sGeneralSelectInfo((prev) => ({
+        ...prev,
+        selectedProductOrder: null,
+        selectedAddress: null,
+      }))
+
+      sDataProductOrder([])
+      sDataAddress([])
+    }
+  }, [generalSelectInfo.selectedClient])
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
   }
 
-  const formatMoney = (number) => {
-    return formatMoneyConfig(+number, dataSeting)
+  const totalMoney = (option) => {
+    const totalPrice = option.reduce((acc, item) => {
+      const totalPrice = item?.price * item?.quantity
+      return acc + totalPrice
+    }, 0)
+
+    const totalDiscountPrice = option.reduce((acc, item) => {
+      const totalDiscountPrice = item?.price * (item?.discount / 100) * item?.quantity
+      return acc + totalDiscountPrice
+    }, 0)
+
+    const totalDiscountAfterPrice = option.reduce((acc, item) => {
+      const tienSauCK = item?.quantity * item?.price_after_discount
+      return acc + tienSauCK
+    }, 0)
+
+    const totalTax = option.reduce((acc, item) => {
+      const totalTaxIem =
+        item?.price_after_discount * (isNaN(item?.tax?.tax_rate) ? 0 : item?.tax?.tax_rate / 100) * item?.quantity
+      return acc + totalTaxIem
+    }, 0)
+
+    const totalAmount = option.reduce((acc, item) => {
+      const totalAmount = item?.total_amount
+      return acc + totalAmount
+    }, 0)
+    return {
+      totalPrice: totalPrice || 0,
+      totalDiscountPrice: totalDiscountPrice || 0,
+      totalDiscountAfterPrice: totalDiscountAfterPrice || 0,
+      totalTax: totalTax || 0,
+      totalAmount: totalAmount || 0,
+    }
   }
+
+  useEffect(() => {
+    const totalPrice = totalMoney(tableItems)
+    setIsTotalMoney(totalPrice)
+  }, [tableItems])
 
   const _HandleClosePopupAddress = (e) => {
     sOpenPopupAddress(e)
-    !e && _ServerFetching_Address()
+    !e && handleFetchingAddress()
   }
 
   const resetAllStates = () => {
@@ -316,35 +395,23 @@ const DeliveryReceiptForm = (props) => {
     enabled: !!id,
   })
 
-  const _ServerFetching_ProductOrder = async () => {
-    let data = new FormData()
+  // const _ServerFetching_ProductOrder = async () => {
+  //   let data = new FormData()
 
-    data.append('branch_id', idBranch !== null ? +idBranch.value : null)
+  //   data.append('branch_id', idBranch !== null ? +idBranch.value : null)
 
-    data.append('client_id', idClient !== null ? +idClient.value : null)
+  //   data.append('client_id', idClient !== null ? +idClient.value : null)
 
-    id && data.append('filter[delivery_id]', id ? id : '')
+  //   id && data.append('filter[delivery_id]', id ? id : '')
 
-    try {
-      const { results } = await apiDeliveryReceipt.apiSearchOrdersToCustomer(data)
+  //   try {
+  //     const { results } = await apiDeliveryReceipt.apiSearchOrdersToCustomer(data)
 
-      sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })))
+  //     sDataProductOrder(results?.map((e) => ({ label: e.text, value: e.id })))
 
-      sOnFetchingProductOrder(false)
-    } catch (error) {}
-  }
-
-  const _ServerFetching_Address = async () => {
-    let data = new FormData()
-    data.append('client_id', idClient !== null ? +idClient.value : null)
-    try {
-      const rResult = await apiDeliveryReceipt.apiGetShippingClient(data)
-
-      sDataAddress(rResult?.map((e) => ({ label: e.name, value: e.id })))
-
-      sOnFetchingAddress(false)
-    } catch (error) {}
-  }
+  //     sOnFetchingProductOrder(false)
+  //   } catch (error) {}
+  // }
 
   const handleSaveStatus = () => {
     isKeyState?.sListData([])
@@ -498,17 +565,6 @@ const DeliveryReceiptForm = (props) => {
       sOnFetchingAddress(true)
     }
   }, [idClient])
-
-  const useFetchingEffect = (condition, serverFetchFunction) => {
-    useEffect(() => {
-      if (condition) {
-        serverFetchFunction()
-      }
-    }, [condition, serverFetchFunction])
-  }
-
-  useFetchingEffect(onFetchingProductOrder, _ServerFetching_ProductOrder)
-  useFetchingEffect(onFetchingAddress, _ServerFetching_Address)
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
 
@@ -1000,71 +1056,56 @@ const DeliveryReceiptForm = (props) => {
   const sortedArr = []
 
   return (
-    <div className="overflow-hidden">
-      <Head>
-        <title>
-          {id
-            ? dataLang?.delivery_receipt_edit || 'delivery_receipt_edit'
-            : dataLang?.delivery_receipt_add || 'delivery_receipt_add'}
-        </title>
-      </Head>
-      <Container className="!h-max py-6 bg-gray-color">
-        {statusExprired ? (
-          <EmptyExprired />
-        ) : (
-          <React.Fragment>
-            <Breadcrumb items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
-          </React.Fragment>
-        )}
-        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-typo-gray-5 capitalize font-medium mt-1 2xl:!mb-5 lg:!mb-3">
-          {id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
-        </h2>
-
-        <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-40 relative">
-          {/* Cột trái */}
-          <div className="w-3/4">
-            <SidebarLeft dataLang={dataLang} formatNumber={formatNumber} sortedArr={sortedArr} />
-          </div>
-
-          {/* Cột phải */}
-          <div className="w-1/4">
-            <SidebarRight dataLang={dataLang} />
-          </div>
-        </div>
-
-        {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-6 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
-          <div className="w-3/4"></div>
-          <div className="w-1/4 flex justify-end items-center gap-2 py-4 3xl:px-5 px-3">
-            <button
-              onClick={() => router.push(routerDeliveryReceipt.home)}
-              dataLang={dataLang}
-              className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 px-2 h-full bg-[#F2F3F5] 2xl:text-base text-sm font-normal rounded-lg"
-            >
-              Thoát
-            </button>
-            <Button
-              //   onClick={handleSubmitValidate.bind(this)}
-              dataLang={dataLang}
-              //   loading={onSending}
-              className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
-            >
-              Lưu
-            </Button>
-          </div>
-        </div>
-      </Container>
-      <PopupConfim
-        dataLang={dataLang}
-        type="warning"
-        title={TITLE_DELETE_ITEMS}
-        subtitle={CONFIRMATION_OF_CHANGES}
-        isOpen={isOpen}
-        nameModel={'change_item'}
-        save={handleSaveStatus}
-        cancel={handleCancleStatus}
-      />
-    </div>
+    <LayoutSalesPurchaseManager
+      dataLang={dataLang}
+      titleHead={
+        id
+          ? dataLang?.delivery_receipt_edit || 'delivery_receipt_edit'
+          : dataLang?.delivery_receipt_add || 'delivery_receipt_add'
+      }
+      breadcrumbItems={breadcrumbItems}
+      titleLayout={id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
+      sidebarLeft={
+        <SidebarLeft
+          dataLang={dataLang}
+          formatNumber={formatNumber}
+          searchItems={dataItems && dataItems?.length > 0 ? dataItems : []}
+          sortedArr={sortedArr}
+          selectedSearchItems={selectedSearchItems}
+          setSelectedSearchItems={setSelectedSearchItems}
+          tableItems={tableItems}
+          setTableItems={setTableItems}
+        />
+      }
+      sidebarRight={
+        <SidebarRight
+          dataLang={dataLang}
+          generalSelectInfo={generalSelectInfo}
+          sGeneralSelectInfo={sGeneralSelectInfo}
+          dataProductOrder={dataProductOrder}
+          dataClient={dataClient}
+          dataBranch={dataBranch}
+          dataStaffs={dataStaffs}
+          dataAddress={dataAddress}
+          isTotalMoney={isTotalMoney}
+        />
+      }
+      routerBack={routerDeliveryReceipt.home}
+      onSave={_HandleSubmit.bind(this)}
+      isLoading={onSending}
+      popupConfim={
+        <PopupConfim
+          dataLang={dataLang}
+          type="warning"
+          title={TITLE_DELETE_ITEMS}
+          subtitle={CONFIRMATION_OF_CHANGES}
+          isOpen={isOpen}
+          nameModel={'change_item'}
+          save={handleSaveStatus}
+          cancel={handleCancleStatus}
+        />
+      }
+    />
   )
 }
 

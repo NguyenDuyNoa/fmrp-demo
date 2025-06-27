@@ -1,6 +1,8 @@
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
+import useSetingServer from '@/hooks/useConfigNumber'
+import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
@@ -12,15 +14,23 @@ import { FiUser } from 'react-icons/fi'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 
-const SidebarRight = ({ dataLang }) => {
+const SidebarRight = ({
+  dataLang,
+  generalSelectInfo,
+  sGeneralSelectInfo,
+  dataProductOrder,
+  dataClient,
+  dataBranch,
+  dataStaffs,
+  dataAddress,
+  isTotalMoney,
+}) => {
+  // Call hook
+  const dataSeting = useSetingServer()
+
+  // State management
+  const [startDate, setStartDate] = useState(dayjs())
   const [showMoreInfo, setShowMoreInfo] = useState(false)
-  const [isTotalMoney, setIsTotalMoney] = useState({
-    totalPrice: 0,
-    totalDiscountPrice: 0,
-    totalDiscountAfterPrice: 0,
-    totalTax: 0,
-    totalAmount: 0,
-  })
 
   return (
     <div className="flex flex-col gap-y-6">
@@ -67,13 +77,13 @@ const SidebarRight = ({ dataLang }) => {
                             format: 'HH:mm',
                           }}
                           suffixIcon={null}
-                          //   value={dayjs(startDate)}
-                          //   onChange={(date) => {
-                          //     if (date) {
-                          //       const dateString = date.toDate().toString()
-                          //       setStartDate(dateString)
-                          //     }
-                          //   }}
+                          value={dayjs(startDate)}
+                          onChange={(date) => {
+                            if (date) {
+                              const dateString = date.toDate().toString()
+                              setStartDate(dateString)
+                            }
+                          }}
                         />
                       </ConfigProvider>
                     </div>
@@ -86,38 +96,6 @@ const SidebarRight = ({ dataLang }) => {
                   )} */}
                 </div>
 
-                {/* Địa Chỉ Giao Hàng */}
-                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                  <InfoFormLabel isRequired label={'Địa chỉ giao hàng'} />
-                  <div className="w-full relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <PiMapPinLight color="#7a7a7a" />
-                    </span>
-                    <SelectWithSort
-                      title="Địa chỉ giao hàng"
-                      placeholderText="Chọn địa chỉ giao hàng"
-                      options={[]}
-                      //   value={selectedPersonalContact || contactPerson}
-                      //   onChange={(value) => setSelectedPersonalContact(value)}
-                    />
-                  </div>
-                </div>
-                {/* Đơn Hàng Bán */}
-                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                  <InfoFormLabel isRequired label={'Đơn Hàng Bán'} />
-                  <div className="w-full relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <PiMapPinLight color="#7a7a7a" />
-                    </span>
-                    <SelectWithSort
-                      title="Đơn Hàng Bán"
-                      placeholderText="Chọn đơn hàng bán"
-                      options={[]}
-                      //   value={selectedPersonalContact || contactPerson}
-                      //   onChange={(value) => setSelectedPersonalContact(value)}
-                    />
-                  </div>
-                </div>
                 {/* Khách hàng */}
                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                   <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
@@ -129,9 +107,11 @@ const SidebarRight = ({ dataLang }) => {
                       <SelectWithSort
                         title="Khách hàng"
                         placeholderText="Chọn khách hàng"
-                        options={[]}
-                        // value={selectedCustomer}
-                        // onChange={(value) => setSelectedCustomer(value)}
+                        options={dataClient}
+                        value={generalSelectInfo?.selectedClient}
+                        onChange={(value) => {
+                          sGeneralSelectInfo({ ...generalSelectInfo, selectedClient: value })
+                        }}
                         // isError={errCustomer}
                       />
                     </div>
@@ -142,6 +122,41 @@ const SidebarRight = ({ dataLang }) => {
                     )} */}
                   </div>
                 </div>
+
+                {/* Đơn Hàng Bán */}
+                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                  <InfoFormLabel isRequired label={'Đơn Hàng Bán'} />
+                  <div className="w-full relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                      <PiMapPinLight color="#7a7a7a" />
+                    </span>
+                    <SelectWithSort
+                      title="Đơn Hàng Bán"
+                      placeholderText="Chọn đơn hàng bán"
+                      options={dataProductOrder}
+                      value={generalSelectInfo?.selectedProductOrder}
+                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedProductOrder: value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Địa Chỉ Giao Hàng */}
+                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                  <InfoFormLabel isRequired label={'Địa chỉ giao hàng'} />
+                  <div className="w-full relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                      <PiMapPinLight color="#7a7a7a" />
+                    </span>
+                    <SelectWithSort
+                      title="Địa chỉ giao hàng"
+                      placeholderText="Chọn địa chỉ giao hàng"
+                      options={dataAddress}
+                      value={generalSelectInfo?.selectedAddress}
+                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedAddress: value })}
+                    />
+                  </div>
+                </div>
+
                 {/* Xem thêm thông tin */}
                 <AnimatePresence initial={false}>
                   {showMoreInfo && (
@@ -165,9 +180,11 @@ const SidebarRight = ({ dataLang }) => {
                               <SelectWithSort
                                 title="Chi nhánh"
                                 placeholderText="Chọn chi nhánh"
-                                options={[]}
-                                // value={selectedBranch}
-                                // onChange={(value) => setSelectedBranch(value)}
+                                options={dataBranch}
+                                value={generalSelectInfo?.selectedBranch}
+                                onChange={(value) =>
+                                  sGeneralSelectInfo({ ...generalSelectInfo, selectedBranch: value })
+                                }
                                 // isError={errBranch}
                               />
                             </div>
@@ -190,9 +207,9 @@ const SidebarRight = ({ dataLang }) => {
                               <SelectWithSort
                                 title="Nhân viên"
                                 placeholderText="Chọn nhân viên"
-                                options={[]}
-                                // value={selectedStaff}
-                                // onChange={(value) => setSelectedStaff(value)}
+                                options={dataStaffs}
+                                value={generalSelectInfo?.selectedStaff}
+                                onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedStaff: value })}
                                 // isError={errStaff}
                               />
                             </div>
@@ -201,23 +218,6 @@ const SidebarRight = ({ dataLang }) => {
                                 {dataLang?.sales_product_err_staff_in_charge || 'sales_product_err_staff_in_charge'}
                               </label>
                             )} */}
-                          </div>
-                        </div>
-
-                        {/* Người liên lạc */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <InfoFormLabel label={'Người liên lạc' || dataLang?.contact_person} />
-                          <div className="w-full relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                              <FiUser color="#7a7a7a" />
-                            </span>
-                            <SelectWithSort
-                              title="Người liên lạc"
-                              placeholderText="Chọn người liên lạc"
-                              options={[]}
-                              //   value={selectedPersonalContact || contactPerson}
-                              //   onChange={(value) => setSelectedPersonalContact(value)}
-                            />
                           </div>
                         </div>
                       </>
@@ -274,24 +274,30 @@ const SidebarRight = ({ dataLang }) => {
         {/* Tổng tiền */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
           <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
-          <span>{isTotalMoney.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
+          <span>{isTotalMoney.totalPrice ? formatMoneyConfig(+isTotalMoney.totalPrice, dataSeting) : '-'}</span>
         </div>
         {/* Tiền chiết khấu */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
-          <span>{isTotalMoney.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
+          <span>
+            {isTotalMoney.totalDiscountPrice ? formatMoneyConfig(+isTotalMoney.totalDiscountPrice, dataSeting) : '-'}
+          </span>
         </div>
         {/* Tiền sau chiết khấu */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">
             {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
           </h4>
-          <span>{isTotalMoney.totalDiscountAfterPrice ? formatMoney(isTotalMoney.totalDiscountAfterPrice) : '-'}</span>
+          <span>
+            {isTotalMoney.totalDiscountAfterPrice
+              ? formatMoneyConfig(+isTotalMoney.totalDiscountAfterPrice, dataSeting)
+              : '-'}
+          </span>
         </div>
         {/* Tiền thuế */}
         <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
           <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
-          <span>{isTotalMoney.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
+          <span>{isTotalMoney.totalTax ? formatMoneyConfig(+isTotalMoney.totalTax, dataSeting) : '-'}</span>
         </div>
         {/* Thành tiền */}
         <div className="flex justify-between responsive-text-base items-center mb-4">
@@ -299,7 +305,7 @@ const SidebarRight = ({ dataLang }) => {
             {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
           </h4>
           <span className="text-blue-color font-semibold">
-            {isTotalMoney.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
+            {isTotalMoney.totalAmount ? formatMoneyConfig(+isTotalMoney.totalAmount, dataSeting) : '-'}
           </span>
         </div>
       </div>

@@ -1516,7 +1516,6 @@ const DeliveryReceiptForm = (props) => {
             <div className="col-span-10">
               <div className="grid grid-cols-11 border-t border-b border-l border-r divide-x">
                 <div className="col-span-2">
-                  {' '}
                   <Select
                     classNamePrefix="customDropdowDefault"
                     placeholder={dataLang?.delivery_receipt_warehouse || 'delivery_receipt_warehouse'}
