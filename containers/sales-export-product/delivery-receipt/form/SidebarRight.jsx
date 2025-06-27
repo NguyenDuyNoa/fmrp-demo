@@ -14,19 +14,23 @@ import { FiUser } from 'react-icons/fi'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 
-const SidebarRight = ({ dataLang }) => {
+const SidebarRight = ({
+  dataLang,
+  generalSelectInfo,
+  sGeneralSelectInfo,
+  dataProductOrder,
+  dataClient,
+  dataBranch,
+  dataStaffs,
+  dataAddress,
+  isTotalMoney,
+}) => {
   // Call hook
   const dataSeting = useSetingServer()
 
   // State management
+  const [startDate, setStartDate] = useState(dayjs())
   const [showMoreInfo, setShowMoreInfo] = useState(false)
-  const [isTotalMoney, setIsTotalMoney] = useState({
-    totalPrice: 0,
-    totalDiscountPrice: 0,
-    totalDiscountAfterPrice: 0,
-    totalTax: 0,
-    totalAmount: 0,
-  })
 
   return (
     <div className="flex flex-col gap-y-6">
@@ -73,13 +77,13 @@ const SidebarRight = ({ dataLang }) => {
                             format: 'HH:mm',
                           }}
                           suffixIcon={null}
-                          //   value={dayjs(startDate)}
-                          //   onChange={(date) => {
-                          //     if (date) {
-                          //       const dateString = date.toDate().toString()
-                          //       setStartDate(dateString)
-                          //     }
-                          //   }}
+                          value={dayjs(startDate)}
+                          onChange={(date) => {
+                            if (date) {
+                              const dateString = date.toDate().toString()
+                              setStartDate(dateString)
+                            }
+                          }}
                         />
                       </ConfigProvider>
                     </div>
@@ -92,38 +96,6 @@ const SidebarRight = ({ dataLang }) => {
                   )} */}
                 </div>
 
-                {/* Địa Chỉ Giao Hàng */}
-                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                  <InfoFormLabel isRequired label={'Địa chỉ giao hàng'} />
-                  <div className="w-full relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <PiMapPinLight color="#7a7a7a" />
-                    </span>
-                    <SelectWithSort
-                      title="Địa chỉ giao hàng"
-                      placeholderText="Chọn địa chỉ giao hàng"
-                      options={[]}
-                      //   value={selectedPersonalContact || contactPerson}
-                      //   onChange={(value) => setSelectedPersonalContact(value)}
-                    />
-                  </div>
-                </div>
-                {/* Đơn Hàng Bán */}
-                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                  <InfoFormLabel isRequired label={'Đơn Hàng Bán'} />
-                  <div className="w-full relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <PiMapPinLight color="#7a7a7a" />
-                    </span>
-                    <SelectWithSort
-                      title="Đơn Hàng Bán"
-                      placeholderText="Chọn đơn hàng bán"
-                      options={[]}
-                      //   value={selectedPersonalContact || contactPerson}
-                      //   onChange={(value) => setSelectedPersonalContact(value)}
-                    />
-                  </div>
-                </div>
                 {/* Khách hàng */}
                 <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                   <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
@@ -135,9 +107,11 @@ const SidebarRight = ({ dataLang }) => {
                       <SelectWithSort
                         title="Khách hàng"
                         placeholderText="Chọn khách hàng"
-                        options={[]}
-                        // value={selectedCustomer}
-                        // onChange={(value) => setSelectedCustomer(value)}
+                        options={dataClient}
+                        value={generalSelectInfo?.selectedClient}
+                        onChange={(value) => {
+                          sGeneralSelectInfo({ ...generalSelectInfo, selectedClient: value })
+                        }}
                         // isError={errCustomer}
                       />
                     </div>
@@ -148,6 +122,41 @@ const SidebarRight = ({ dataLang }) => {
                     )} */}
                   </div>
                 </div>
+
+                {/* Đơn Hàng Bán */}
+                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                  <InfoFormLabel isRequired label={'Đơn Hàng Bán'} />
+                  <div className="w-full relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                      <PiMapPinLight color="#7a7a7a" />
+                    </span>
+                    <SelectWithSort
+                      title="Đơn Hàng Bán"
+                      placeholderText="Chọn đơn hàng bán"
+                      options={dataProductOrder}
+                      value={generalSelectInfo?.selectedProductOrder}
+                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedProductOrder: value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Địa Chỉ Giao Hàng */}
+                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                  <InfoFormLabel isRequired label={'Địa chỉ giao hàng'} />
+                  <div className="w-full relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                      <PiMapPinLight color="#7a7a7a" />
+                    </span>
+                    <SelectWithSort
+                      title="Địa chỉ giao hàng"
+                      placeholderText="Chọn địa chỉ giao hàng"
+                      options={dataAddress}
+                      value={generalSelectInfo?.selectedAddress}
+                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedAddress: value })}
+                    />
+                  </div>
+                </div>
+
                 {/* Xem thêm thông tin */}
                 <AnimatePresence initial={false}>
                   {showMoreInfo && (
@@ -171,9 +180,11 @@ const SidebarRight = ({ dataLang }) => {
                               <SelectWithSort
                                 title="Chi nhánh"
                                 placeholderText="Chọn chi nhánh"
-                                options={[]}
-                                // value={selectedBranch}
-                                // onChange={(value) => setSelectedBranch(value)}
+                                options={dataBranch}
+                                value={generalSelectInfo?.selectedBranch}
+                                onChange={(value) =>
+                                  sGeneralSelectInfo({ ...generalSelectInfo, selectedBranch: value })
+                                }
                                 // isError={errBranch}
                               />
                             </div>
@@ -196,9 +207,9 @@ const SidebarRight = ({ dataLang }) => {
                               <SelectWithSort
                                 title="Nhân viên"
                                 placeholderText="Chọn nhân viên"
-                                options={[]}
-                                // value={selectedStaff}
-                                // onChange={(value) => setSelectedStaff(value)}
+                                options={dataStaffs}
+                                value={generalSelectInfo?.selectedStaff}
+                                onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedStaff: value })}
                                 // isError={errStaff}
                               />
                             </div>
@@ -207,23 +218,6 @@ const SidebarRight = ({ dataLang }) => {
                                 {dataLang?.sales_product_err_staff_in_charge || 'sales_product_err_staff_in_charge'}
                               </label>
                             )} */}
-                          </div>
-                        </div>
-
-                        {/* Người liên lạc */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <InfoFormLabel label={'Người liên lạc' || dataLang?.contact_person} />
-                          <div className="w-full relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                              <FiUser color="#7a7a7a" />
-                            </span>
-                            <SelectWithSort
-                              title="Người liên lạc"
-                              placeholderText="Chọn người liên lạc"
-                              options={[]}
-                              //   value={selectedPersonalContact || contactPerson}
-                              //   onChange={(value) => setSelectedPersonalContact(value)}
-                            />
                           </div>
                         </div>
                       </>

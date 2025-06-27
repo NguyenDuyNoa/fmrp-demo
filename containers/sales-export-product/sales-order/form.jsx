@@ -329,14 +329,6 @@ const SalesOrderForm = (props) => {
     }
   }
 
-  const options = dataItems?.map((e) => {
-    return {
-      label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-      value: e.id,
-      e,
-    }
-  })
-
   // tổng thay đổi
   useEffect(() => {
     if (totalTax == null) return
@@ -911,8 +903,6 @@ const SalesOrderForm = (props) => {
     onSending && handleSubmit()
   }, [onSending])
 
-  const allItems = [...options]
-
   const taxRateLabel = (option) => {
     return (
       <div className="flex items-center justify-start">
@@ -977,7 +967,7 @@ const SalesOrderForm = (props) => {
                 {/* Search Bar */}
                 <SelectBySearch
                   placeholderText="Tìm kiếm mặt hàng"
-                  allItems={typeOrder === '1' && quote === null ? [] : allItems}
+                  allItems={typeOrder === '1' && quote === null ? [] : dataItems}
                   formatNumber={formatNumber}
                   selectedOptions={itemsAll}
                   idProductSale={idProductSale}
@@ -1123,7 +1113,7 @@ const SalesOrderForm = (props) => {
                                 </span>
                               </p>
                               <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
-                                ĐVT: <span>{e?.unit}</span> - Tồn:
+                                ĐVT: <span>{e?.unit}</span> - Tồn:{' '}
                                 <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
                               </p>
                               <div className="flex items-center justify-center col-span-1">

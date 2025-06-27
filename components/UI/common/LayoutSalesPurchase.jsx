@@ -21,8 +21,6 @@ const LayoutSalesPurchaseManager = ({
   const router = useRouter()
   const statusExprired = useStatusExprired()
 
-  console.log('breadcrumbItems', breadcrumbItems)
-
   return (
     <div className="overflow-hidden">
       <Head>
