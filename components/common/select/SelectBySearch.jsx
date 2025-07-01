@@ -7,13 +7,12 @@ const { Option } = Select
 
 const SelectBySearch = ({
   placeholderText,
-  allItems,
-  formatNumber,
   selectedOptions = [],
   idProductSale,
   onChange,
   handleIncrease,
   options,
+  children,
 }) => {
   // Khởi tạo selectedItems bằng selectedOptions từ props
   const [_, setSelectedItems] = useState(selectedOptions)
@@ -62,14 +61,6 @@ const SelectBySearch = ({
     })
   }
 
-  const itemsMap = allItems.map((e) => {
-    return {
-      label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
-      value: e.id,
-      e,
-    }
-  })
-
   return (
     <div className="relative w-full">
       <Select
@@ -88,37 +79,7 @@ const SelectBySearch = ({
         suffixIcon={null}
         listHeight={420}
       >
-        {itemsMap.map((opt) => {
-          const e = opt.e
-          return (
-            <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
-              <div className="flex p-2 hover:bg-gray-100 rounded-md cursor-pointer items-center justify-between font-deca">
-                <div className="flex gap-3 items-start w-[calc(100%-80px)]">
-                  <img
-                    src={e.images ?? '/icon/noimagelogo.png'}
-                    alt={e.name}
-                    className="w-10 h-10 object-cover rounded-md"
-                  />
-                  <div className="flex flex-col 3xl:text-[10px] text-[9px] overflow-hidden w-full">
-                    <div className="font-semibold responsive-text-sm truncate text-black">{e.name}</div>
-                    {(e.product_variation || e.product_variation_1) && (
-                      <div className="text-blue-600 truncate">
-                        {e.product_variation && `Màu sắc: ${e.product_variation} `}
-                        {e.product_variation_1 && `- Size: ${e.product_variation_1}`}
-                      </div>
-                    )}
-                    <div className="text-gray-500">
-                      ĐVT: {e.unit_name} - Tồn: {formatNumber(e.qty_warehouse)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-red-500 responsive-text-sm min-w-[80px] text-right whitespace-nowrap">
-                  {formatNumber(e.price_sell || e.price)} đ
-                </div>
-              </div>
-            </Option>
-          )
-        })}
+        {children}
       </Select>
 
       <div className="absolute 3xl:right-3 right-2 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">

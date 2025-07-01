@@ -30,8 +30,8 @@ const OrderFormTabs = ({ Info, Note }) => {
             )}
             <button
               onClick={() => setActiveTab(tab.key)}
-              className={`relative w-full py-2 responsive-text-sm font-normal rounded-lg z-10 transition-all duration-300 ${
-                activeTab === tab.key ? 'text-white' : 'text-gray-800'
+              className={`relative w-full py-2 responsive-text-sm font-medium rounded-lg z-10 transition-all duration-300 ${
+                activeTab === tab.key ? 'text-white' : 'text-[#11315B]'
               } `}
             >
               <span className="lg:px-1">{tab.label}</span>

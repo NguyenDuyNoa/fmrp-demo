@@ -50,6 +50,7 @@ import 'dayjs/locale/vi'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
+import OptionSelectBySearch from './components/OptionSelectBySearch'
 
 dayjs.extend(customParseFormat)
 dayjs.locale('vi')
@@ -932,6 +933,14 @@ const SalesOrderForm = (props) => {
     },
   ]
 
+  const options = dataItems?.map((e) => {
+    return {
+      label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+      value: e.id,
+      e,
+    }
+  })
+
   return (
     <div className="overflow-hidden">
       <Head>
@@ -967,8 +976,6 @@ const SalesOrderForm = (props) => {
                 {/* Search Bar */}
                 <SelectBySearch
                   placeholderText="Tìm kiếm mặt hàng"
-                  allItems={typeOrder === '1' && quote === null ? [] : dataItems}
-                  formatNumber={formatNumber}
                   selectedOptions={itemsAll}
                   idProductSale={idProductSale}
                   onChange={(value) => {
@@ -976,7 +983,16 @@ const SalesOrderForm = (props) => {
                   }}
                   options={option}
                   handleIncrease={handleIncrease}
-                />
+                >
+                  {options?.map((opt) => {
+                    const e = opt.e
+                    return (
+                      <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
+                        <OptionSelectBySearch e={e} formatNumber={formatNumber} />
+                      </Option>
+                    )
+                  })}
+                </SelectBySearch>
               </div>
 
               {sortedArr.length <= 0 && <EmptyData />}

@@ -9,20 +9,24 @@ import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown2, ArrowUp2 } from 'iconsax-react'
 import { useState } from 'react'
+import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { FiUser } from 'react-icons/fi'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
+import { TbNotes } from 'react-icons/tb'
+import PopupAddress from '../components/PopupAddress'
 
 const SidebarRight = ({
   dataLang,
-  generalSelectInfo,
-  sGeneralSelectInfo,
+  generalSelectedInfo,
+  sGeneralSelectedInfo,
   dataProductOrder,
   dataClient,
   dataBranch,
   dataStaffs,
   dataAddress,
+  handleFetchingAddress,
   isTotalMoney,
 }) => {
   // Call hook
@@ -31,6 +35,12 @@ const SidebarRight = ({
   // State management
   const [startDate, setStartDate] = useState(dayjs())
   const [showMoreInfo, setShowMoreInfo] = useState(false)
+  const [openPopupAddress, sOpenPopupAddress] = useState(false)
+
+  const onClickPopupAddress = (e) => {
+    sOpenPopupAddress(e)
+    !e && handleFetchingAddress()
+  }
 
   return (
     <div className="flex flex-col gap-y-6">
@@ -108,9 +118,9 @@ const SidebarRight = ({
                         title="Khách hàng"
                         placeholderText="Chọn khách hàng"
                         options={dataClient}
-                        value={generalSelectInfo?.selectedClient}
+                        value={generalSelectedInfo?.selectedClient}
                         onChange={(value) => {
-                          sGeneralSelectInfo({ ...generalSelectInfo, selectedClient: value })
+                          sGeneralSelectedInfo({ ...generalSelectedInfo, selectedClient: value })
                         }}
                         // isError={errCustomer}
                       />
@@ -128,14 +138,16 @@ const SidebarRight = ({
                   <InfoFormLabel isRequired label={'Đơn Hàng Bán'} />
                   <div className="w-full relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <PiMapPinLight color="#7a7a7a" />
+                      <TbNotes color="#7a7a7a" />
                     </span>
                     <SelectWithSort
                       title="Đơn Hàng Bán"
                       placeholderText="Chọn đơn hàng bán"
                       options={dataProductOrder}
-                      value={generalSelectInfo?.selectedProductOrder}
-                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedProductOrder: value })}
+                      value={generalSelectedInfo?.selectedProductOrder}
+                      onChange={(value) =>
+                        sGeneralSelectedInfo({ ...generalSelectedInfo, selectedProductOrder: value })
+                      }
                     />
                   </div>
                 </div>
@@ -151,8 +163,21 @@ const SidebarRight = ({
                       title="Địa chỉ giao hàng"
                       placeholderText="Chọn địa chỉ giao hàng"
                       options={dataAddress}
-                      value={generalSelectInfo?.selectedAddress}
-                      onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedAddress: value })}
+                      value={generalSelectedInfo?.selectedAddress}
+                      onChange={(value) => sGeneralSelectedInfo({ ...generalSelectedInfo, selectedAddress: value })}
+                    />
+                    {generalSelectedInfo.selectedClient && (
+                      <AiFillPlusCircle
+                        onClick={() => onClickPopupAddress(true)}
+                        className="right-0 top-0 -translate-x-[450%] 3xl:translate-y-[80%] 2xl:translate-y-[70%] xl:translate-y-[70%] translate-y-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
+                      />
+                    )}
+                    <PopupAddress
+                      dataLang={dataLang}
+                      clientId={generalSelectedInfo?.selectedClient}
+                      openPopupAddress={openPopupAddress}
+                      handleClosePopupAddress={() => onClickPopupAddress(false)}
+                      className="hidden"
                     />
                   </div>
                 </div>
@@ -181,9 +206,9 @@ const SidebarRight = ({
                                 title="Chi nhánh"
                                 placeholderText="Chọn chi nhánh"
                                 options={dataBranch}
-                                value={generalSelectInfo?.selectedBranch}
+                                value={generalSelectedInfo?.selectedBranch}
                                 onChange={(value) =>
-                                  sGeneralSelectInfo({ ...generalSelectInfo, selectedBranch: value })
+                                  sGeneralSelectedInfo({ ...generalSelectedInfo, selectedBranch: value })
                                 }
                                 // isError={errBranch}
                               />
@@ -208,8 +233,10 @@ const SidebarRight = ({
                                 title="Nhân viên"
                                 placeholderText="Chọn nhân viên"
                                 options={dataStaffs}
-                                value={generalSelectInfo?.selectedStaff}
-                                onChange={(value) => sGeneralSelectInfo({ ...generalSelectInfo, selectedStaff: value })}
+                                value={generalSelectedInfo?.selectedStaff}
+                                onChange={(value) =>
+                                  sGeneralSelectedInfo({ ...generalSelectedInfo, selectedStaff: value })
+                                }
                                 // isError={errStaff}
                               />
                             </div>

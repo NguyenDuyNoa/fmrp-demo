@@ -2,10 +2,20 @@ import { Empty, Radio, Select } from 'antd'
 
 const { Option } = Select
 
-const SelectWithSort = ({ title, placeholderText, options, value, onChange, onClear, disabled, isError = false }) => {
+const SelectWithSort = ({
+  title,
+  placeholderText,
+  options,
+  value,
+  onChange,
+  onClear,
+  disabled,
+  isError = false,
+  className = 'select-with-sort w-full',
+}) => {
   return (
     <Select
-      className="select-with-sort 3xl:min-w-[330px] w-full truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer"
+      className={`w-full truncate placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer ${className}`}
       showSearch
       placeholder={placeholderText}
       allowClear
@@ -24,7 +34,7 @@ const SelectWithSort = ({ title, placeholderText, options, value, onChange, onCl
       optionLabelProp="label"
       status={isError ? 'error' : ''}
     >
-      {options.map((opt, index) => (
+      {options?.map((opt, index) => (
         <Option key={opt.value} value={opt.value} label={opt.label}>
           <div
             className={`flex items-center py-2 gap-x-2 responsive-text-base ${

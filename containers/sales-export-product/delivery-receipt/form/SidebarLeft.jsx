@@ -1,5 +1,6 @@
+import TableHeader from '@/components/common/orderManagement/TableHeader'
 import TaxRateLabel from '@/components/common/orderManagement/TaxRateLabel'
-import SelectBySearch from '@/components/common/select/SelectBySearch'
+import SelectWithSort from '@/components/common/select/SelectWithSort'
 import EmptyData from '@/components/UI/emptyData'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
@@ -7,18 +8,18 @@ import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericF
 import { useTaxList } from '@/hooks/common/useTaxs'
 import { isAllowedDiscount, isAllowedNumber } from '@/utils/helpers/common'
 import formatMoney from '@/utils/helpers/formatMoney'
-import { Dropdown, Select } from 'antd'
+import { Dropdown } from 'antd'
 import { Add, ArrowDown2, Minus } from 'iconsax-react'
 import { useState } from 'react'
 import { FaPencilAlt } from 'react-icons/fa'
 import { MdClear } from 'react-icons/md'
 import { v4 as uuidv4 } from 'uuid'
+import SelectBySearch from '../components/SelectBySearch'
 
 const SidebarLeft = ({
   dataLang,
   formatNumber,
   searchItems,
-  sortedArr,
   selectedSearchItems,
   setSelectedSearchItems,
   tableItems,
@@ -78,6 +79,7 @@ const SidebarLeft = ({
       setTableItems([...newData])
     }
   }
+  console.log('tableItems', tableItems)
 
   return (
     <div className="min-h-full max-h-[1132px] flex flex-col bg-white border border-[#919EAB3D] rounded-2xl p-4">
@@ -99,6 +101,7 @@ const SidebarLeft = ({
           }}
           options={tableItems}
           handleIncrease={handleIncrease}
+          dataLang={dataLang}
         />
       </div>
 
@@ -108,18 +111,14 @@ const SidebarLeft = ({
         <>
           {/* Thông tin mặt hàng Header */}
           <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-left truncate font-[400]">
-              {dataLang?.sales_product_item || 'sales_product_item'}
-            </h4>
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
-              Kho - Vị Trí Kho
-            </h4>
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+            <TableHeader className="text-left">{dataLang?.sales_product_item || 'sales_product_item'}</TableHeader>
+            <TableHeader className="text-left">Kho - Vị Trí Kho</TableHeader>
+            <TableHeader className="text-center">
               {dataLang?.sales_product_quantity || 'sales_product_quantity'}
-            </h4>
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+            </TableHeader>
+            <TableHeader className="text-center">
               {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
-            </h4>
+            </TableHeader>
             {/* Chọn hoàng loạt % chiết khấu */}
             <Dropdown
               overlay={
@@ -148,9 +147,9 @@ const SidebarLeft = ({
                 <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
               </div>
             </Dropdown>
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start font-[400] whitespace-nowrap">
+            <TableHeader className="text-start">
               {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-            </h4>
+            </TableHeader>
             {/* Chọn hoàng loạt % thuế */}
             <Dropdown
               overlay={
@@ -208,9 +207,9 @@ const SidebarLeft = ({
                 <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
               </div>
             </Dropdown>
-            <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
+            <TableHeader className="text-start">
               {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
-            </h4>
+            </TableHeader>
           </div>
 
           {/* Thông tin mặt hàng Body */}
@@ -255,7 +254,11 @@ const SidebarLeft = ({
                 </div>
                 {/*  Kho - Vị trí kho */}
                 <div className="flex items-center justify-center">
-                  <Select placeholder="Chọn kho" />
+                  <SelectWithSort
+                    placeholderText="Chọn kho - Vị trí kho"
+                    className="select-warehouse"
+                    // options={dataWarehouse}
+                  />
                 </div>
                 {/* Số lượng */}
                 <div className="flex items-center justify-center">
