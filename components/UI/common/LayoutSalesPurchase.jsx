@@ -38,10 +38,10 @@ const LayoutSalesPurchaseManager = ({
         </h2>
         <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-40 relative">
           {/* Cột trái */}
-          <div className="w-3/4">{sidebarLeft}</div>
+          <div className="w-4/5">{sidebarLeft}</div>
 
           {/* Cột phải */}
-          <div className="w-1/4">{sidebarRight}</div>
+          <div className="w-1/5">{sidebarRight}</div>
         </div>
 
         {/* Nút lưu và thoát */}
