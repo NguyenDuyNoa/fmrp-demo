@@ -959,47 +959,56 @@ body {
   border-radius: 8px;
 }
 
-.select-with-sort .ant-select-selector {
+.select-warehouse {
+  width: 100%;
+  height: 40px;
   border-radius: 8px;
 }
 
-.select-with-sort .ant-select-selector .ant-select-selection-wrap .ant-select-selection-search input {
-  cursor: pointer;
-}
+.select-with-sort,
+.select-warehouse {
+  .ant-select-selector {
+    border-radius: 8px;
+  }
 
-.select-with-sort .ant-select-selector:hover {
-  border-color: #003da0 !important;
-  border-radius: 8px;
-}
+  .ant-select-selector .ant-select-selection-wrap .ant-select-selection-search input {
+    cursor: pointer;
+  }
 
-.select-with-sort .ant-select-selector:focus {
-  border-color: #003da0 !important;
-}
+  .ant-select-selector:hover {
+    border-color: #003da0 !important;
+    border-radius: 8px;
+  }
 
-.select-with-sort .ant-select-selector:focus-visible {
-  border-color: #003da0 !important;
+  .ant-select-selector:focus {
+    border-color: #003da0 !important;
+  }
+
+  .ant-select-selector:focus-visible {
+    border-color: #003da0 !important;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #919eab;
+    font-weight: 400;
+    font-family: 'Lexend Deca';
+  }
+
+  .ant-select-dropdown .ant-select-item {
+    padding: 5px 6px !important;
+  }
+
+  .ant-select-focused .ant-select-selector {
+    border-color: #003da0 !important;
+  }
+
+  .option-content:last-child {
+    border-bottom: none;
+  }
 }
 
 .select-with-sort .ant-select-selection-wrap {
-  margin-left: 20px;
-}
-
-.select-with-sort .ant-select-selection-placeholder {
-  color: #919eab;
-  font-weight: 400;
-  font-family: 'Lexend Deca';
-}
-
-.select-with-sort .ant-select-dropdown .ant-select-item {
-  padding: 5px 6px !important;
-}
-
-.select-with-sort.ant-select-focused .ant-select-selector {
-  border-color: #003da0 !important;
-}
-
-.select-with-sort .option-content:last-child {
-  border-bottom: none;
+  margin-left: 24px;
 }
 
 .ant-picker-outlined:hover {
@@ -1110,4 +1119,37 @@ body {
 /* Corner (góc giữa scrollbar dọc và ngang) */
 .scroll-bar-products-sale::-webkit-scrollbar-corner {
   background: transparent; /* Ẩn góc */
+}
+
+[class^='ant-'],
+[class*=' ant-'],
+.css-xxx * {
+  font-family: 'Lexend Deca', sans-serif !important;
+}
+
+.ant-picker-ok {
+  .ant-btn {
+    margin-block: 8px;
+    padding: 18px 12px;
+    border-radius: 8px;
+    span {
+      display: none;
+    }
+    &::before {
+      content: 'Hoàn thành';
+      font-size: 14px;
+    }
+  }
+}
+
+.ant-select-dropdown {
+  .ant-select-item-option-content {
+    white-space: normal;
+  }
+}
+
+.ant-select {
+  .ant-select-selection-item {
+    white-space: normal;
+  }
 }

@@ -942,10 +942,10 @@ const DeliveryReceiptForm = (props) => {
   const breadcrumbItems = [
     {
       label: `${dataLang?.returnSales_title || 'returnSales_title'}`,
+      // href: "/",
     },
     {
       label: `${dataLang?.delivery_receipt_list || 'delivery_receipt_list'}`,
-      href: '/sales-export-product/delivery-receipt',
     },
     {
       label: `${
@@ -965,7 +965,7 @@ const DeliveryReceiptForm = (props) => {
             : dataLang?.delivery_receipt_add || 'delivery_receipt_add'}
         </title>
       </Head>
-      <Container className="!h-max py-6 bg-gray-color">
+      <Container className="!h-auto">
         {statusExprired ? (
           <EmptyExprired />
         ) : (
@@ -973,10 +973,16 @@ const DeliveryReceiptForm = (props) => {
             <Breadcrumb items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
           </React.Fragment>
         )}
-        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-typo-gray-5 capitalize font-medium mt-1 2xl:!mb-5 lg:!mb-3">
-          {id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
-        </h2>
         <div className="h-[97%] space-y-3 overflow-hidden">
+          <div className="flex items-center justify-between ">
+            <h2 className="text-title-section text-[#52575E] capitalize font-medium ">
+              {dataLang?.delivery_receipt_edit_notes || 'delivery_receipt_edit_notes'}
+            </h2>
+            <div className="flex items-center justify-end mr-2">
+              <ButtonBack onClick={() => router.push(routerDeliveryReceipt.home)} dataLang={dataLang} />
+            </div>
+          </div>
+
           <div className="w-full rounded ">
             <div className="">
               <h2 className="font-normal bg-[#ECF0F4] p-2">
@@ -1516,6 +1522,7 @@ const DeliveryReceiptForm = (props) => {
             <div className="col-span-10">
               <div className="grid grid-cols-11 border-t border-b border-l border-r divide-x">
                 <div className="col-span-2">
+                  {' '}
                   <Select
                     classNamePrefix="customDropdowDefault"
                     placeholder={dataLang?.delivery_receipt_warehouse || 'delivery_receipt_warehouse'}
