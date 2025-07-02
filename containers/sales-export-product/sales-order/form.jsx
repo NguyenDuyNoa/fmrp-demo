@@ -1195,7 +1195,6 @@ const SalesOrderForm = (props) => {
                           <InPutNumericFormat
                             value={e?.discount}
                             onValueChange={(value) => {
-                              console.log(value)
                               handleOnChangeInputOption(e?.id, 'discount', value)
                             }}
                             className={`cursor-text appearance-none text-end 3xl:my-2 my-1 3xl:p-2 p-1 font-normal w-full focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}

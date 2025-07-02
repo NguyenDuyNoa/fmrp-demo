@@ -1,6 +1,5 @@
 import apiDeliveryReceipt from '@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
-import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
@@ -23,7 +22,6 @@ import useSetingServer from '@/hooks/useConfigNumber'
 import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
-import applyFontFamily from '@/utils/helpers/applyFontFamily'
 import { isAllowedDiscount, isAllowedNumber } from '@/utils/helpers/common'
 import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
@@ -37,12 +35,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Add, ArrowDown2, ArrowUp2, Minus, TableDocument } from 'iconsax-react'
 import moment from 'moment/moment'
 import Head from 'next/head'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
-import { FaPencilAlt } from 'react-icons/fa'
 import { LuBriefcase } from 'react-icons/lu'
 import { MdClear } from 'react-icons/md'
 import { PiMapPinLight, PiUser } from 'react-icons/pi'
@@ -52,6 +50,7 @@ import Select, { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import PopupAddress from './components/PopupAddress'
+import SelectWarehouse from './components/SelectWarehouse'
 import SelectWithRadio from './components/SelectWithRadio'
 import { useDeliveryReceipItemAll } from './hooks/useDeliveryReceipItemAll'
 
@@ -74,7 +73,7 @@ const DeliveryReceiptForm = (props) => {
   const authState = useSelector((state) => state.auth)
 
   // State Variables
-  const [openSelectSearch, setOpenSelectSearch] = useState(false)
+  const [activeTab, setActiveTab] = useState('info')
 
   const [showMoreInfo, setShowMoreInfo] = useState(false)
 
@@ -162,20 +161,25 @@ const DeliveryReceiptForm = (props) => {
     'filter[delivery_id]': id ? id : '',
   })
 
+  const [isFirstRender, sIsFirstRender] = useState(true)
+
+  console.log('isFistRender', isFirstRender)
+
   // Gắn chi nhánh đầu tiên vào state idBranch
   useEffect(() => {
     if (dataBranch.length > 0) {
       sIdBranch(dataBranch[0])
     }
-  }, [dataBranch])
+  }, [dataBranch, router.query])
 
   // Gắn người dùng đầu tiên vào state idStaff
   useEffect(() => {
-    if (dataStaff.length > 0 && authState?.staff_id) {
+    if (dataStaff.length > 0 && authState?.staff_id && isFirstRender) {
       const staff = dataStaff.find((e) => e.value === authState?.staff_id)
       sIdStaff(staff)
+      sIsFirstRender(false)
     }
-  }, [dataStaff])
+  }, [dataStaff, isFirstRender, authState?.staff_id, router.query])
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
@@ -191,29 +195,30 @@ const DeliveryReceiptForm = (props) => {
   }
 
   const resetAllStates = () => {
-    sCode('')
-    sStartDate(new Date())
-    sIdBranch(null)
-    sIdClient(null)
-    sIdContactPerson(null)
-    sIdProductOrder(null)
-    sIdStaff(null)
-    sIdAddress(null)
-    sNote('')
-    sErrBranch(false)
-    sErrDate(false)
-    sErrClient(false)
-    sErrProductOrder(false)
-    sErrQuantity(false)
-    sErrStaff(false)
-    sErrSurvive(false)
-    sErrSurvivePrice(false)
-    sErrWarehouse(false)
+    // sCode('')
+    // sStartDate(new Date())
+    // sIdBranch(null)
+    // sIdClient(null)
+    // sIdContactPerson(null)
+    // sIdProductOrder(null)
+    // sIdStaff(null)
+    // sIdAddress(null)
+    // sNote('')
+    // sErrBranch(false)
+    // sErrDate(false)
+    // sErrClient(false)
+    // sErrProductOrder(false)
+    // sErrQuantity(false)
+    // sErrStaff(false)
+    // sErrSurvive(false)
+    // sErrSurvivePrice(false)
+    // sErrWarehouse(false)
+    sIsFirstRender(true)
   }
 
-  // useEffect(() => {
-  //   router.query && resetAllStates()
-  // }, [router.query])
+  useEffect(() => {
+    router.query && resetAllStates()
+  }, [router.query])
 
   const options = dataItems?.map((e) => ({
     label: `${e.name}
@@ -361,8 +366,6 @@ const DeliveryReceiptForm = (props) => {
   }
 
   const _HandleChangeInput = (type, value) => {
-    console.log('type, value', type, value)
-
     if (type == 'code') {
       sCode(value.target.value)
     } else if (type === 'date') {
@@ -769,13 +772,13 @@ const DeliveryReceiptForm = (props) => {
         {dataItems?.length > 0 && (
           <div className="grid items-center grid-cols-2 cursor-pointer">
             <div
-              className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] "
+              className="hover:bg-[#0000000A] p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] font-deca"
               onClick={() => handleSelectAll('addAll')}
             >
               Chọn tất cả
             </div>
             <div
-              className="hover:bg-slate-200 p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px]"
+              className="hover:bg-[#0000000A] p-2 col-span-1 text-center 3xl:text-[16px] 2xl:text-[16px] xl:text-[14px] text-[13px] font-deca"
               onClick={() => handleSelectAll('deleteAll')}
             >
               Bỏ chọn tất cả
@@ -795,7 +798,7 @@ const DeliveryReceiptForm = (props) => {
           <img
             src={option.e?.images ?? '/icon/noimagelogo.png'}
             alt={option?.e.name}
-            className="w-10 h-10 object-cover rounded-md"
+            className="size-16 object-cover rounded-md"
           />
           <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full">
             <div className="font-semibold responsive-text-sm truncate text-black">{option.e.name}</div>
@@ -952,7 +955,18 @@ const DeliveryReceiptForm = (props) => {
       }`,
     },
   ]
-  console.log('listData', listData)
+
+  // Tab items
+  const tabItems = [
+    {
+      key: 'info',
+      label: 'Thông tin chung',
+    },
+    {
+      key: 'note',
+      label: 'Ghi chú',
+    },
+  ]
 
   return (
     <div className="overflow-hidden">
@@ -975,7 +989,7 @@ const DeliveryReceiptForm = (props) => {
         <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-40 relative">
           {/* Cột trái */}
           <div className="w-4/5">
-            <div className="min-h-full max-h-[1132px] flex flex-col bg-white border border-[#919EAB3D] rounded-2xl p-4">
+            <div className="min-h-full max-h-[1132px] flex flex-col gap-6 bg-white border border-[#919EAB3D] rounded-2xl p-4">
               {/* Thông tin mặt hàng */}
               <div className="flex justify-between items-center">
                 {/* Heading */}
@@ -985,6 +999,7 @@ const DeliveryReceiptForm = (props) => {
                 {/* Search Bar */}
                 <div className="relative w-full">
                   <Select
+                    isOpen={true}
                     options={idProductOrder ? options : []}
                     closeMenuOnSelect={false}
                     onChange={_HandleChangeInput.bind(this, 'itemAll')}
@@ -1015,7 +1030,7 @@ const DeliveryReceiptForm = (props) => {
                         primary: 'transparent',
                       },
                     })}
-                    styles={applyFontFamily({
+                    styles={{
                       placeholder: (base) => ({
                         ...base,
                         color: '#cbd5e1',
@@ -1031,7 +1046,7 @@ const DeliveryReceiptForm = (props) => {
                         borderRadius: '8px',
                         border: state.isFocused ? '2px solid #003DA0' : '1px solid #D0D5DD',
                       }),
-                    })}
+                    }}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
                     <CiSearch className="text-white responsive-text-lg" />
@@ -1039,16 +1054,17 @@ const DeliveryReceiptForm = (props) => {
                 </div>
               </div>
 
+              {/* Table */}
               {listData.length <= 0 ? (
                 <EmptyData />
               ) : (
-                <>
+                <div>
                   {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
                     <TableHeader className="text-left">
                       {dataLang?.import_from_items || 'import_from_items'}
                     </TableHeader>
-                    <TableHeader className="text-left">Kho - Vị trí kho</TableHeader>
+                    <TableHeader className="text-center">Kho - Vị trí kho</TableHeader>
                     <TableHeader className="text-center">Số lượng</TableHeader>
                     <TableHeader className="text-center">Đơn giá</TableHeader>
                     <Dropdown
@@ -1072,69 +1088,39 @@ const DeliveryReceiptForm = (props) => {
                       arrow
                     >
                       <div className="inline-flex items-center justify-between cursor-pointer w-full">
-                        <TableHeader className="text-left">% Chiết khấu</TableHeader>
+                        <TableHeader className="text-left">% CK</TableHeader>
                         <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
                     <TableHeader className="text-start">Đơn giá sau CK</TableHeader>
                     <Dropdown
                       overlay={
-                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                        <div className="px-4 py-5 shadow-lg bg-white rounded-lg">
                           <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
                             Chọn hoàng loạt % thuế
                           </p>
-                          <div className="">
-                            <Select
-                              options={taxOptions}
-                              onChange={_HandleChangeInput.bind(this, 'generalTax')}
-                              value={generalTax}
-                              formatOptionLabel={(option) => (
-                                <div className="flex items-center justify-start gap-1 ">
-                                  <h2>{option?.label}</h2>
-                                  <h2>{`(${option?.tax_rate})`}</h2>
-                                </div>
-                              )}
-                              placeholder={dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
-                              hideSelectedOptions={false}
-                              className={` "border-transparent placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                              isSearchable={true}
-                              noOptionsMessage={() => dataLang?.returns_nodata || 'returns_nodata'}
-                              menuPortalTarget={document.body}
-                              closeMenuOnSelect={true}
-                              style={{
-                                border: 'none',
-                                boxShadow: 'none',
-                                outline: 'none',
-                              }}
-                              theme={(theme) => ({
-                                ...theme,
-                                colors: {
-                                  ...theme.colors,
-                                  primary25: '#EBF5FF',
-                                  primary50: '#92BFF7',
-                                  primary: '#0F4F9E',
-                                },
-                              })}
-                              styles={applyFontFamily({
-                                placeholder: (base) => ({
-                                  ...base,
-                                  color: '#cbd5e1',
-                                }),
-                                menuPortal: (base) => ({
-                                  ...base,
-                                  zIndex: 20,
-                                }),
-                                control: (base, state) => ({
-                                  ...base,
-                                  boxShadow: 'none',
-                                  padding: '2.7px',
-                                  ...(state.isFocused && {
-                                    border: '0 0 0 1px #92BFF7',
-                                  }),
-                                }),
-                              })}
-                            />
-                          </div>
+                          <SelectWarehouse
+                            placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                            options={taxOptions}
+                            value={generalTax}
+                            onChange={(value) => _HandleChangeInput('generalTax', value)}
+                            renderOption={(option, isLabel) => (
+                              <div
+                                className={`flex items-center justify-start gap-1 text-[#1C252E]${
+                                  isLabel ? ' py-2' : ''
+                                }`}
+                              >
+                                <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
+                                {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                  <h2 className="responsive-text-sm leading-normal">
+                                    {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
+                                  </h2>
+                                )}
+                              </div>
+                            )}
+                            isLabel={true}
+                            isPopupMatchSelectWidth={false}
+                          />
                         </div>
                       }
                       trigger={['click']}
@@ -1150,7 +1136,7 @@ const DeliveryReceiptForm = (props) => {
                   </div>
 
                   {/* Thông tin mặt hàng Body */}
-                  <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+                  <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2">
                     <div className="w-full h-full">
                       {isFetching ? (
                         <Loading className="w-full h-10" color="#0f4f9e" />
@@ -1162,25 +1148,28 @@ const DeliveryReceiptForm = (props) => {
                             return (
                               <div
                                 key={e?.id?.toString()}
-                                className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-4 items-center"
+                                className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-4 my-1"
                               >
+                                {/* Mặt hàng */}
                                 <div className="h-full p-2 pb-1">
-                                  {/* Mặt hàng */}
                                   <div className="flex items-center justify-between gap-2">
                                     <div className="flex items-start">
                                       <div className="flex items-start gap-3">
                                         <img
                                           src={option.e?.images ?? '/icon/noimagelogo.png'}
                                           alt={option?.e.name}
-                                          className="w-10 h-10 object-cover rounded-md"
+                                          className="size-16 object-cover rounded-md"
                                         />
                                         <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full text-neutral-03 font-normal">
-                                          <div className="font-semibold responsive-text-sm truncate text-black">
+                                          <h4 className="font-semibold responsive-text-sm truncate text-black">
                                             {option.e.name}
-                                          </div>
-                                          <div>
+                                          </h4>
+                                          <h5>
                                             {option.e?.code}: {option.e?.product_variation}
-                                          </div>
+                                          </h5>
+                                          <h5>
+                                            ĐVT: <span>{option.e?.unit_name}</span>
+                                          </h5>
                                           <div className="flex flex-col items-start gap-1">
                                             <div className="flex items-center gap-1">
                                               <h5>{dataLang[option.e?.text_type]}</h5>
@@ -1189,9 +1178,7 @@ const DeliveryReceiptForm = (props) => {
                                               </h5>
                                               <h5>{option.e?.quantity ? formatNumber(+option.e?.quantity) : '0'}</h5>
                                             </div>
-                                            <div>
-                                              ĐVT: <span>{option.e?.unit_name}</span>
-                                            </div>
+
                                             <div className="flex items-center gap-1">
                                               <div className="flex items-center gap-1">
                                                 <h5>
@@ -1214,14 +1201,20 @@ const DeliveryReceiptForm = (props) => {
                                             </div>
                                             {/* Ghi chú */}
                                             <div className="flex items-center justify-center col-span-1">
-                                              <FaPencilAlt size={10} />
+                                              <Image
+                                                src={'/icon/pen.svg'}
+                                                alt="icon pen"
+                                                width={16}
+                                                height={16}
+                                                className="size-3 object-cover"
+                                              />
                                               <input
                                                 // value={ce?.note}
                                                 // onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'note')}
                                                 placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
                                                 name="optionEmail"
                                                 type="text"
-                                                className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
+                                                className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
                                               />
                                             </div>
                                           </div>
@@ -1238,7 +1231,7 @@ const DeliveryReceiptForm = (props) => {
                                   {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
                                     <button
                                       onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
-                                      className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                                      className="w-full rounded-lg mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
                                     >
                                       <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                                       <span className="relative text-xs">
@@ -1248,287 +1241,205 @@ const DeliveryReceiptForm = (props) => {
                                   )}
                                 </div>
 
-                                {e?.child?.map((ce) => (
-                                  <React.Fragment key={ce?.id?.toString()}>
-                                    {/* Kho - Vị trí kho */}
-                                    <div className="flex flex-col justify-center h-full p-1">
-                                      <Select
-                                        options={ce?.dataWarehouse}
-                                        value={ce?.warehouse}
-                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'warehouse')}
-                                        className={`${
-                                          (errWarehouse && ce?.warehouse == null) ||
-                                          (errWarehouse &&
-                                            (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
-                                            ? 'border-red-500 border'
-                                            : ''
-                                        }  my-1 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                        placeholder={dataLang?.PDF_house || 'PDF_house'}
-                                        menuPortalTarget={document.body}
-                                        formatOptionLabel={(option) => {
-                                          return (
-                                            (option?.warehouse_name || option?.label || option?.qty) && (
-                                              <div className="">
-                                                <div className="flex gap-1">
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                    {'Kho'}:
-                                                  </h2>
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                    {option?.warehouse_name}
-                                                  </h2>
-                                                </div>
-                                                <div className="flex gap-1">
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                    {'Vị trí kho'}:
-                                                  </h2>
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-semibold">
-                                                    {option?.label}
-                                                  </h2>
-                                                </div>
-                                                <div className="flex gap-1">
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] font-medium">
-                                                    {dataLang?.returns_survive || 'returns_survive'}:
-                                                  </h2>
-                                                  <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] uppercase font-semibold">
-                                                    {formatNumber(option?.qty)}
-                                                  </h2>
-                                                </div>
-                                                <div className="flex items-center gap-2 italic">
-                                                  {dataProductSerial.is_enable === '1' && (
-                                                    <div className="text-[11px] text-[#667085] font-[500]">
-                                                      Serial: {option?.serial ? option?.serial : '-'}
-                                                    </div>
-                                                  )}
-                                                  {dataMaterialExpiry.is_enable === '1' ||
-                                                  dataProductExpiry.is_enable === '1' ? (
-                                                    <>
-                                                      <div className="text-[11px] text-[#667085] font-[500]">
-                                                        Lot: {option?.lot ? option?.lot : '-'}
-                                                      </div>
-                                                      <div className="text-[11px] text-[#667085] font-[500]">
-                                                        Date:{' '}
-                                                        {option?.date
-                                                          ? formatMoment(option?.date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                                          : '-'}
-                                                      </div>
-                                                    </>
-                                                  ) : (
-                                                    ''
-                                                  )}
-                                                </div>
-                                              </div>
-                                            )
-                                          )
-                                        }}
-                                        style={{
-                                          border: 'none',
-                                          boxShadow: 'none',
-                                          outline: 'none',
-                                        }}
-                                        theme={(theme) => ({
-                                          ...theme,
-                                          colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                          },
-                                        })}
-                                        classNamePrefix="customDropdow"
-                                      />
-                                    </div>
-                                    {/* Số lượng */}
-                                    <div className="flex items-center justify-center relative">
-                                      <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
-                                        <button
-                                          disabled={
-                                            ce?.quantity === 1 ||
-                                            ce?.quantity === '' ||
-                                            ce?.quantity === null ||
-                                            ce?.quantity === 0
-                                          }
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
-                                          onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
-                                        >
-                                          <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                        </button>
-                                        <InPutNumericFormat
-                                          onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
-                                          value={ce?.quantity || null}
-                                          className={`${
-                                            errQuantity &&
-                                            (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
-                                              ? 'border-b border-red-500'
-                                              : errSurvive
-                                              ? 'border-b border-red-500'
-                                              : 'border-b border-gray-200'
-                                          }
-                                                                                ${
-                                                                                  (ce?.quantity == 0 &&
-                                                                                    'border-red-500') ||
-                                                                                  (ce?.quantity == '' &&
-                                                                                    'border-red-500')
-                                                                                } 
-                                                                                appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                          isAllowed={(values) => {
-                                            const { value } = values
-                                            const newValue = +value
-                                            const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
+                                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 items-center">
+                                  {e?.child?.map((ce) => {
+                                    return (
+                                      <React.Fragment key={ce?.id?.toString()}>
+                                        {/* Kho - Vị trí kho */}
+                                        <div className="flex flex-col justify-center h-full">
+                                          <SelectWarehouse
+                                            dataLang={dataLang}
+                                            placeholder={dataLang?.PDF_house || 'PDF_house'}
+                                            options={ce?.dataWarehouse}
+                                            value={ce?.warehouse}
+                                            onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'warehouse', value)}
+                                            formatNumber={formatNumber}
+                                            isError={errWarehouse}
+                                          />
+                                        </div>
+                                        {/* Số lượng */}
+                                        <div className="flex items-center justify-center">
+                                          <div
+                                            className={`relative flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                              errQuantity &&
+                                              (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
+                                                ? 'border-red-500'
+                                                : errSurvive
+                                                ? ' border-red-500'
+                                                : 'border-border-gray-2'
+                                            }  ${
+                                              (ce?.quantity == 0 && 'border-red-500') ||
+                                              (ce?.quantity == '' && 'border-red-500')
+                                            } `}
+                                          >
+                                            <button
+                                              disabled={
+                                                ce?.quantity === 1 ||
+                                                ce?.quantity === '' ||
+                                                ce?.quantity === null ||
+                                                ce?.quantity === 0
+                                              }
+                                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                              onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
+                                            >
+                                              <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                            </button>
+                                            <InPutNumericFormat
+                                              onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
+                                              value={ce?.quantity || null}
+                                              className={` appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                              isAllowed={(values) => {
+                                                const { value } = values
+                                                const newValue = +value
+                                                const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
 
-                                            if (newValue > +ce?.warehouse?.qty) {
-                                              isShow(
-                                                'error',
-                                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                  +ce?.warehouse?.qty
-                                                )} số lượng tồn kho`
-                                              )
-                                              return
-                                            } else if (newValue > quantityAmount) {
-                                              isShow(
-                                                'error',
-                                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                  quantityAmount
-                                                )} số lượng chưa giao`
-                                              )
-                                              return
-                                            }
-                                            return true
-                                          }}
-                                        />
-                                        <button
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
-                                          onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
-                                        >
-                                          <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                        </button>
-                                      </div>
+                                                if (newValue > +ce?.warehouse?.qty) {
+                                                  isShow(
+                                                    'error',
+                                                    `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                      +ce?.warehouse?.qty
+                                                    )} số lượng tồn kho`
+                                                  )
+                                                  return
+                                                } else if (newValue > quantityAmount) {
+                                                  isShow(
+                                                    'error',
+                                                    `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                      quantityAmount
+                                                    )} số lượng chưa giao`
+                                                  )
+                                                  return
+                                                }
+                                                return true
+                                              }}
+                                            />
+                                            <button
+                                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                              onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
+                                            >
+                                              <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                            </button>
+                                            <div className="absolute -top-3 -right-2 p-1 cursor-pointer">
+                                              <PopupParent
+                                                trigger={
+                                                  <div className="relative ">
+                                                    <TableDocument size="18" color="#4f46e5" className="font-medium" />
+                                                    <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
+                                                      <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
+                                                        <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
+                                                      </span>
+                                                    </span>
+                                                  </div>
+                                                }
+                                                position="bottom center"
+                                                on={['hover', 'focus']}
+                                              >
+                                                <div className="flex flex-col bg-primary-06 px-2.5 py-0.5 rounded-lg font-deca">
+                                                  <span className="text-xs font-medium">
+                                                    Sl tồn:{' '}
+                                                    {ce?.warehouse == null ? 0 : formatNumber(+ce?.warehouse?.qty)}
+                                                  </span>
 
-                                      <div className="absolute top-1 -right-7 p-1 cursor-pointer">
-                                        <PopupParent
-                                          className=""
-                                          trigger={
-                                            <div className="relative ">
-                                              <TableDocument size="18" color="#4f46e5" className="font-medium" />
-                                              <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                                <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
-                                                  <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
-                                                </span>
-                                              </span>
+                                                  <span className="text-xs font-medium">
+                                                    Sl đã giao: {formatNumber(ce?.quantityDelive)}
+                                                  </span>
+                                                  <span className="text-xs font-medium">
+                                                    Sl chưa giao: {formatNumber(ce?.quantityStock - ce?.quantityDelive)}
+                                                  </span>
+                                                </div>
+                                              </PopupParent>
                                             </div>
-                                          }
-                                          position="left center"
-                                          on={['hover', 'focus']}
-                                        >
-                                          <div className="flex flex-col bg-gray-300 px-2.5 py-0.5 rounded-sm">
-                                            <span className="text-xs font-medium">
-                                              Sl tồn: {ce?.warehouse == null ? 0 : formatNumber(+ce?.warehouse?.qty)}
-                                            </span>
-
-                                            <span className="text-xs font-medium">
-                                              Sl đã giao: {formatNumber(ce?.quantityDelive)}
-                                            </span>
-                                            <span className="text-xs font-medium">
-                                              Sl chưa giao: {formatNumber(ce?.quantityStock - ce?.quantityDelive)}
-                                            </span>
                                           </div>
-                                        </PopupParent>
-                                      </div>
-                                    </div>
-                                    {/* Đơn giá */}
-                                    <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                      <InPutMoneyFormat
-                                        className={`${
-                                          errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
-                                            ? 'border-b border-red-500'
-                                            : errSurvivePrice &&
-                                              (ce?.price == null || ce?.price == '' || ce?.price == 0)
-                                            ? 'border-b border-red-500'
-                                            : 'border-b border-gray-200'
-                                        }
-                                                                            ${
-                                                                              (ce?.price == 0 && 'border-red-500') ||
-                                                                              (ce?.price == '' && 'border-red-500')
-                                                                            } 
-                                                                            appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal 3xl:w-24 2xl:w-[60px] xl:w-[50px] w-[40px]  focus:outline-none `}
-                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
-                                        isAllowed={isAllowedNumber}
-                                        value={ce?.price}
-                                      />
-                                    </div>
-
-                                    <div className="flex justify-center  h-full p-0.5 flex-col items-center">
-                                      <InPutNumericFormat
-                                        className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none"
-                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
-                                        value={ce?.discount}
-                                        isAllowed={isAllowedDiscount}
-                                      />
-                                    </div>
-
-                                    <div className=" text-right flex items-center justify-end  h-full p-0.5">
-                                      <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                        {formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}
-                                      </h3>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center h-full p-1 ">
-                                      <Select
-                                        options={taxOptions}
-                                        value={ce?.tax}
-                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'tax')}
-                                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                        className={`3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                        menuPortalTarget={document.body}
-                                        style={{
-                                          border: 'none',
-                                          boxShadow: 'none',
-                                          outline: 'none',
-                                        }}
-                                        formatOptionLabel={(option) => (
-                                          <div className="flex items-center justify-start gap-1 ">
-                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                              {option?.label}
-                                            </h2>
-                                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
-                                          </div>
-                                        )}
-                                        theme={(theme) => ({
-                                          ...theme,
-                                          colors: {
-                                            ...theme.colors,
-                                            primary25: '#EBF5FF',
-                                            primary50: '#92BFF7',
-                                            primary: '#0F4F9E',
-                                          },
-                                        })}
-                                        classNamePrefix="customDropdowTax"
-                                      />
-                                    </div>
-
-                                    {/* Thành tiền và nút xóa */}
-                                    <div className="flex items-center justify-between text-right">
-                                      <div className="justify-center pr-1  p-0.5 h-full flex flex-col items-end 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                        {formatNumber(
-                                          ce?.price *
-                                            (1 - Number(ce?.discount) / 100) *
-                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                            Number(ce?.quantity)
-                                        )}
-                                      </div>
-
-                                      {/* Nút xoá */}
-                                      <div className="flex items-center justify-center">
-                                        <button
-                                          type="button"
-                                          title="Xóa"
-                                          onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                          className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                                        </div>
+                                        {/* Đơn giá */}
+                                        <div
+                                          className={`flex items-center justify-center py-2 px-3 rounded-lg border ${
+                                            errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                              ? 'border-red-500'
+                                              : errSurvivePrice &&
+                                                (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                              ? 'border-red-500'
+                                              : 'border-neutral-N400'
+                                          } ${
+                                            (ce?.price == 0 && 'border-red-500') ||
+                                            (ce?.price == '' && 'border-red-500')
+                                          } `}
                                         >
-                                          <MdClear />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  </React.Fragment>
-                                ))}
+                                          <InPutMoneyFormat
+                                            className={`appearance-none text-right responsive-text-sm font-semibold w-full focus:outline-none `}
+                                            onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
+                                            isAllowed={isAllowedNumber}
+                                            value={ce?.price}
+                                          />
+                                        </div>
+                                        {/* % Chiết khấu */}
+                                        <div className="flex items-center justify-end py-2 px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                          <InPutNumericFormat
+                                            className="appearance-none w-full focus:outline-none text-right"
+                                            onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
+                                            value={ce?.discount}
+                                            isAllowed={isAllowedDiscount}
+                                          />
+                                          <span className="pl-1">%</span>
+                                        </div>
+                                        {/* Đơn giá sau CK */}
+                                        <div className="text-right flex items-center justify-start responsive-text-sm font-semibold">
+                                          <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
+                                          <span className="pl-1">đ</span>
+                                        </div>
+                                        {/* % Thuế */}
+                                        <div className="flex flex-col justify-center h-full">
+                                          <SelectWarehouse
+                                            placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                                            options={taxOptions}
+                                            value={ce?.tax}
+                                            onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
+                                            renderOption={(option, isLabel) => (
+                                              <div
+                                                className={`flex items-center justify-start gap-1 text-[#1C252E] ${
+                                                  isLabel ? ' py-2' : ''
+                                                }`}
+                                              >
+                                                <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
+                                                {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                                  <h2 className="responsive-text-sm leading-normal">
+                                                    {option?.tax_rate === '20'
+                                                      ? `(${option?.tax_rate}%)`
+                                                      : `${option?.tax_rate}%`}
+                                                  </h2>
+                                                )}
+                                              </div>
+                                            )}
+                                          />
+                                        </div>
+                                        {/* Thành tiền và nút xóa */}
+                                        <div className="flex items-center justify-between text-right">
+                                          <div className="flex items-center justify-end pr-1 p-0.5 responsive-text-sm font-semibold">
+                                            {formatNumber(
+                                              ce?.price *
+                                                (1 - Number(ce?.discount) / 100) *
+                                                (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                                Number(ce?.quantity)
+                                            )}
+                                            <span className="pl-1">đ</span>
+                                          </div>
+
+                                          {/* Nút xoá */}
+                                          <div className="flex items-center justify-center">
+                                            <button
+                                              type="button"
+                                              title="Xóa"
+                                              onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                              className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                                            >
+                                              <MdClear />
+                                            </button>
+                                          </div>
+                                        </div>
+                                      </React.Fragment>
+                                    )
+                                  })}
+                                </div>
                               </div>
                             )
                           })}
@@ -1536,7 +1447,7 @@ const DeliveryReceiptForm = (props) => {
                       )}
                     </div>
                   </Customscrollbar>
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -1549,9 +1460,32 @@ const DeliveryReceiptForm = (props) => {
                 <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mt-6 mb-4 capitalize">
                   Thông tin
                 </h2>
-                <OrderFormTabs
-                  Info={() => {
-                    return (
+                <div className="w-full">
+                  {/* Tab header */}
+                  <div className="w-full flex items-center space-x-2 bg-blue-100 p-1 mb-6 rounded-xl relative">
+                    {tabItems.map((tab) => (
+                      <div className="w-full relative" key={tab.key}>
+                        {activeTab === tab.key && (
+                          <motion.div
+                            layoutId="active-tab-bg"
+                            className="absolute inset-0 bg-blue-color rounded-lg"
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                        <button
+                          onClick={() => setActiveTab(tab.key)}
+                          className={`relative w-full py-2 responsive-text-sm font-medium rounded-lg z-10 transition-all duration-300 ${
+                            activeTab === tab.key ? 'text-white' : 'text-[#11315B]'
+                          } `}
+                        >
+                          <span className="lg:px-1">{tab.label}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Tab Content */}
+                  <div className="mt-4">
+                    {activeTab === 'info' && (
                       <div className="flex flex-col gap-4 relative">
                         {/* Mã chứng từ */}
                         <div className="flex flex-col flex-wrap items-center gap-y-3">
@@ -1605,102 +1539,104 @@ const DeliveryReceiptForm = (props) => {
                         </div>
 
                         {/* Khách hàng */}
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel isRequired={true} label="Khách hàng" />
-                          <div className="w-full">
-                            <div className="relative flex flex-row">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <LuBriefcase color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title="Khách hàng"
-                                placeholderText="Chọn khách hàng"
-                                options={dataClient}
-                                value={idClient}
-                                onChange={(value) => {
-                                  const newValue = dataClient.find((item) => item.value === value)
-                                  _HandleChangeInput('idClient', newValue)
-                                }}
-                                isError={errClient}
-                                isShowAddNew={true}
-                              />
-                              {errClient && (
-                                <label className="text-sm text-red-500">{'Vui lòng chọn khách hàng'}</label>
-                              )}
+                        <div className="flex flex-col gap-y-2">
+                          <div className="flex flex-col flex-wrap items-center gap-y-3">
+                            <InfoFormLabel isRequired={true} label="Khách hàng" />
+                            <div className="w-full flex">
+                              <div className="relative flex flex-col select-with-radio">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                                  <LuBriefcase color="#7a7a7a" />
+                                </span>
+                                <SelectWithRadio
+                                  title="Khách hàng"
+                                  placeholderText="Chọn khách hàng"
+                                  options={dataClient}
+                                  value={idClient}
+                                  onChange={(value) => {
+                                    const newValue = dataClient.find((item) => item.value === value)
+                                    _HandleChangeInput('idClient', newValue)
+                                  }}
+                                  isError={errClient}
+                                  isShowAddNew={true}
+                                />
+                              </div>
                             </div>
                           </div>
+                          {errClient && <label className="text-sm text-red-500">{'Vui lòng chọn khách hàng'}</label>}
                         </div>
                         {/* Đơn hàng bán */}
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel
-                            isRequired={true}
-                            label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                          />
-                          <div className="w-full">
-                            <div className="relative flex flex-row">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <TbNotes color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                                placeholderText="Chọn đơn hàng bán"
-                                options={dataProductOrder}
-                                value={idProductOrder}
-                                onChange={(value) => {
-                                  const newValue = dataProductOrder.find((item) => item.value === value)
-                                  _HandleChangeInput('idProductOrder', newValue)
-                                }}
-                                isError={errProductOrder}
-                              />
-
-                              {errProductOrder && (
-                                <label className="text-sm text-red-500">
-                                  {dataLang?.delivery_receipt_err_select_product_order ||
-                                    'delivery_receipt_err_select_product_order'}
-                                </label>
-                              )}
+                        <div className="flex flex-col gap-y-2">
+                          <div className="flex flex-col flex-wrap items-center gap-y-3">
+                            <InfoFormLabel
+                              isRequired={true}
+                              label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+                            />
+                            <div className="w-full flex">
+                              <div className="relative flex flex-col select-with-radio">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                                  <TbNotes color="#7a7a7a" />
+                                </span>
+                                <SelectWithRadio
+                                  title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+                                  placeholderText="Chọn đơn hàng bán"
+                                  options={dataProductOrder}
+                                  value={idProductOrder}
+                                  onChange={(value) => {
+                                    const newValue = dataProductOrder.find((item) => item.value === value)
+                                    _HandleChangeInput('idProductOrder', newValue)
+                                  }}
+                                  isError={errProductOrder}
+                                />
+                              </div>
                             </div>
                           </div>
+                          {errProductOrder && (
+                            <label className="text-sm text-red-500">
+                              {dataLang?.delivery_receipt_err_select_product_order ||
+                                'delivery_receipt_err_select_product_order'}
+                            </label>
+                          )}
                         </div>
                         {/* Địa chỉ giao hàng */}
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
-                          <div className="w-full">
-                            <div className="relative">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <PiMapPinLight color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title={dataLang?.select_address || 'select_address'}
-                                placeholderText="Chọn địa chỉ giao hàng"
-                                options={dataAddress}
-                                value={idAddress}
-                                onChange={(value) => {
-                                  const newValue = dataAddress.find((item) => item.value === value)
-                                  _HandleChangeInput('idAddress', newValue)
-                                }}
-                                isError={errAddress}
-                              />
-                              <AiFillPlusCircle
-                                onClick={() => _HandleClosePopupAddress(true)}
-                                className="right-10 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
-                              />
-                              <PopupAddress
-                                dataLang={dataLang}
-                                clientId={idClient?.value || idClient}
-                                handleFetchingAddress={_ServerFetching_Address}
-                                openPopupAddress={openPopupAddress}
-                                handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
-                                className="hidden"
-                              />
-                              {errAddress && (
-                                <label className="text-sm text-red-500">
-                                  {dataLang?.delivery_receipt_err_select_address ||
-                                    'delivery_receipt_err_select_address'}
-                                </label>
-                              )}
+                        <div className="flex flex-col gap-y-2">
+                          <div className="flex flex-col flex-wrap items-center gap-y-3">
+                            <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
+                            <div className="w-full flex">
+                              <div className="relative flex flex-col select-with-radio">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                                  <PiMapPinLight color="#7a7a7a" />
+                                </span>
+                                <SelectWithRadio
+                                  title={dataLang?.select_address || 'select_address'}
+                                  placeholderText="Chọn địa chỉ giao hàng"
+                                  options={dataAddress}
+                                  value={idAddress}
+                                  onChange={(value) => {
+                                    const newValue = dataAddress.find((item) => item.value === value)
+                                    _HandleChangeInput('idAddress', newValue)
+                                  }}
+                                  isError={errAddress}
+                                />
+                                <AiFillPlusCircle
+                                  onClick={() => _HandleClosePopupAddress(true)}
+                                  className="right-10 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180  transition-all ease-in-out absolute "
+                                />
+                                <PopupAddress
+                                  dataLang={dataLang}
+                                  clientId={idClient?.value || idClient}
+                                  handleFetchingAddress={_ServerFetching_Address}
+                                  openPopupAddress={openPopupAddress}
+                                  handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
+                                  className="hidden"
+                                />
+                              </div>
                             </div>
                           </div>
+                          {errAddress && (
+                            <label className="text-sm text-red-500">
+                              {dataLang?.delivery_receipt_err_select_address || 'delivery_receipt_err_select_address'}
+                            </label>
+                          )}
                         </div>
                         {/* Xem thêm thông tin */}
                         <AnimatePresence initial={false}>
@@ -1713,65 +1649,72 @@ const DeliveryReceiptForm = (props) => {
                               transition={{ duration: 0.5, ease: 'easeInOut' }}
                               className="overflow-hidden"
                             >
-                              <>
+                              <div className="flex flex-col gap-y-3">
                                 {/* Chi nhánh */}
-                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
-                                  <div className="w-full">
-                                    <div className="relative flex flex-row">
-                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <PiMapPinLight color="#7a7a7a" />
+                                <div className="flex flex-col gap-y-2">
+                                  <div className="flex flex-col flex-wrap items-center gap-y-3">
+                                    <InfoFormLabel
+                                      isRequired={true}
+                                      label={dataLang?.import_branch || 'import_branch'}
+                                    />
+                                    <div className="w-full flex">
+                                      <div className="relative flex flex-col select-with-radio">
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                          <PiMapPinLight color="#7a7a7a" />
+                                        </div>
+                                        <SelectWithRadio
+                                          title={dataLang?.import_branch || 'import_branch'}
+                                          placeholderText="Chọn chi nhánh"
+                                          options={dataBranch}
+                                          value={idBranch}
+                                          onChange={(value) => {
+                                            const newValue = dataBranch.find((item) => item.value === value)
+                                            _HandleChangeInput('branch', newValue)
+                                          }}
+                                          isError={errBranch}
+                                        />
                                       </div>
-                                      <SelectWithRadio
-                                        title={dataLang?.import_branch || 'import_branch'}
-                                        placeholderText="Chọn chi nhánh"
-                                        options={dataBranch}
-                                        value={idBranch}
-                                        onChange={(value) => {
-                                          const newValue = dataBranch.find((item) => item.value === value)
-                                          _HandleChangeInput('branch', newValue)
-                                        }}
-                                        isError={errBranch}
-                                      />
-                                      {errBranch && (
-                                        <label className="text-sm text-red-500">
-                                          {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                                        </label>
-                                      )}
                                     </div>
                                   </div>
+                                  {errBranch && (
+                                    <label className="text-sm text-red-500">
+                                      {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+                                    </label>
+                                  )}
                                 </div>
                                 {/* Người dùng */}
-                                <div className="flex flex-col flex-wrap items-center gap-y-3">
-                                  <InfoFormLabel
-                                    isRequired
-                                    label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
-                                  />
-                                  <div className="w-full">
-                                    <div className="relative flex flex-row">
-                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <PiUser color="#7a7a7a" />
+                                <div className="flex flex-col gap-y-2">
+                                  <div className="flex flex-col flex-wrap items-center gap-y-3">
+                                    <InfoFormLabel
+                                      isRequired
+                                      label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
+                                    />
+                                    <div className="w-full flex">
+                                      <div className="relative flex flex-col select-with-radio">
+                                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                          <PiUser color="#7a7a7a" />
+                                        </div>
+                                        <SelectWithRadio
+                                          title={dataLang?.import_branch || 'import_branch'}
+                                          placeholderText="Chọn người dùng"
+                                          options={dataStaff}
+                                          value={idStaff}
+                                          onChange={(value) => {
+                                            const newValue = dataStaff.find((item) => item.value === value)
+                                            _HandleChangeInput('idStaff', newValue)
+                                          }}
+                                          isError={errStaff}
+                                        />
                                       </div>
-                                      <SelectWithRadio
-                                        title={dataLang?.import_branch || 'import_branch'}
-                                        placeholderText="Chọn người dùng"
-                                        options={dataStaff}
-                                        value={idStaff}
-                                        onChange={(value) => {
-                                          const newValue = dataStaff.find((item) => item.value === value)
-                                          _HandleChangeInput('idStaff', newValue)
-                                        }}
-                                        isError={errStaff}
-                                      />
-                                      {errStaff && (
-                                        <label className="text-sm text-red-500">
-                                          {dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
-                                        </label>
-                                      )}
                                     </div>
                                   </div>
+                                  {errStaff && (
+                                    <label className="text-sm text-red-500">
+                                      {dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
+                                    </label>
+                                  )}
                                 </div>
-                              </>
+                              </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -1796,10 +1739,8 @@ const DeliveryReceiptForm = (props) => {
                           </button>
                         </div>
                       </div>
-                    )
-                  }}
-                  Note={() => {
-                    return (
+                    )}
+                    {activeTab === 'note' && (
                       <div className="w-full mx-auto">
                         <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
                           {dataLang?.sales_product_note || 'sales_product_note'}
@@ -1815,9 +1756,9 @@ const DeliveryReceiptForm = (props) => {
                           />
                         </div>
                       </div>
-                    )
-                  }}
-                />
+                    )}
+                  </div>
+                </div>
               </div>
               {/* Cột tổng cộng */}
               <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
