@@ -1,6 +1,7 @@
 import { forwardRef, createContext, useContext, useState, useEffect, useRef } from "react";
 import { Customscrollbar } from "./Customscrollbar";
 import { motion } from "framer-motion";
+import { twMerge } from "tailwind-merge";
 
 // Tạo context để lưu trữ thông tin active tab
 export const TabContext = createContext(null);
@@ -59,7 +60,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
 export const Container = ({ children, className }) => {
   return (
     <div
-      className={`${className} pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden h-screen`}
+      className={twMerge(`pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden h-screen ${className}`)}
     >
       {children}
     </div>

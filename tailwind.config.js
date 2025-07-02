@@ -67,6 +67,13 @@ module.exports = {
           "01": "#EE1E1E",
           "02": "#FFEEF0",
         },
+        danger: {
+          "6": "#F53F3F",
+        },
+        grey: {
+          "300": "#DFE3E8",
+          "700": "#454F5B",
+        },
         typo: {
           blue: {
             1: "#11315B",
@@ -267,6 +274,22 @@ module.exports = {
             fontSize: '18px', /* text-xl */
             lineHeight: '28px'
           }
+        },
+        '.responsive-text-xl': {
+          fontSize: '16px',
+          lineHeight: '24px',
+          '@screen xl': {
+            fontSize: '1.125rem', /* text-lg */
+            lineHeight: '1.5rem'  
+          },
+          '@screen 2xl': {
+            fontSize: '1.25rem', /* text-xl */
+            lineHeight: '1.5rem'  
+          },  
+          '@screen 3xl': {
+            fontSize: '1.5rem', /* text-xl */
+            lineHeight: '2rem'  
+          },  
         },
       })
     }

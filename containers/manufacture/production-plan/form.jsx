@@ -1,24 +1,24 @@
-import dynamic from "next/dynamic";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import ButtonSubmit from "@/components/UI/button/buttonSubmit";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
+import { Container, ContainerBody } from "@/components/UI/common/layout";
+import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import LayoutForm from "@/components/layout/LayoutForm";
+import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
+import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import { useBranchList } from "@/hooks/common/useBranch";
 import { useChangeValue } from "@/hooks/useChangeValue";
 import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
-import PopupConfim from "@/components/UI/popupConfim/popupConfim";
-import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { routerPproductionPlan } from "@/routers/manufacture";
-import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
-import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
-import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
-import { useBranchList } from "@/hooks/common/useBranch";
 import { formatMoment } from "@/utils/helpers/formatMoment";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { useMutation } from "@tanstack/react-query";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 const InFo = dynamic(() => import("./components/form/info"), { ssr: false });
 const Table = dynamic(() => import("./components/form/table"), { ssr: false });
@@ -86,7 +86,7 @@ const ProductionPlanForm = (props) => {
             form.append(tab == "plan" ? "dataBusinessitemId[]" : "dataOrderItemId[]", e?.id);
         });
         try {
-            const { data, isSuccess } = await apiProductionPlan.apiHandlingManufacture(form);
+            const { data } = await apiProductionPlan.apiHandlingManufacture(form);
             data.items?.length < 1 && backPage();
             queryData({
                 dataProduction: data?.items.map((e) => {
@@ -161,14 +161,16 @@ const ProductionPlanForm = (props) => {
     }, [data.dataProduction]);
 
     const handChangeTable = (idParent, id, value, type) => {
-        const newData = data.dataProduction.map((e) => {
-            if (e.idParent == idParent && e.id == id) {
-                return { ...e, [type]: value };
-            }
-            return e;
+        queryData((prevData) => {
+            const newData = prevData.dataProduction.map((e) => {
+                if (e.idParent == idParent && e.id == id) {
+                    return { ...e, [type]: value };
+                }
+                return e;
+            });
+            setItem("arrData", JSON.stringify(newData));
+            return { ...prevData, dataProduction: newData };
         });
-        queryData({ dataProduction: newData });
-        setItem("arrData", JSON.stringify(newData));
     };
 
     useEffect(() => {
@@ -259,16 +261,17 @@ const ProductionPlanForm = (props) => {
     };
 
     const shareProps = {
+        dataLang,
         data,
-        listBranch,
-        isLoading,
-        handleRemoveBtn,
+        isLoading: mutatePlan.isPending,
         handleRemoveItem,
+        handChangeTable,
+        handleRemoveBtn,
         isValue,
         onChangeValue,
-        tab,
-        handChangeTable,
-        dataLang
+        listBranch,
+        tab: getLocalStorageTab,
+        dateRange: isValue.dateRange
     };
 
     // breadcrumb
@@ -285,12 +288,29 @@ const ProductionPlanForm = (props) => {
             label: dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'
         },
     ];
+
+    const handleExit = () => {
+        router.push("/manufacture/production-plan?tab=order");
+    };
+
     return (
         <>
-            <Head>
+            <LayoutForm
+                title={dataLang?.production_plan_form_add || 'production_plan_form_add'}
+                heading={dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}
+                breadcrumbItems={breadcrumbItems}
+                statusExprired={statusExprired}
+                dataLang={dataLang}
+                leftContent={<Table {...shareProps} />}
+                info={<InFo {...shareProps} />}
+                onSave={handSavePlan}
+                onExit={handleExit}
+                loading={mutatePlan.isPending}
+            />
+            {/* <Head>
                 <title>{dataLang?.production_plan_form_add || 'production_plan_form_add'}</title>
-            </Head>
-            <Container>
+            </Head> */}
+            {/* <Container>
                 {statusExprired ? (
                     <EmptyExprired />
                 ) : (
@@ -298,11 +318,6 @@ const ProductionPlanForm = (props) => {
                         items={breadcrumbItems}
                         className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
                     />
-                    // <div className="flex space-x-1 mt-4 3xl:text-sm 2xl:text-[11px] xl:text-[10px] lg:text-[10px]">
-                    //     <h6 className="text-[#141522]/40">{dataLang?.production_plan_form_materials_planning || 'production_plan_form_materials_planning'}</h6>
-                    //     <span className="text-[#141522]/40">/</span>
-                    //     <h6>{dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}</h6>
-                    // </div>
                 )}
                 <ContainerBody>
                     <div className="flex items-center justify-between mt-1 mr-2">
@@ -326,7 +341,7 @@ const ProductionPlanForm = (props) => {
                     <InFo {...shareProps} />
                     <Table {...shareProps} />
                 </ContainerBody>
-            </Container>
+            </Container> */}
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"
