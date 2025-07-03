@@ -1,25 +1,24 @@
-import { forwardRef, createContext, useContext, useState, useEffect, useRef } from "react";
-import { Customscrollbar } from "./Customscrollbar";
-import { motion } from "framer-motion";
-import { twMerge } from "tailwind-merge";
+import { motion } from 'framer-motion'
+import { createContext, forwardRef, useContext, useRef, useState } from 'react'
+import { Customscrollbar } from './Customscrollbar'
 
 // Tạo context để lưu trữ thông tin active tab
-export const TabContext = createContext(null);
+export const TabContext = createContext(null)
 
-export const useTabContext = () => useContext(TabContext);
+export const useTabContext = () => useContext(TabContext)
 
 // Component tạo hiệu ứng gạch chân cho tab active
 export const AnimatedTabUnderline = () => {
-  const { activeTabInfo } = useTabContext() || {};
-  const prevPositionRef = useRef(null);
+  const { activeTabInfo } = useTabContext() || {}
+  const prevPositionRef = useRef(null)
 
   if (!activeTabInfo || activeTabInfo.left === undefined || activeTabInfo.width === undefined) {
-    return null;
+    return null
   }
 
   // Lưu vị trí trước đó để animation có thể chạy từ vị trí cũ đến vị trí mới
-  const from = prevPositionRef.current || { left: activeTabInfo.left, width: 0 };
-  prevPositionRef.current = { left: activeTabInfo.left, width: activeTabInfo.width };
+  const from = prevPositionRef.current || { left: activeTabInfo.left, width: 0 }
+  prevPositionRef.current = { left: activeTabInfo.left, width: activeTabInfo.width }
 
   return (
     <motion.div
@@ -27,17 +26,17 @@ export const AnimatedTabUnderline = () => {
       initial={{ left: from.left, width: from.width }}
       animate={{ left: activeTabInfo.left, width: activeTabInfo.width }}
       transition={{
-        type: "spring",
+        type: 'spring',
         stiffness: 500,
         damping: 30,
       }}
     />
-  );
-};
+  )
+}
 
 export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
   // Lưu trữ thông tin active tab
-  const [activeTabInfo, setActiveTabInfo] = useState(null);
+  const [activeTabInfo, setActiveTabInfo] = useState(null)
 
   return (
     <TabContext.Provider value={{ activeTabInfo, setActiveTabInfo }}>
@@ -54,8 +53,8 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
         <AnimatedTabUnderline />
       </div>
     </TabContext.Provider>
-  );
-});
+  )
+})
 
 export const Container = ({ children, className }) => {
   return (
@@ -64,8 +63,8 @@ export const Container = ({ children, className }) => {
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
 export const ContainerBody = ({ children }) => {
   return (
@@ -75,22 +74,15 @@ export const ContainerBody = ({ children }) => {
         {children}
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const ContainerTotal = ({ children, className }) => {
-  return (
-    <div
-      className={`${className ? className : ""
-        } grid grid-cols-12 bg-gray-100 items-center`}
-    >
-      {children}
-    </div>
-  );
-};
+  return <div className={`${className ? className : ''} grid grid-cols-12 bg-gray-100 items-center`}>{children}</div>
+}
 export const ContainerTable = ({ children }) => {
-  return <div className="w-full h-full">{children}</div>;
-};
+  return <div className="w-full h-full">{children}</div>
+}
 
 export const LayOutTableDynamic = ({
   head,
@@ -116,9 +108,7 @@ export const LayOutTableDynamic = ({
               </div>
             )}
             <div className="flex flex-col flex-1 min-h-0">
-              <ContainerTable className="flex-1 min-h-0 overflow-hidden">
-                {table}
-              </ContainerTable>
+              <ContainerTable className="flex-1 min-h-0 overflow-hidden">{table}</ContainerTable>
             </div>
             {showTotal && <div className="w-full h-fit ">{total}</div>}
             <div className="w-full h-fit ">{pagination}</div>
@@ -126,5 +116,5 @@ export const LayOutTableDynamic = ({
         </ContainerBody>
       </Container>
     </>
-  );
-};
+  )
+}

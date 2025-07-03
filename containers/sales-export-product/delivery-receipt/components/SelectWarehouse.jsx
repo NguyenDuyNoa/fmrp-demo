@@ -69,7 +69,7 @@ const SelectWarehouse = ({
         value: value.value,
         label: <RenderOption opt={value} isLabel={true} />,
       }
-    : undefined
+    : null
 
   const handleChange = (value) => {
     const newValue = options?.find((opt) => opt.value === value?.value)
