@@ -1288,249 +1288,245 @@ const SalesOrderForm = (props) => {
                 </h2>
                 {/* Tabs */}
                 <OrderFormTabs
-                  Info={() => {
-                    return (
-                      <div className="relative">
-                        {/* Số đơn hàng */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
-                          <div className="w-full relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">
-                              #
+                  info={
+                    <div className="relative">
+                      {/* Số đơn hàng */}
+                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                        <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
+                        <div className="w-full relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">
+                            #
+                          </span>
+                          <input
+                            value={codeProduct}
+                            onChange={handleOnChangeInput.bind(this, 'codeProduct')}
+                            name="fname"
+                            type="text"
+                            placeholder={dataLang?.system_default || 'system_default'}
+                            className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
+                          />
+                        </div>
+                      </div>
+                      {/* Ngày tạo đơn */}
+                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+                        <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
+                        <div className="w-full">
+                          <div className="relative w-full flex flex-row custom-date-picker">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                              <BsCalendarEvent color="#7a7a7a" />
                             </span>
-                            <input
-                              value={codeProduct}
-                              onChange={handleOnChangeInput.bind(this, 'codeProduct')}
-                              name="fname"
-                              type="text"
-                              placeholder={dataLang?.system_default || 'system_default'}
-                              className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
-                            />
+                            <ConfigProvider locale={viVN}>
+                              <DatePicker
+                                className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                                status={errDate ? 'error' : ''}
+                                placeholder="Chọn ngày"
+                                format="DD/MM/YYYY HH:mm"
+                                showTime={{
+                                  defaultValue: dayjs('00:00', 'HH:mm'),
+                                  format: 'HH:mm',
+                                }}
+                                suffixIcon={null}
+                                value={dayjs(startDate)}
+                                onChange={(date) => {
+                                  if (date) {
+                                    const dateString = date.toDate().toString()
+                                    setStartDate(dateString)
+                                  }
+                                }}
+                              />
+                            </ConfigProvider>
                           </div>
                         </div>
-                        {/* Ngày tạo đơn */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
-                          <div className="w-full">
-                            <div className="relative w-full flex flex-row custom-date-picker">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                <BsCalendarEvent color="#7a7a7a" />
-                              </span>
-                              <ConfigProvider locale={viVN}>
-                                <DatePicker
-                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                                  status={errDate ? 'error' : ''}
-                                  placeholder="Chọn ngày"
-                                  format="DD/MM/YYYY HH:mm"
-                                  showTime={{
-                                    defaultValue: dayjs('00:00', 'HH:mm'),
-                                    format: 'HH:mm',
-                                  }}
-                                  suffixIcon={null}
-                                  value={dayjs(startDate)}
-                                  onChange={(date) => {
-                                    if (date) {
-                                      const dateString = date.toDate().toString()
-                                      setStartDate(dateString)
-                                    }
-                                  }}
-                                />
-                              </ConfigProvider>
-                            </div>
-                          </div>
 
-                          {errDate && (
+                        {errDate && (
+                          <label className="text-sm text-red-500">
+                            {dataLang?.price_quote_errDate || 'price_quote_errDate'}
+                          </label>
+                        )}
+                      </div>
+                      {/* Ngày cần hàng */}
+                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+                        <InfoFormLabel
+                          isRequired
+                          label={dataLang?.sales_product_item_date || 'sales_product_item_date'}
+                        />
+                        <div className="w-full">
+                          <div className="relative flex flex-row custom-date-picker">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                              <BsCalendarEvent color="#7a7a7a" />
+                            </span>
+                            <ConfigProvider locale={viVN}>
+                              <DatePicker
+                                className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                                placeholder="Chọn ngày"
+                                format="DD/MM/YYYY"
+                                suffixIcon={null}
+                                value={deliveryDate ? dayjs(deliveryDate) : null}
+                                onChange={(date) => {
+                                  if (date) {
+                                    const dateString = date.toDate().toString()
+                                    setDeliveryDate(dateString)
+                                  } else {
+                                    setDeliveryDate(null) // Xử lý khi user xóa date
+                                  }
+                                }}
+                                status={errDeliveryDate ? 'error' : ''}
+                              />
+                            </ConfigProvider>
+                          </div>
+                          {errDeliveryDate && (
                             <label className="text-sm text-red-500">
-                              {dataLang?.price_quote_errDate || 'price_quote_errDate'}
+                              {dataLang?.sales_product_err_delivery_date || 'Vui lòng chọn ngày giao hàng'}
                             </label>
                           )}
                         </div>
-                        {/* Ngày cần hàng */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                          <InfoFormLabel
-                            isRequired
-                            label={dataLang?.sales_product_item_date || 'sales_product_item_date'}
-                          />
-                          <div className="w-full">
-                            <div className="relative flex flex-row custom-date-picker">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                <BsCalendarEvent color="#7a7a7a" />
-                              </span>
-                              <ConfigProvider locale={viVN}>
-                                <DatePicker
-                                  className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                                  placeholder="Chọn ngày"
-                                  format="DD/MM/YYYY"
-                                  suffixIcon={null}
-                                  value={deliveryDate ? dayjs(deliveryDate) : null}
-                                  onChange={(date) => {
-                                    if (date) {
-                                      const dateString = date.toDate().toString()
-                                      setDeliveryDate(dateString)
-                                    } else {
-                                      setDeliveryDate(null) // Xử lý khi user xóa date
-                                    }
-                                  }}
-                                  status={errDeliveryDate ? 'error' : ''}
+                      </div>
+                      {/* Khách hàng */}
+                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                        <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
+                        <div className="w-full">
+                          <div className="relative flex flex-row">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                              <LuBriefcase color="#7a7a7a" />
+                            </span>
+                            <SelectWithSort
+                              title="Khách hàng"
+                              placeholderText="Chọn khách hàng"
+                              options={!!flagStateChange ? [] : dataCustomer}
+                              value={selectedCustomer}
+                              onChange={(value) => setSelectedCustomer(value)}
+                              isError={errCustomer}
+                            />
+                          </div>
+                          {errCustomer && (
+                            <label className="text-sm text-red-500">
+                              {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
+                            </label>
+                          )}
+                        </div>
+                      </div>
+                      {/* Xem thêm thông tin */}
+                      <AnimatePresence initial={false}>
+                        {showMoreInfo && (
+                          <motion.div
+                            key="more-info"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.5, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                          >
+                            <React.Fragment>
+                              {/* Chi nhánh */}
+                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                                <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
+                                <div className="w-full">
+                                  <div className="relative flex flex-row">
+                                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                      <PiMapPinLight color="#7a7a7a" />
+                                    </div>
+                                    <SelectWithSort
+                                      title="Chi nhánh"
+                                      placeholderText="Chọn chi nhánh"
+                                      options={dataBranch}
+                                      value={selectedBranch}
+                                      onChange={(value) => setSelectedBranch(value)}
+                                      isError={errBranch}
+                                    />
+                                  </div>
+                                  {errBranch && (
+                                    <label className="text-sm text-red-500">
+                                      {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
+                                    </label>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Nhân viên */}
+                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                                <InfoFormLabel
+                                  isRequired
+                                  label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
                                 />
-                              </ConfigProvider>
-                            </div>
-                            {errDeliveryDate && (
-                              <label className="text-sm text-red-500">
-                                {dataLang?.sales_product_err_delivery_date || 'Vui lòng chọn ngày giao hàng'}
-                              </label>
-                            )}
-                          </div>
-                        </div>
-                        {/* Khách hàng */}
-                        <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                          <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
-                          <div className="w-full">
-                            <div className="relative flex flex-row">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <LuBriefcase color="#7a7a7a" />
-                              </span>
-                              <SelectWithSort
-                                title="Khách hàng"
-                                placeholderText="Chọn khách hàng"
-                                options={!!flagStateChange ? [] : dataCustomer}
-                                value={selectedCustomer}
-                                onChange={(value) => setSelectedCustomer(value)}
-                                isError={errCustomer}
-                              />
-                            </div>
-                            {errCustomer && (
-                              <label className="text-sm text-red-500">
-                                {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
-                              </label>
-                            )}
-                          </div>
-                        </div>
-                        {/* Xem thêm thông tin */}
-                        <AnimatePresence initial={false}>
-                          {showMoreInfo && (
-                            <motion.div
-                              key="more-info"
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.5, ease: 'easeInOut' }}
-                              className="overflow-hidden"
-                            >
-                              <React.Fragment>
-                                {/* Chi nhánh */}
-                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
-                                  <div className="w-full">
-                                    <div className="relative flex flex-row">
-                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <PiMapPinLight color="#7a7a7a" />
-                                      </div>
-                                      <SelectWithSort
-                                        title="Chi nhánh"
-                                        placeholderText="Chọn chi nhánh"
-                                        options={dataBranch}
-                                        value={selectedBranch}
-                                        onChange={(value) => setSelectedBranch(value)}
-                                        isError={errBranch}
-                                      />
-                                    </div>
-                                    {errBranch && (
-                                      <label className="text-sm text-red-500">
-                                        {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
-                                      </label>
-                                    )}
-                                  </div>
-                                </div>
-                                {/* Nhân viên */}
-                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <InfoFormLabel
-                                    isRequired
-                                    label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
-                                  />
-                                  <div className="w-full">
-                                    <div className="relative flex flex-row">
-                                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <FiUser color="#7a7a7a" />
-                                      </span>
-                                      <SelectWithSort
-                                        title="Nhân viên"
-                                        placeholderText="Chọn nhân viên"
-                                        options={!!flagStateChange ? [] : dataStaffs}
-                                        value={selectedStaff}
-                                        onChange={(value) => setSelectedStaff(value)}
-                                        isError={errStaff}
-                                      />
-                                    </div>
-                                    {errStaff && (
-                                      <label className="text-sm text-red-500">
-                                        {dataLang?.sales_product_err_staff_in_charge ||
-                                          'sales_product_err_staff_in_charge'}
-                                      </label>
-                                    )}
-                                  </div>
-                                </div>
-                                {/* Người liên lạc */}
-                                <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                  <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
-                                  <div className="w-full relative">
+                                <div className="w-full">
+                                  <div className="relative flex flex-row">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                                       <FiUser color="#7a7a7a" />
                                     </span>
                                     <SelectWithSort
-                                      title="Người liên lạc"
-                                      placeholderText="Chọn người liên lạc"
-                                      options={!!flagStateChange ? [] : dataPersonContact}
-                                      value={selectedPersonalContact || contactPerson}
-                                      onChange={(value) => setSelectedPersonalContact(value)}
+                                      title="Nhân viên"
+                                      placeholderText="Chọn nhân viên"
+                                      options={!!flagStateChange ? [] : dataStaffs}
+                                      value={selectedStaff}
+                                      onChange={(value) => setSelectedStaff(value)}
+                                      isError={errStaff}
                                     />
                                   </div>
+                                  {errStaff && (
+                                    <label className="text-sm text-red-500">
+                                      {dataLang?.sales_product_err_staff_in_charge ||
+                                        'sales_product_err_staff_in_charge'}
+                                    </label>
+                                  )}
                                 </div>
-                              </React.Fragment>
-                            </motion.div>
+                              </div>
+                              {/* Người liên lạc */}
+                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                                <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
+                                <div className="w-full relative">
+                                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                                    <FiUser color="#7a7a7a" />
+                                  </span>
+                                  <SelectWithSort
+                                    title="Người liên lạc"
+                                    placeholderText="Chọn người liên lạc"
+                                    options={!!flagStateChange ? [] : dataPersonContact}
+                                    value={selectedPersonalContact || contactPerson}
+                                    onChange={(value) => setSelectedPersonalContact(value)}
+                                  />
+                                </div>
+                              </div>
+                            </React.Fragment>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      {/* Xem thêm Button */}
+                      <div className="flex items-center justify-center p-1 pb-6 hover:underline">
+                        <button
+                          onClick={() => setShowMoreInfo(!showMoreInfo)}
+                          className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
+                        >
+                          {showMoreInfo ? (
+                            <span className="inline-flex items-center gap-x-1">
+                              Ẩn bớt
+                              <ArrowUp2 size={16} />
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-x-1">
+                              Xem thêm
+                              <ArrowDown2 size={16} />
+                            </span>
                           )}
-                        </AnimatePresence>
-                        {/* Xem thêm Button */}
-                        <div className="flex items-center justify-center p-1 pb-6 hover:underline">
-                          <button
-                            onClick={() => setShowMoreInfo(!showMoreInfo)}
-                            className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
-                          >
-                            {showMoreInfo ? (
-                              <span className="inline-flex items-center gap-x-1">
-                                Ẩn bớt
-                                <ArrowUp2 size={16} />
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-x-1">
-                                Xem thêm
-                                <ArrowDown2 size={16} />
-                              </span>
-                            )}
-                          </button>
-                        </div>
+                        </button>
                       </div>
-                    )
-                  }}
-                  Note={() => {
-                    return (
-                      <div className="w-full mx-auto">
-                        <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
-                          {dataLang?.sales_product_note || 'sales_product_note'}
-                        </h4>
-                        <div className="w-full pb-6">
-                          <textarea
-                            value={note}
-                            placeholder="Nhập ghi chú tại đây"
-                            onChange={handleOnChangeInput.bind(this, 'note')}
-                            name="fname"
-                            type="text"
-                            className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
-                          />
-                        </div>
+                    </div>
+                  }
+                  note={
+                    <div className="w-full mx-auto">
+                      <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
+                        {dataLang?.sales_product_note || 'sales_product_note'}
+                      </h4>
+                      <div className="w-full pb-6">
+                        <textarea
+                          value={note}
+                          placeholder="Nhập ghi chú tại đây"
+                          onChange={handleOnChangeInput.bind(this, 'note')}
+                          name="fname"
+                          type="text"
+                          className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+                        />
                       </div>
-                    )
-                  }}
+                    </div>
+                  }
                 />
               </div>
               {/* Cột tổng cộng */}
@@ -1576,7 +1572,7 @@ const SalesOrderForm = (props) => {
           </div>
         </div>
         {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-6 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
+        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-8 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
           <div className="w-3/4"></div>
           <div className="w-1/4 flex justify-end items-center gap-2 py-4 3xl:px-5 px-3">
             <button

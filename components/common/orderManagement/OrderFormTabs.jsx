@@ -12,7 +12,7 @@ const tabItems = [
     label: 'Ghi chú',
   },
 ]
-const OrderFormTabs = ({ Info, Note }) => {
+const OrderFormTabs = ({ info, note }) => {
   const [activeTab, setActiveTab] = useState('info')
 
   return (
@@ -41,8 +41,8 @@ const OrderFormTabs = ({ Info, Note }) => {
       </div>
       {/* Tab Content */}
       <div className="mt-4">
-        {activeTab === 'info' && <Info />}
-        {activeTab === 'note' && <Note />}
+        {activeTab === 'info' && info}
+        {activeTab === 'note' && note}
       </div>
     </div>
   )
