@@ -1,6 +1,6 @@
+import { forwardRef, useEffect, useRef } from 'react'
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
-import React, { forwardRef, useEffect, useRef } from 'react'
 
 const SimpleBarCustom = forwardRef(({ children, scrollableNodePropsClassName, hideScrollbar, ...props }, ref) => {
   const innerRef = useRef(null)

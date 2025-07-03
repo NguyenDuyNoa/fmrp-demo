@@ -6,7 +6,7 @@ import useToast from '@/hooks/useToast'
 import Image from 'next/image'
 import React, { useEffect } from 'react'
 import DatePicker from 'react-datepicker'
-import { PiHash } from 'react-icons/pi'
+import { PiHash, PiMapPinLight, PiCaretDownBold } from 'react-icons/pi'
 import { twMerge } from 'tailwind-merge'
 import { useSelector } from 'react-redux'
 
@@ -15,13 +15,18 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
   const authState = useSelector((state) => state.auth)
 
   useEffect(() => {
+    // Luôn tạo dateRange mới với 3 ngày từ ngày hiện tại
     const today = new Date()
     const endDate = new Date()
-    endDate.setDate(today.getDate() + 2) // Thêm 2 ngày để có tổng 3 ngày
+    endDate.setDate(today.getDate() + 2)
 
-    if (!isValue.dateRange.startDate && !isValue.dateRange.endDate) {
+    // Luôn cập nhật dateRange mới khi component mount
+    onChangeValue('dateRange')({ startDate: today, endDate: endDate })
+
+    // Thêm timeout ngắn để đảm bảo dateRange được áp dụng cho table
+    setTimeout(() => {
       onChangeValue('dateRange')({ startDate: today, endDate: endDate })
-    }
+    }, 500)
   }, [])
 
   useEffect(() => {
@@ -30,7 +35,6 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
         value: authState.branch[0].id,
         label: authState.branch[0].name,
       }
-      console.log('Chi nhánh được chọn:', firstBranch)
       onChangeValue('idBrach')(firstBranch)
     }
   }, [authState.branch])
@@ -55,9 +59,9 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
         <div className="relative">
           <input
             type="text"
-            placeholder={dataLang?.auto_text || "Tự động"}
+            placeholder={dataLang?.auto_text || 'Tự động'}
             disabled={true}
-            className="border border-border-gray-1 py-[7px] pl-8 pr-3 rounded-lg placeholder:text-typo-gray-2 placeholder:responsive-text-base text-neutral-05 w-full"
+            className="border border-border-gray-1 py-[7px] pl-9 pr-3 rounded-lg placeholder:text-typo-gray-2 placeholder:responsive-text-base text-neutral-05 w-full"
           />
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-02">
             <PiHash />
@@ -86,7 +90,7 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
             placeholderText={
               dataLang?.production_plan_form_materials_select_date || 'production_plan_form_materials_select_date'
             }
-            className={`py-[8px] pl-8 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-neutral-05 w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-1 border rounded-lg
+            className={`py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-neutral-05 w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-1 border rounded-lg
                         ${isValue.date == null ? 'border-red-500' : 'border-border-gray-1'}`}
           />
           <CalendarBlankIcon className="size-4 absolute left-3 -translate-y-1/2 top-1/2 opacity-60" />
@@ -121,7 +125,7 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
               isValue.dateRange.startDate == null || isValue.dateRange.endDate == null
                 ? 'border-red-500'
                 : 'border-border-gray-1'
-            } py-[8px] pl-8 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
+            } py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
              focus:border-[#0F4F9E] focus:border-1 border  rounded-lg z-[999] `}
           />
           <CalendarBlankIcon className="size-4 absolute left-3 -translate-y-1/2 top-1/2 opacity-60" />
@@ -142,6 +146,8 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
           value={isValue.idBrach}
           onChange={onChangeValue('idBrach')}
           options={listBranch}
+          icon={<PiMapPinLight color="#9295A4" className="size-4" />}
+          dropdownIcon={<PiCaretDownBold color="#9295A4" className="size-4" />}
           className="w-full rounded-lg cursor-pointer placeholder:responsive-text-base responsive-text-base"
           styles={{
             control: (baseStyles, state) => ({
@@ -225,7 +231,7 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
         <div
           className={twMerge(
             tab == 'order' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600',
-            'inline-flex px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm'
+            ' px-3 py-1.5 rounded-lg responsive-text-base font-medium shadow-sm text-center w-full'
           )}
         >
           {tab == 'order'

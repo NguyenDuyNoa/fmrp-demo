@@ -1,8 +1,4 @@
 import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import LayoutForm from "@/components/layout/LayoutForm";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -28,7 +24,7 @@ const initialData = {
 };
 
 const ProductionPlanForm = (props) => {
-    const { getItem, setItem } = FnlocalStorage();
+    const { getItem, setItem, removeItem } = FnlocalStorage();
 
     const getLocalStorageTab = () => getItem("tab");
 
@@ -88,6 +84,7 @@ const ProductionPlanForm = (props) => {
         try {
             const { data } = await apiProductionPlan.apiHandlingManufacture(form);
             data.items?.length < 1 && backPage();
+            
             queryData({
                 dataProduction: data?.items.map((e) => {
                     return {
@@ -100,7 +97,7 @@ const ProductionPlanForm = (props) => {
                         quantityRemaining: +e?.quantity_rest,
                         quantityWarehouse: +e?.quantity_warehouse,
                         productVariation: e?.product_variation,
-                        date: { startDate: null, endDate: null },
+                        date: isValue.dateRange?.startDate ? { ...isValue.dateRange } : { startDate: null, endDate: null },
                         deliveryDate: formatMoment(e?.delivery_date, FORMAT_MOMENT.DATE_SLASH_LONG),
                     };
                 }),
@@ -161,16 +158,14 @@ const ProductionPlanForm = (props) => {
     }, [data.dataProduction]);
 
     const handChangeTable = (idParent, id, value, type) => {
-        queryData((prevData) => {
-            const newData = prevData.dataProduction.map((e) => {
-                if (e.idParent == idParent && e.id == id) {
-                    return { ...e, [type]: value };
-                }
-                return e;
-            });
-            setItem("arrData", JSON.stringify(newData));
-            return { ...prevData, dataProduction: newData };
+        const newData = data.dataProduction.map((e) => {
+            if (e.idParent == idParent && e.id == id) {
+                return { ...e, [type]: value };
+            }
+            return e;
         });
+        setItem("arrData", JSON.stringify(newData));
+        queryData({ dataProduction: newData });
     };
 
     useEffect(() => {
@@ -183,6 +178,20 @@ const ProductionPlanForm = (props) => {
         queryData({ dataProduction: newData });
     }, [isValue.dateRange]);
 
+    // Thêm useEffect mới để đảm bảo dateRange được áp dụng cho tất cả các items sau khi data được tải
+    useEffect(() => {
+        // Chỉ thực hiện khi đã có data và dateRange
+        if (data.dataProduction.length > 0 && isValue.dateRange?.startDate && isValue.dateRange?.endDate) {
+            const newData = data.dataProduction.map((e) => {
+                return {
+                    ...e,
+                    date: { ...isValue.dateRange },
+                };
+            });
+            queryData({ dataProduction: newData });
+        }
+    }, [data.dataProduction.length]); // Chỉ chạy khi số lượng items thay đổi
+
     const mutatePlan = useMutation({
         mutationFn: (data) => {
             return apiProductionPlan.apiHandlingProductionPlans(data);
@@ -192,7 +201,7 @@ const ProductionPlanForm = (props) => {
     })
 
     const handSavePlan = async () => {
-        const { hasMissingBom, hasMissingStage, hasMissingQuantityDate } = data.dataProduction.reduce(
+        const { hasMissingBom, hasMissingStage, hasMissingQuantityDate, hasZeroQuantity } = data.dataProduction.reduce(
             (acc, item) => {
                 if (!item.bom == "1") {
                     acc.hasMissingBom = true;
@@ -203,10 +212,18 @@ const ProductionPlanForm = (props) => {
                 if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate || !item.date.endDate)) {
                     acc.hasMissingQuantityDate = true;
                 }
+                if (item.quantityRemaining == 0 || item.quantityRemaining == null || item.quantityRemaining < 0) {
+                    acc.hasZeroQuantity = true;
+                }
                 return acc;
             },
-            { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false }
+            { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false, hasZeroQuantity: false }
         );
+
+        if (hasZeroQuantity) {
+            showToat("error", "Số lượng cần không được bằng 0");
+            return;
+        }
 
         if (hasMissingQuantityDate || !isValue.idBrach || (!isValue.date) || (!isValue.dateRange.startDate || !isValue.dateRange.endDate)) {
             if (!isValue.idBrach || (!isValue.date)) {
@@ -270,7 +287,7 @@ const ProductionPlanForm = (props) => {
         isValue,
         onChangeValue,
         listBranch,
-        tab: getLocalStorageTab,
+        tab,
         dateRange: isValue.dateRange
     };
 
@@ -307,41 +324,6 @@ const ProductionPlanForm = (props) => {
                 onExit={handleExit}
                 loading={mutatePlan.isPending}
             />
-            {/* <Head>
-                <title>{dataLang?.production_plan_form_add || 'production_plan_form_add'}</title>
-            </Head> */}
-            {/* <Container>
-                {statusExprired ? (
-                    <EmptyExprired />
-                ) : (
-                    <Breadcrumb
-                        items={breadcrumbItems}
-                        className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]"
-                    />
-                )}
-                <ContainerBody>
-                    <div className="flex items-center justify-between mt-1 mr-2">
-                        <h2 className="text-title-section text-[#52575E] capitalize font-medium">
-                            {dataLang?.production_plan_form_add || 'production_plan_form_add'}
-                        </h2>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => router.push("/manufacture/production-plan?tab=order")}
-                                className="xl:text-sm text-xs xl:px-5 px-3 xl:py-2.5 py-1.5  bg-slate-100  rounded btn-animation hover:scale-105"
-                            >
-                                {dataLang?.import_comeback || "import_comeback"}
-                            </button>
-                            <ButtonSubmit
-                                loading={mutatePlan.isPending}
-                                onClick={(e) => handSavePlan()}
-                                dataLang={dataLang}
-                            />
-                        </div>
-                    </div>
-                    <InFo {...shareProps} />
-                    <Table {...shareProps} />
-                </ContainerBody>
-            </Container> */}
             <PopupConfim
                 dataLang={dataLang}
                 type="warning"

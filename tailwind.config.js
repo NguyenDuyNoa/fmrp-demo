@@ -82,11 +82,11 @@ module.exports = {
           '02': '#FFEEF0',
         },
         danger: {
-          "6": "#F53F3F",
+          6: '#F53F3F',
         },
         grey: {
-          "300": "#DFE3E8",
-          "700": "#454F5B",
+          300: '#DFE3E8',
+          700: '#454F5B',
         },
         typo: {
           blue: {
@@ -283,20 +283,36 @@ module.exports = {
           },
         },
         '.responsive-text-xl': {
-          fontSize: '16px',
+          fontSize: '17px',
           lineHeight: '24px',
           '@screen xl': {
-            fontSize: '1.125rem', /* text-lg */
-            lineHeight: '1.5rem'  
+            fontSize: '18px',
+            lineHeight: '28px',
           },
           '@screen 2xl': {
-            fontSize: '1.25rem', /* text-xl */
-            lineHeight: '1.5rem'  
-          },  
+            fontSize: '19px',
+            lineHeight: '28px',
+          },
           '@screen 3xl': {
-            fontSize: '1.5rem', /* text-xl */
-            lineHeight: '2rem'  
-          },  
+            fontSize: '1.25rem' /* text-xl */,
+            lineHeight: '28px',
+          },
+        },
+        '.responsive-text-2xl': {
+          fontSize: '21px',
+          lineHeight: '28px',
+          '@screen xl': {
+            fontSize: '22px',
+            lineHeight: '2rem',
+          },
+          '@screen 2xl': {
+            fontSize: '23px',
+            lineHeight: '2rem',
+          },
+          '@screen 3xl': {
+            fontSize: '1.5rem' /* text-2xl */,
+            lineHeight: '2rem',
+          },
         },
       })
     },
