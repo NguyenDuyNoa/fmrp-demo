@@ -1,8 +1,4 @@
 import apiProductionPlan from "@/Api/apiManufacture/manufacture/productionPlan/apiProductionPlan";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import ButtonSubmit from "@/components/UI/button/buttonSubmit";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { Container, ContainerBody } from "@/components/UI/common/layout";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
 import LayoutForm from "@/components/layout/LayoutForm";
 import { CONFIRM_DELETION, TITLE_DELETE } from "@/constants/delete/deleteTable";
@@ -162,16 +158,14 @@ const ProductionPlanForm = (props) => {
     }, [data.dataProduction]);
 
     const handChangeTable = (idParent, id, value, type) => {
-        queryData((prevData) => {
-            const newData = prevData.dataProduction.map((e) => {
-                if (e.idParent == idParent && e.id == id) {
-                    return { ...e, [type]: value };
-                }
-                return e;
-            });
-            setItem("arrData", JSON.stringify(newData));
-            return { ...prevData, dataProduction: newData };
+        const newData = data.dataProduction.map((e) => {
+            if (e.idParent == idParent && e.id == id) {
+                return { ...e, [type]: value };
+            }
+            return e;
         });
+        setItem("arrData", JSON.stringify(newData));
+        queryData({ dataProduction: newData });
     };
 
     useEffect(() => {
@@ -207,7 +201,7 @@ const ProductionPlanForm = (props) => {
     })
 
     const handSavePlan = async () => {
-        const { hasMissingBom, hasMissingStage, hasMissingQuantityDate } = data.dataProduction.reduce(
+        const { hasMissingBom, hasMissingStage, hasMissingQuantityDate, hasZeroQuantity } = data.dataProduction.reduce(
             (acc, item) => {
                 if (!item.bom == "1") {
                     acc.hasMissingBom = true;
@@ -218,10 +212,18 @@ const ProductionPlanForm = (props) => {
                 if (!item.quantityRemaining || item.quantityRemaining == 0 || (!item.date.startDate || !item.date.endDate)) {
                     acc.hasMissingQuantityDate = true;
                 }
+                if (item.quantityRemaining == 0 || item.quantityRemaining == null || item.quantityRemaining < 0) {
+                    acc.hasZeroQuantity = true;
+                }
                 return acc;
             },
-            { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false }
+            { hasMissingBom: false, hasMissingStage: false, hasMissingQuantityDate: false, hasZeroQuantity: false }
         );
+
+        if (hasZeroQuantity) {
+            showToat("error", "Số lượng cần không được bằng 0");
+            return;
+        }
 
         if (hasMissingQuantityDate || !isValue.idBrach || (!isValue.date) || (!isValue.dateRange.startDate || !isValue.dateRange.endDate)) {
             if (!isValue.idBrach || (!isValue.date)) {
@@ -285,7 +287,7 @@ const ProductionPlanForm = (props) => {
         isValue,
         onChangeValue,
         listBranch,
-        tab: getLocalStorageTab,
+        tab,
         dateRange: isValue.dateRange
     };
 

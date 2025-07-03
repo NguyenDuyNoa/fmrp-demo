@@ -3,36 +3,45 @@ import DropdownFilledIcon from '@/components/icons/common/DropdownFilledIcon'
 import configSelectFillter from '@/configs/configSelectFillter'
 import { SelectCore } from '@/utils/lib/Select'
 import { FaCheck } from 'react-icons/fa'
-import { components } from 'react-select'
+import { components as reactSelectComponents } from 'react-select'
 import { Customscrollbar } from '../common/Customscrollbar'
 
 export const CustomOption = (props) => {
   return (
-    <components.Option {...props}>
+    <reactSelectComponents.Option {...props}>
       <div
         className={`flex items-center justify-between w-full ${props.isDisabled ? 'cursor-default' : 'cursor-pointer'}`}
       >
         <div>{props.children}</div>
         {props.isSelected && <FaCheck className="w-2.5 h-2.5 ml-2 text-primary" />}
       </div>
-    </components.Option>
+    </reactSelectComponents.Option>
   )
 }
 
 // Custom Dropdown Indicator
-const DropdownIndicator = (props) => (
-  <components.DropdownIndicator {...props}>
-    <DropdownFilledIcon
-      className={`w-3 h-3 transition-transform duration-500 ${
-        props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'
-      }`}
-    />
-  </components.DropdownIndicator>
-)
+const DropdownIndicator = (props) => {
+  const CustomIcon = props.selectProps.dropdownIcon
+  return (
+    <reactSelectComponents.DropdownIndicator {...props}>
+      {CustomIcon ? (
+        <div className={`transition-transform duration-500 ${props.selectProps.menuIsOpen ? 'rotate-180' : ''}`}>
+          {CustomIcon}
+        </div>
+      ) : (
+        <DropdownFilledIcon
+          className={`w-3 h-3 transition-transform duration-500 ${
+            props.selectProps.menuIsOpen ? 'rotate-180 text-[#003DA0]' : 'text-neutral-02'
+          }`}
+        />
+      )}
+    </reactSelectComponents.DropdownIndicator>
+  )
+}
 
 // Custom Clear Indicator
 const ClearIndicator = (props) => (
-  <components.ClearIndicator
+  <reactSelectComponents.ClearIndicator
     {...props}
     innerProps={{
       ...props.innerProps,
@@ -45,11 +54,22 @@ const ClearIndicator = (props) => (
     }}
   >
     <CloseXIcon className="w-4 h-4 text-[#9295A4]" />
-  </components.ClearIndicator>
+  </reactSelectComponents.ClearIndicator>
 )
 
 export const CustomMenuList = (props) => {
   return <Customscrollbar className="max-h-[300px]">{props.children}</Customscrollbar>
+}
+
+// Custom Control với Icon tùy chỉnh
+const CustomControl = ({ children, ...props }) => {
+  const Icon = props.selectProps.icon
+  return (
+    <reactSelectComponents.Control {...props}>
+      {Icon && <div className="ml-3">{Icon}</div>}
+      {children}
+    </reactSelectComponents.Control>
+  )
 }
 
 const SelectComponent = ({
@@ -77,6 +97,8 @@ const SelectComponent = ({
   maxShowMuti,
   id,
   type = 'header',
+  icon = null,
+  dropdownIcon = null,
 }) => {
   // const styles = {
   //     menuList: (base) => ({
@@ -165,13 +187,16 @@ const SelectComponent = ({
         className={`${configSelectFillter.className} ${className || 'min-w-[200px]'}`}
         isMulti={isMulti ? isMulti : false}
         components={{
-          ...components,
+          ...(components || {}),
           Option: CustomOption,
           MenuList: CustomMenuList,
-          DropdownIndicator, // ← Custom arrow indicator
-          IndicatorSeparator: () => null, // ← Bỏ đường thẳng
+          DropdownIndicator,
+          IndicatorSeparator: () => null,
           ClearIndicator,
+          Control: icon ? CustomControl : reactSelectComponents.Control,
         }}
+        icon={icon}
+        dropdownIcon={dropdownIcon}
         maxShowMuti={maxShowMuti}
         noOptionsMessage={noOptionsMessage ? noOptionsMessage : configSelectFillter.noOptionsMessage}
         closeMenuOnSelect={closeMenuOnSelect}

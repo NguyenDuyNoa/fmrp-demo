@@ -29,11 +29,15 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable, d
 
   useEffect(() => {
     if (dateRange?.startDate && dateRange?.endDate && data?.dataProduction?.length > 0) {
+      const startDate = dateRange.startDate
+      const endDate = dateRange.endDate
       data.dataProduction.forEach(item => {
-        handChangeTable(item.idParent, item.id, { startDate: dateRange.startDate, endDate: dateRange.endDate }, 'date')
+        if (item.date?.startDate !== startDate || item.date?.endDate !== endDate) {
+          handChangeTable(item.idParent, item.id, { startDate, endDate }, 'date')
+        }
       })
     }
-  }, [dateRange?.startDate, dateRange?.endDate, data?.dataProduction])
+  }, [dateRange?.startDate, dateRange?.endDate])
 
   return (
     <div className="flex flex-col gap-4 2xl:gap-6">
@@ -151,12 +155,14 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable, d
                           )
                           return
                         }
-                        handChangeTable(i.idParent, i.id, value, 'quantityRemaining')
+                        const numericValue = parseFloat(value) || 0
+                        handChangeTable(i.idParent, i.id, numericValue, 'quantityRemaining')
                       }}
                       disabled={false}
-                      // max={99999}
+                      min={0}
+                      step={1}
                       classNameButton="size-5 2xl:size-6"
-                      classNameInput={`w-10 !responsive-text-sm text-center ${
+                      classNameInput={`w-full !responsive-text-sm text-center ${
                         i?.quantityRemaining == null || i?.quantityRemaining === '' || i?.quantityRemaining === 0
                           ? '!border-red-500'
                           : '!border-[#D8DAE5]'
