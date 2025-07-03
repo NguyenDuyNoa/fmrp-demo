@@ -34,13 +34,15 @@ const InputCustom = ({
   const handleChange = useCallback(
     (type) => {
       if (disabled) return
-      const current = parseToNumber(state)
+      const current = parseToNumber(inputValue)
       let result = current
       if (type === 'increment' && current < max) result = current + 1
       if (type === 'decrement' && current > min) result = current - 1
       setState(result)
+      setInputValue(result)
+      setFormattedValue(formatNumber(result))
     },
-    [disabled, state, parseToNumber, max, min, setState]
+    [disabled, inputValue, parseToNumber, max, min, setState]
   )
 
   const handleInputChange = useCallback(

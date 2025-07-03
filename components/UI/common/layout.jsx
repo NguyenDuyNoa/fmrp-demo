@@ -60,7 +60,7 @@ export const ContainerFilterTab = forwardRef(({ children, className }, ref) => {
 export const Container = ({ children, className }) => {
   return (
     <div
-      className={twMerge(`pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden h-screen ${className}`)}
+      className={`pt-[72px] 3xl:px-6 2xl:px-4 xl:px-4 px-4 3xl:space-y-2 space-y-1 overflow-hidden h-screen ${className}`}
     >
       {children}
     </div>

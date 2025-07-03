@@ -15,13 +15,18 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
   const authState = useSelector((state) => state.auth)
 
   useEffect(() => {
+    // Luôn tạo dateRange mới với 3 ngày từ ngày hiện tại
     const today = new Date()
     const endDate = new Date()
-    endDate.setDate(today.getDate() + 2) // Thêm 2 ngày để có tổng 3 ngày
-
-    if (!isValue.dateRange.startDate && !isValue.dateRange.endDate) {
+    endDate.setDate(today.getDate() + 2)
+    
+    // Luôn cập nhật dateRange mới khi component mount
+    onChangeValue('dateRange')({ startDate: today, endDate: endDate })
+    
+    // Thêm timeout ngắn để đảm bảo dateRange được áp dụng cho table
+    setTimeout(() => {
       onChangeValue('dateRange')({ startDate: today, endDate: endDate })
-    }
+    }, 500)
   }, [])
 
   useEffect(() => {
@@ -30,7 +35,6 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
         value: authState.branch[0].id,
         label: authState.branch[0].name,
       }
-      console.log('Chi nhánh được chọn:', firstBranch)
       onChangeValue('idBrach')(firstBranch)
     }
   }, [authState.branch])
