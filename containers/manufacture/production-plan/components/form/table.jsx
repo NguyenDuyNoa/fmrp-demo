@@ -41,7 +41,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable, d
 
   return (
     <div className="flex flex-col gap-4 2xl:gap-6">
-      <h2 className="responsive-text-xl font-medium text-brand-color">Thông tin Nguyên vật liệu</h2>
+      <h2 className="responsive-text-xl font-medium text-brand-color">Thông tin thành phẩm</h2>
       <div className="flex flex-col">
         <div className="grid grid-cols-30 items-center border-b border-[#F3F3F4] rounded">
           <h3 className="text-[#64748B] col-span-3 py-2 px-2 text-center font-medium responsive-text-sm capitalize flex items-center">

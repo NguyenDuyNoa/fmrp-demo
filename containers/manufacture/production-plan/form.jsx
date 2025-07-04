@@ -302,7 +302,7 @@ const ProductionPlanForm = (props) => {
             href: "/manufacture/production-plan?tab=order",
         },
         {
-            label: dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'
+            label: "Thêm lệnh sản xuất"
         },
     ];
 
@@ -314,7 +314,7 @@ const ProductionPlanForm = (props) => {
         <>
             <LayoutForm
                 title={dataLang?.production_plan_form_add || 'production_plan_form_add'}
-                heading={dataLang?.production_plan_form_add_content || 'production_plan_form_add_content'}
+                heading={"Thêm lệnh sản xuất"}
                 breadcrumbItems={breadcrumbItems}
                 statusExprired={statusExprired}
                 dataLang={dataLang}
