@@ -52,7 +52,7 @@ import Select, { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import PopupAddress from './components/PopupAddress'
-import SelectWarehouse from './components/SelectWarehouse'
+import SelectCustomLabel from './components/SelectCustomLabel'
 import SelectWithRadio from './components/SelectWithRadio'
 import { useDeliveryReceipItemAll } from './hooks/useDeliveryReceipItemAll'
 
@@ -162,7 +162,7 @@ const DeliveryReceiptForm = (props) => {
   })
 
   const { data: dataItems } = useDeliveryReceipItemAll({
-    'filter[order_id]': idProductOrder !== null ? +idProductOrder.value || +idProductOrder : null,
+    'filter[order_id]': idProductOrder !== null ? +idProductOrder?.value : null,
     'filter[delivery_id]': id ? id : '',
   })
 
@@ -407,11 +407,21 @@ const DeliveryReceiptForm = (props) => {
       if (value?.length === 0) {
         sListData([])
       } else if (value?.length > 0) {
-        const newData = value?.map((e, index) => {
+        const listDataMap = new Map(listData.map((item) => [item?.id, item]))
+        const valueMap = new Map(value.map((item) => [item?.value, item]))
+
+        const uniqueList = value.filter((item) => !listDataMap.has(item?.value))
+        const matchedList = listData.filter((item) => valueMap.has(item?.id))
+
+        const newData = uniqueList?.map((e) => {
           const parent = _DataValueItem(e).parent
           return parent
         })
-        sListData([...newData])
+        if (matchedList?.length > 0) {
+          sListData([...matchedList, ...newData])
+        } else {
+          sListData([...newData])
+        }
       }
     } else if (type === 'note') {
       sNote(value.target.value)
@@ -615,8 +625,6 @@ const DeliveryReceiptForm = (props) => {
   }
 
   const _HandleChangeChild = (parentId, childId, type, value) => {
-    console.log('🚀 ~ _HandleChangeChild ~ parentId:', parentId, 'childId:', childId, 'type', type, 'value', value)
-
     const newData = listData.map((e) => {
       if (e?.id !== parentId) return e
       const newChild = e.child?.map((ce) => {
@@ -817,21 +825,24 @@ const DeliveryReceiptForm = (props) => {
             <div className="text-blue-600 font-normal truncate">
               {option.e?.code}: {option.e?.product_variation}
             </div>
-            <div className="flex items-center gap-1 text-neutral-03 font-normal">
+            <div className="flex flex-wrap items-center gap-1 text-neutral-03 font-normal">
               <div className="flex items-center gap-1">
-                <h5>{dataLang[option.e?.text_type]}</h5>
-                <h5>{dataLang?.delivery_receipt_quantity || 'delivery_receipt_quantity'}:</h5>
-                <h5>{option.e?.quantity ? formatNumber(+option.e?.quantity) : '0'} - </h5>
-              </div>
-              <div className="flex items-center gap-1">
-                <h5>{dataLang?.delivery_receipt_quantity_undelivered_order || 'Số lượng'}:</h5>
-                <h5>{quantityUndelived ? formatNumber(+quantityUndelived) : '0'} - </h5>
+                <h5>
+                  {dataLang[option.e?.text_type]} {dataLang?.delivery_receipt_quantity || 'delivery_receipt_quantity'}:{' '}
+                  {option.e?.quantity ? formatNumber(+option.e?.quantity) : '0'} -{' '}
+                </h5>
               </div>
               <div className="flex items-center gap-1">
                 <h5>
-                  {dataLang?.delivery_receipt_quantity_delivered_order || 'delivery_receipt_quantity_delivered_order'}:
+                  {dataLang?.delivery_receipt_quantity_undelivered_order || 'Số lượng'}:{' '}
+                  {quantityUndelived ? formatNumber(+quantityUndelived) : '0'} -{' '}
                 </h5>
-                <h5>{option.e?.quantity_delivery ? formatNumber(+option.e?.quantity_delivery) : '0'}</h5>
+              </div>
+              <div className="flex items-center gap-1">
+                <h5>
+                  {dataLang?.delivery_receipt_quantity_delivered_order || 'delivery_receipt_quantity_delivered_order'}:{' '}
+                  {option.e?.quantity_delivery ? formatNumber(+option.e?.quantity_delivery) : '0'}
+                </h5>
               </div>
             </div>
           </div>
@@ -926,6 +937,10 @@ const DeliveryReceiptForm = (props) => {
     formData.append('staff_id', idStaff?.value ? idStaff?.value : '')
     formData.append('product_order_id', idProductOrder?.value ? idProductOrder?.value : '')
     formData.append('note', note ? note : '')
+
+    const firstChild = listData?.[0]?.child[0]
+    console.log('🚀 ~ DeliveryReceiptPage ~ firstChild?.note:', firstChild?.note)
+
     listData.forEach((item, index) => {
       formData.append(`items[${index}][id]`, id ? item?.idParenBackend : '')
       formData.append(`items[${index}][item]`, item?.matHang?.value)
@@ -936,7 +951,7 @@ const DeliveryReceiptForm = (props) => {
         formData.append(`items[${index}][child][${childIndex}][price]`, childItem?.price)
         formData.append(`items[${index}][child][${childIndex}][discount]`, childItem?.discount)
         formData.append(`items[${index}][child][${childIndex}][tax]`, childItem?.tax?.value)
-        formData.append(`items[${index}][child][${childIndex}][note]`, childItem?.note ? childItem?.note : '')
+        formData.append(`items[${index}][child][${childIndex}][note]`, firstChild?.note ? firstChild?.note : '')
       })
     })
     try {
@@ -978,18 +993,6 @@ const DeliveryReceiptForm = (props) => {
           ? dataLang?.delivery_receipt_edit || 'delivery_receipt_edit'
           : dataLang?.delivery_receipt_add || 'delivery_receipt_add'
       }`,
-    },
-  ]
-
-  // Tab items
-  const tabItems = [
-    {
-      key: 'info',
-      label: 'Thông tin chung',
-    },
-    {
-      key: 'note',
-      label: 'Ghi chú',
     },
   ]
 
@@ -1084,7 +1087,7 @@ const DeliveryReceiptForm = (props) => {
               ) : (
                 <div>
                   {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
                     <TableHeader className="text-left">
                       {dataLang?.import_from_items || 'import_from_items'}
                     </TableHeader>
@@ -1123,7 +1126,7 @@ const DeliveryReceiptForm = (props) => {
                           <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
                             Chọn hoàng loạt % thuế
                           </p>
-                          <SelectWarehouse
+                          <SelectCustomLabel
                             placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                             options={taxOptions}
                             value={generalTax}
@@ -1156,11 +1159,11 @@ const DeliveryReceiptForm = (props) => {
                         <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
                       </div>
                     </Dropdown>
-                    <TableHeader className="text-right">Thành tiền</TableHeader>
+                    <TableHeader className="text-center">Thành tiền</TableHeader>
                   </div>
 
                   {/* Thông tin mặt hàng Body */}
-                  <Customscrollbar className="max-h-[400px] h-[400px] overflow-auto pb-2">
+                  <Customscrollbar className="max-h-[400px] h-[400px]  pb-2">
                     <div className="w-full h-full">
                       {isFetching ? (
                         <Loading className="w-full h-10" color="#0f4f9e" />
@@ -1168,16 +1171,17 @@ const DeliveryReceiptForm = (props) => {
                         <>
                           {listData?.map((e) => {
                             const option = e?.matHang
+                            const firstChild = e?.child[0]
                             return (
                               <div
                                 key={e?.id?.toString()}
-                                className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-4 my-1 py-4 border-b border-[#F3F3F4]"
+                                className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-3 2xl:gap-4 my-1 py-4 border-b border-[#F3F3F4]"
                               >
                                 {/* Mặt hàng */}
-                                <div className="h-full p-2 pb-1">
-                                  <div className="flex items-center justify-between gap-2">
+                                <div className="h-full p-2">
+                                  <div className="flex items-center justify-between gap-1 xl:gap-2">
                                     <div className="flex items-start">
-                                      <div className="flex items-start gap-3">
+                                      <div className="flex xl:flex-row flex-col items-start gap-3">
                                         <img
                                           src={option.e?.images ?? '/icon/noimagelogo.png'}
                                           alt={option?.e.name}
@@ -1211,8 +1215,8 @@ const DeliveryReceiptForm = (props) => {
                                       className="size-3 object-cover"
                                     />
                                     <input
-                                      // value={ce?.note}
-                                      // onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'note')}
+                                      value={firstChild?.note}
+                                      onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
                                       placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
                                       name="optionEmail"
                                       type="text"
@@ -1229,7 +1233,7 @@ const DeliveryReceiptForm = (props) => {
                                   )}
                                 </div>
 
-                                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-4 items-center">
+                                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center">
                                   {e?.child?.map((ce) => {
                                     const discountedPrice = formatMoney(
                                       Number(ce?.price) * (1 - Number(ce?.discount) / 100)
@@ -1238,7 +1242,7 @@ const DeliveryReceiptForm = (props) => {
                                       <React.Fragment key={ce?.id?.toString()}>
                                         {/* Kho - Vị trí kho */}
                                         <div className="flex flex-col justify-center h-full">
-                                          <SelectWarehouse
+                                          <SelectCustomLabel
                                             dataLang={dataLang}
                                             placeholder={dataLang?.PDF_house || 'PDF_house'}
                                             options={ce?.dataWarehouse}
@@ -1344,7 +1348,7 @@ const DeliveryReceiptForm = (props) => {
                                         </div>
                                         {/* Đơn giá */}
                                         <div
-                                          className={`flex items-center justify-center py-2 px-3 rounded-lg border ${
+                                          className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
                                             errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
                                               ? 'border-red-500'
                                               : errSurvivePrice &&
@@ -1362,30 +1366,28 @@ const DeliveryReceiptForm = (props) => {
                                             isAllowed={isAllowedNumber}
                                             value={ce?.price}
                                           />
-                                          <span className="pl-1 text-right responsive-text-sm font-semibold">đ</span>
+                                          <span className="pl-1 text-right responsive-text-sm font-semibold underline">
+                                            đ
+                                          </span>
                                         </div>
                                         {/* % Chiết khấu */}
-                                        <div className="flex items-center justify-end py-2 px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                        <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
                                           <InPutNumericFormat
                                             className="appearance-none w-full focus:outline-none text-right"
                                             onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                             value={ce?.discount}
                                             isAllowed={isAllowedDiscount}
                                           />
-                                          <span className="pl-1">%</span>
+                                          <span className="2xl:pl-1">%</span>
                                         </div>
                                         {/* Đơn giá sau CK */}
-                                        <div
-                                          className={`flex items-center ${
-                                            discountedPrice > 10000000 ? 'justify-end' : 'justify-center'
-                                          } responsive-text-sm font-semibold`}
-                                        >
+                                        <div className={`flex items-center text-left responsive-text-sm font-semibold`}>
                                           <h3>{discountedPrice}</h3>
-                                          <span className="pl-1">đ</span>
+                                          <span className="pl-1 underline">đ</span>
                                         </div>
                                         {/* % Thuế */}
                                         <div className="flex flex-col justify-center h-full">
-                                          <SelectWarehouse
+                                          <SelectCustomLabel
                                             placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                                             options={taxOptions}
                                             value={ce?.tax}
@@ -1393,7 +1395,7 @@ const DeliveryReceiptForm = (props) => {
                                             renderOption={(option, isLabel) => (
                                               <div
                                                 className={`flex items-center justify-start gap-1 text-[#1C252E] ${
-                                                  isLabel ? ' py-2' : ''
+                                                  isLabel ? 'py-1 2xl:py-2' : ''
                                                 }`}
                                               >
                                                 <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
@@ -1408,29 +1410,28 @@ const DeliveryReceiptForm = (props) => {
                                             )}
                                           />
                                         </div>
-                                        {/* Thành tiền*/}
-                                        <div className="flex items-center justify-end pr-1 p-0.5">
-                                          <span className="text-right responsive-text-sm font-semibold">
+                                        {/* Thành tiền và nút xóa*/}
+                                        <div className="flex items-center justify-between gap-2 pr-1 p-0.5">
+                                          <span className="text-left responsive-text-sm font-semibold">
                                             {formatNumber(
                                               ce?.price *
                                                 (1 - Number(ce?.discount) / 100) *
                                                 (1 + Number(ce?.tax?.tax_rate) / 100) *
                                                 Number(ce?.quantity)
                                             )}
-                                            <span className="pl-1">đ</span>
+                                            <span className="pl-1 underline">đ</span>
                                           </span>
-                                        </div>
-
-                                        {/* Nút xoá */}
-                                        <div className="flex items-center">
-                                          <button
-                                            type="button"
-                                            title="Xóa"
-                                            onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                            className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                                          >
-                                            <MdClear />
-                                          </button>
+                                          {/* Nút xoá */}
+                                          <div className="flex items-center">
+                                            <button
+                                              type="button"
+                                              title="Xóa"
+                                              onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                              className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                                            >
+                                              <MdClear />
+                                            </button>
+                                          </div>
                                         </div>
                                       </React.Fragment>
                                     )
@@ -1473,7 +1474,7 @@ const DeliveryReceiptForm = (props) => {
                             name="fname"
                             type="text"
                             placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
-                            className={`responsive-text-base placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
+                            className={`2xl:text-[14px] text-[13px] placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
                           />
                         </div>
                       </div>
@@ -1484,7 +1485,7 @@ const DeliveryReceiptForm = (props) => {
                           label={dataLang?.import_day_vouchers || 'import_day_vouchers'}
                         />
 
-                        <div className="relative w-full flex flex-row custom-date-picker">
+                        <div className="relative w-full flex flex-row custom-date-picker date-form">
                           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                             <BsCalendarEvent color="#7a7a7a" />
                           </span>
@@ -1595,7 +1596,7 @@ const DeliveryReceiptForm = (props) => {
                               />
                               <AiFillPlusCircle
                                 onClick={() => _HandleClosePopupAddress(true)}
-                                className="right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
+                                className="text-[13px] xl:text-base right-7 xl:right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
                               />
                               <PopupAddress
                                 dataLang={dataLang}
@@ -1738,9 +1739,9 @@ const DeliveryReceiptForm = (props) => {
                   {'Tổng cộng' || dataLang?.price_quote_total}
                 </h2>
                 {/* Tổng tiền */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
-                  <h4>{dataLang?.purchase_order_table_total || 'purchase_order_table_total'}</h4>
-                  <span>
+                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-black-color">
+                  <h4 className="text-left">{dataLang?.purchase_order_table_total || 'purchase_order_table_total'}</h4>
+                  <span className="text-right">
                     {formatMoney(
                       listData?.reduce((accumulator, item) => {
                         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1753,9 +1754,11 @@ const DeliveryReceiptForm = (props) => {
                   </span>
                 </div>
                 {/* Tiền chiết khấu */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4>{dataLang?.purchase_order_detail_discounty || 'purchase_order_detail_discounty'}</h4>
-                  <span>
+                <div className="flex justify-between gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
+                  <h4 className="text-left">
+                    {dataLang?.purchase_order_detail_discounty || 'purchase_order_detail_discounty'}
+                  </h4>
+                  <span className="text-right">
                     {formatMoney(
                       listData?.reduce((accumulator, item) => {
                         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1769,12 +1772,12 @@ const DeliveryReceiptForm = (props) => {
                   </span>
                 </div>
                 {/* Tiền sau chiết khấu */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4>
+                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
+                  <h4 className="text-left">
                     {dataLang?.purchase_order_detail_money_after_discount ||
                       'purchase_order_detail_money_after_discount'}
                   </h4>
-                  <span>
+                  <span className="text-right">
                     {formatMoney(
                       listData?.reduce((accumulator, item) => {
                         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1788,9 +1791,11 @@ const DeliveryReceiptForm = (props) => {
                   </span>
                 </div>
                 {/* Tiền thuế */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4>{dataLang?.purchase_order_detail_tax_money || 'purchase_order_detail_tax_money'}</h4>
-                  <span>
+                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
+                  <h4 className="text-left">
+                    {dataLang?.purchase_order_detail_tax_money || 'purchase_order_detail_tax_money'}
+                  </h4>
+                  <span className="text-right">
                     {formatMoney(
                       listData?.reduce((accumulator, item) => {
                         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
@@ -1806,11 +1811,11 @@ const DeliveryReceiptForm = (props) => {
                   </span>
                 </div>
                 {/* Thành tiền */}
-                <div className="flex justify-between responsive-text-base items-center mb-4">
-                  <h4 className="w-full text-black font-semibold">
+                <div className="grid grid-cols-2 gap-2 responsive-text-base items-center mb-4">
+                  <h4 className="w-full text-black font-semibold text-left">
                     {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
                   </h4>
-                  <span className="text-blue-color font-semibold">
+                  <span className="text-blue-color font-semibold text-right">
                     {formatMoney(
                       listData?.reduce((accumulator, item) => {
                         const childTotal = item.child?.reduce((childAccumulator, childItem) => {
