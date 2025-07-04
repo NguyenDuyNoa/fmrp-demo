@@ -2,6 +2,7 @@ import InputCustom from '@/components/common/input/InputCustom'
 import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 import KanbanIcon from '@/components/icons/common/KanbanIcon'
 import SaveIcon from '@/components/icons/common/SaveIcon'
+import TrashIcon from '@/components/icons/common/TrashIcon'
 import ButtonSubmit from '@/components/UI/button/buttonSubmit'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
@@ -12,7 +13,6 @@ import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
 import useToast from '@/hooks/useToast'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { Trash } from 'iconsax-react'
 import { debounce } from 'lodash'
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -24,7 +24,6 @@ import { useHandingFinishedStages } from '../../hooks/useHandingFinishedStages'
 import { useListFinishedStages } from '../../hooks/useListFinishedStages'
 import { useLoadOutOfStock } from '../../hooks/useLoadOutOfStock'
 import { PopupOrderCompleted } from './PopupCompleteCommand'
-import TrashIcon from '@/components/icons/common/TrashIcon'
 
 const initialState = {
   open: false,
@@ -424,15 +423,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   // Thêm các biến kiểm tra điều kiện hiển thị
   const showSerialColumns = checkItemFinalStage && dataProductSerial.is_enable === '1'
   const showExpiryColumns =
-    checkItemFinalStage && (dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1')
-
-  // Tính toán col-span dựa trên điều kiện hiển thị
-  const getColSpan = (baseSpan) => {
-    let finalSpan = baseSpan
-    if (showSerialColumns) finalSpan += 2
-    if (showExpiryColumns) finalSpan += 2
-    return finalSpan
-  }
+    checkItemFinalStage && dataMaterialExpiry.is_enable === '1' && dataProductExpiry.is_enable === '1'
 
   return (
     <>
@@ -500,7 +491,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           }}
         >
           {/* <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" /> */}
-          <div className="w-[85vw] xl:h-[80vh] h-[575px] overflow-">
+          <div className="w-[90vw] xl:h-[80vh] h-[575px] overflow-">
             <div className="grid grid-cols-16 h-full gap-4">
               {/* Left Panels */}
               <div className="flex col-span-3 max-h-full min-h-0 overflow-auto">
@@ -627,7 +618,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                       </h3>
                       <h3
                         className={`responsive-text-sm text-neutral-02 p-2 font-semibold ${
-                          showExpiryColumns ? 'col-span-4' : 'col-span-6'
+                          showExpiryColumns || showSerialColumns ? 'col-span-4' : 'col-span-6'
                         }`}
                       >
                         Mặt hàng
@@ -635,25 +626,25 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                       <h3 className="col-span-2 responsive-text-sm text-neutral-02 font-semibold ">Đơn vị tính</h3>
                       <h3
                         className={`responsive-text-sm text-neutral-02 p-2 font-semibold text-center
-                            ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                            ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                             `}
                       >
                         SL hoàn thành
                       </h3>
                       {showSerialColumns && (
-                        <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
+                        <div className="col-span-3 responsive-text-sm text-neutral-02 text-center font-semibold">
                           Serial hoàn thành
                         </div>
                       )}
                       <div
                         className={`responsive-text-sm text-neutral-02 p-2 font-semibold text-center
-                            ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                            ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                             `}
                       >
                         SL lỗi
                       </div>
                       {showSerialColumns && (
-                        <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
+                        <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 text-center font-semibold">
                           Serial lỗi
                         </div>
                       )}
@@ -667,14 +658,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                       )}
                       <div
                         className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 font-semibold
-                            ${showExpiryColumns ? 'col-span-2' : 'col-span-3 p-2'}
+                            ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3 p-2'}
                             `}
                       >
                         SL cần nhập
                       </div>
                       <div
                         className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 p-1 font-semibold
-                            ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                            ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
                             `}
                       >
                         SL đã nhập
@@ -690,13 +681,13 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                         </div>
                       ) : isState.dataTableProducts?.data?.items?.length > 0 ? (
                         isState.dataTableProducts?.data?.items?.map((row, index) => (
-                          <div className="grid grid-cols-25 items-center" key={index}>
+                          <div className="grid grid-cols-25 items-center h-full" key={index}>
                             <div className="col-span-1 py-2 px-1 flex justify-center items-center">
                               <p className="responsive-text-sm text-neutral-07 font-semibold">{index + 1}</p>
                             </div>
                             <div
                               className={`flex gap-2 p-2
-                                    ${showExpiryColumns ? 'col-span-4' : 'col-span-6'}
+                                    ${showExpiryColumns || showSerialColumns ? 'col-span-4' : 'col-span-6'}
                                 `}
                             >
                               <Image
@@ -720,7 +711,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                             <h3 className="col-span-2 p-2 responsive-text-sm text-neutral-07 font-semibold">
                               {row?.unit_name}
                             </h3>
-                            <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
+                            <div
+                              className={`p-2 ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}`}
+                            >
                               <InputCustom
                                 state={row?.quantityEnterClient || 0}
                                 setState={(value) =>
@@ -746,38 +739,43 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                               />
                             </div>
                             {showSerialColumns && (
-                              <div className="col-span-3 p-2 text-sm">
+                              <Customscrollbar
+                                className={`col-span-3 py-2 ${
+                                  isState.dataTableProducts?.data?.items?.length <= 1
+                                    ? 'max-h-[calc(80vh-136px)]'
+                                    : 'max-h-60'
+                                }`}
+                              >
                                 <div className="flex flex-col gap-1">
-                                  {[...Array(row?.quantityEnterClient || 0)].map((_, sIndex) => {
-                                    return (
-                                      <input
-                                        key={sIndex}
-                                        value={row.serial?.[sIndex]?.value || ''}
-                                        onChange={(e) => {
-                                          handleChange({
-                                            table: 'product',
-                                            type: 'serial',
-                                            value: e.target.value.trim(),
-                                            row,
-                                            index: sIndex,
-                                          })
-                                        }}
-                                        className={`
-                                                    border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
-                                                    ${
-                                                      row.serial?.[sIndex]?.isDuplicate
-                                                        ? 'border-red-500'
-                                                        : 'border-gray-200 border-b-2'
-                                                    }
-                                                `}
-                                      />
-                                    )
-                                  })}
+                                  {[...Array(Math.ceil(Math.max(0, Number(row?.quantityEnterClient) || 0)))].map(
+                                    (_, sIndex) => {
+                                      return (
+                                        <input
+                                          key={sIndex}
+                                          value={row.serial?.[sIndex]?.value || ''}
+                                          onChange={(e) => {
+                                            handleChange({
+                                              table: 'product',
+                                              type: 'serial',
+                                              value: e.target.value.trim(),
+                                              row,
+                                              index: sIndex,
+                                            })
+                                          }}
+                                          className={`border text-center py-1 px-1 w-full focus:outline-none rounded-md responsive-text-sm text-neutral-07 font-medium ${
+                                            row.serial?.[sIndex]?.isDuplicate ? 'border-red-500' : 'border-gray-200'
+                                          }`}
+                                        />
+                                      )
+                                    }
+                                  )}
                                 </div>
-                              </div>
+                              </Customscrollbar>
                             )}
 
-                            <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
+                            <div
+                              className={`p-2 ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}`}
+                            >
                               <InputCustom
                                 state={row?.quantityError || 0}
                                 setState={(value) =>
@@ -803,35 +801,40 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                               />
                             </div>
                             {showSerialColumns && (
-                              <td className="col-span-3 p-2 text-sm">
+                              <Customscrollbar
+                                className={`col-span-3 py-2 ${
+                                  isState.dataTableProducts?.data?.items?.length <= 1
+                                    ? 'max-h-[calc(80vh-136px)]'
+                                    : 'max-h-60'
+                                }`}
+                              >
                                 <div className="flex flex-col gap-1">
-                                  {[...Array(row?.quantityError || 0)].map((_, sIndex) => {
-                                    return (
-                                      <input
-                                        key={sIndex}
-                                        value={row.serialError?.[sIndex]?.value || ''}
-                                        onChange={(e) => {
-                                          handleChange({
-                                            table: 'product',
-                                            type: 'serialError',
-                                            value: e.target.value.trim(),
-                                            row,
-                                            index: sIndex,
-                                          })
-                                        }}
-                                        className={`
-                                                    border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
-                                                    ${
-                                                      row.serialError?.[sIndex]?.isDuplicate
-                                                        ? 'border-red-500'
-                                                        : 'border-gray-200 border-b-2'
-                                                    }
-                                                `}
-                                      />
-                                    )
-                                  })}
+                                  {[...Array(Math.ceil(Math.max(0, Number(row?.quantityError) || 0)))].map(
+                                    (_, sIndex) => {
+                                      return (
+                                        <input
+                                          key={sIndex}
+                                          value={row.serialError?.[sIndex]?.value || ''}
+                                          onChange={(e) => {
+                                            handleChange({
+                                              table: 'product',
+                                              type: 'serialError',
+                                              value: e.target.value.trim(),
+                                              row,
+                                              index: sIndex,
+                                            })
+                                          }}
+                                          className={`border text-center py-1 px-1 w-full focus:outline-none rounded-md responsive-text-sm text-neutral-07 font-medium ${
+                                            row.serialError?.[sIndex]?.isDuplicate
+                                              ? 'border-red-500'
+                                              : 'border-gray-200'
+                                          }`}
+                                        />
+                                      )
+                                    }
+                                  )}
                                 </div>
-                              </td>
+                              </Customscrollbar>
                             )}
                             {showExpiryColumns && (
                               <>
@@ -881,14 +884,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                             )}
                             <h3
                               className={`p-2 responsive-text-sm text-neutral-07 font-semibold text-center
-                                ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                                ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
                                 `}
                             >
                               {formatNumber(row?.quantity_enter)}
                             </h3>
                             <h3
                               className={`p-2 responsive-text-sm text-neutral-07 font-semibold text-center
-                                ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                                ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
                                 `}
                             >
                               {formatNumber(row?.quantity_entered)}
@@ -904,10 +907,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                           </div>
                         ))
                       ) : (
-                        <div
-                          colSpan="25"
-                          className="p-2 text-center text-red-500 h-40 my-auto flex justify-center items-center"
-                        >
+                        <div className="col-span-25 p-2 text-center text-red-500 h-40 my-auto flex justify-center items-center">
                           Không có mặt hàng để hoàn thành
                         </div>
                       )}
@@ -915,14 +915,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                     <div className="grid grid-cols-25 items-center bg-[#CCCCCC40] rounded">
                       <h3
                         className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                        ${showExpiryColumns ? 'col-span-7' : 'col-span-9'}
+                        ${showExpiryColumns || showSerialColumns ? 'col-span-7' : 'col-span-9'}
                         `}
                       >
                         TỔNG CỘNG
                       </h3>
                       <h3
                         className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                        ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                        ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                         `}
                       >
                         {formatNumber(totalQuantity)}
@@ -932,11 +932,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                       )}
                       <h3
                         className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                        ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                        ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                         `}
                       >
                         {formatNumber(totalQuantityError)}
                       </h3>
+                      {showSerialColumns && (
+                        <h3 className="col-span-3 p-2 text-neutral-07 responsive-text-base font-medium"></h3>
+                      )}
                       {showExpiryColumns && (
                         <>
                           <h3 className="col-span-3 p-2 font-normal"></h3>
@@ -945,14 +948,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                       )}
                       <h3
                         className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                        ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                        ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
                         `}
                       >
                         {formatNumber(totalQuantityEnter)}
                       </h3>
                       <h3
                         className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                        ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                        ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
                         `}
                       >
                         {formatNumber(totalQuantityEntered)}
@@ -962,225 +965,198 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
                   {/* Xuất kho sản xuất */}
                   {/* <div>
-                            <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
-                            <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white ">
-                                <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
-                                    <thead className="sticky top-0 z-10 bg-gray-100">
-                                        <tr>
-                                            <th className="border p-2 font-normal min-w-[100px]">Hình ảnh</th>
-                                            <th className="border p-2 font-normal min-w-[250px]">Mặt hàng</th>
-                                            <th className="border p-2 font-normal min-w-[120px]">SL sản xuất</th>
-                                            <th className="border p-2 font-normal min-w-[120px]">SL xuất kho</th>
-                                            <th className="border p-2 font-normal min-w-[120px]">Tồn kho</th>
-                                            <th className="border p-2 font-normal min-w-[290px]">Kho hàng</th>
-                                            <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="h-[calc(80vh_/_2_-_155px)]">
-                                        {
-                                            (isLoadingLoadOutOfStock)
-                                                ?
-                                                <tr>
-                                                    <td colSpan="7" >
-                                                        <Loading className='!h-[100px] w-full mx-auto' />
-                                                    </td>
-                                                </tr>
-                                                :
-                                                isState.dataTableBom?.data?.boms?.length > 0 ? (
-                                                    isState.dataTableBom?.data?.boms?.map((row, index) => (
-                                                        <tr key={index}>
-                                                            <td className="p-2 border">
-                                                                <div className="flex items-center justify-center ">
-                                                                    <Image
-                                                                        src={row?.images ? row?.images : "/icon/noimagelogo.png"}
-                                                                        width={36}
-                                                                        height={36}
-                                                                        alt={row?.images ? row?.images : "/icon/noimagelogo.png"}
-                                                                        className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
-                                                                    />
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-2 text-sm border">
-                                                                <div className="flex flex-col gap-0.5 h-full">
-                                                                    <p>
-                                                                        {row?.item_name}
-                                                                    </p>
-                                                                    <p className="text-xs italic">
-                                                                        {row?.product_variation}
-                                                                    </p>
-                                                                    {
-                                                                        row?.reference_no_detail && (
-                                                                            <p className="text-xs text-blue-500">{row?.reference_no_detail}</p>
-                                                                        )
-                                                                    }
-                                                                    <div className="flex items-center gap-1">
-                                                                        <TagColorProduct
-                                                                            dataKey={
-                                                                                row?.type_products === "products" ? 0 :
-                                                                                    row?.type_products === "semi_products" ? 1 :
-                                                                                        row?.type_products === "out_side" ? 2 :
-                                                                                            row?.type_products === "materials" || row?.type_products === "material" ? 3 :
-                                                                                                row?.type_products === "semi_products_outside" ? 4 :
-                                                                                                    null
-                                                                            }
-                                                                            dataLang={dataLang}
-                                                                            name={row?.type_products}
-                                                                        />
+                    <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
+                    <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white ">
+                      <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
+                        <thead className="sticky top-0 z-10 bg-gray-100">
+                          <tr>
+                            <th className="border p-2 font-normal min-w-[100px]">Hình ảnh</th>
+                            <th className="border p-2 font-normal min-w-[250px]">Mặt hàng</th>
+                            <th className="border p-2 font-normal min-w-[120px]">SL sản xuất</th>
+                            <th className="border p-2 font-normal min-w-[120px]">SL xuất kho</th>
+                            <th className="border p-2 font-normal min-w-[120px]">Tồn kho</th>
+                            <th className="border p-2 font-normal min-w-[290px]">Kho hàng</th>
+                            <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
+                          </tr>
+                        </thead>
+                        <tbody className="h-[calc(80vh_/_2_-_155px)]">
+                          {isLoadingLoadOutOfStock ? (
+                            <tr>
+                              <td colSpan="7">
+                                <Loading className="!h-[100px] w-full mx-auto" />
+                              </td>
+                            </tr>
+                          ) : isState.dataTableBom?.data?.boms?.length > 0 ? (
+                            isState.dataTableBom?.data?.boms?.map((row, index) => (
+                              <tr key={index}>
+                                <td className="p-2 border">
+                                  <div className="flex items-center justify-center ">
+                                    <Image
+                                      src={row?.images ? row?.images : '/icon/noimagelogo.png'}
+                                      width={36}
+                                      height={36}
+                                      alt={row?.images ? row?.images : '/icon/noimagelogo.png'}
+                                      className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
+                                    />
+                                  </div>
+                                </td>
+                                <td className="p-2 text-sm border">
+                                  <div className="flex flex-col gap-0.5 h-full">
+                                    <p>{row?.item_name}</p>
+                                    <p className="text-xs italic">{row?.product_variation}</p>
+                                    {row?.reference_no_detail && (
+                                      <p className="text-xs text-blue-500">{row?.reference_no_detail}</p>
+                                    )}
+                                    <div className="flex items-center gap-1">
+                                      <TagColorProduct
+                                        dataKey={
+                                          row?.type_products === 'products'
+                                            ? 0
+                                            : row?.type_products === 'semi_products'
+                                            ? 1
+                                            : row?.type_products === 'out_side'
+                                            ? 2
+                                            : row?.type_products === 'materials' || row?.type_products === 'material'
+                                            ? 3
+                                            : row?.type_products === 'semi_products_outside'
+                                            ? 4
+                                            : null
+                                        }
+                                        dataLang={dataLang}
+                                        name={row?.type_products}
+                                      />
 
-                                                                        {
-                                                                            row?.stage_name && (
-                                                                                <TagColorProduct name={row?.stage_name} lang={false} dataKey={5} />
-                                                                            )
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-2 text-sm text-center border">
-                                                                {formatNumber(row?.quantity_total_quota)}/ <span className="relative text-xs top-1">{row?.unit_name}</span>
-                                                            </td>
-                                                            <td className="p-2 text-sm text-center border">
-                                                                {formatNumber(row?.quantity_quota_primary)}/ <span className="relative text-xs top-1">{row?.unit_name_primary}</span>
-                                                            </td>
-                                                            <td className="p-2 text-sm text-center border">
-                                                                {formatNumber(row?.quantity_warehouse)}
-                                                            </td>
-                                                            <td className="p-2 text-sm border w-[290px]">
-                                                                <SelectComponent
-                                                                    options={row?.list_warehouse_bom || []}
-                                                                    value={row?.warehouseId}
-                                                                    maxShowMuti={1}
-                                                                    isClearable={false}
-                                                                    isMulti={true}
-                                                                    components={{ MultiValue }}
-                                                                    onChange={(e) =>
-                                                                        handleChange({
-                                                                            table: "bom",
-                                                                            type: 'warehouseId',
-                                                                            row,
-                                                                            value: e
-                                                                        })}
-                                                                    className={`${row?.warehouseId?.length == 0 ? "border-red-500 border" : ""}  my-1  text-xs placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
-                                                                    noOptionsMessage={() => dataLang?.returns_nodata || "returns_nodata"}
-                                                                    menuPortalTarget={document.body}
-                                                                    placeholder={"Kho xuất - Vị trí xuất"}
-                                                                    formatOptionLabel={(option) => {
-                                                                        return (
-                                                                            <>
-                                                                                <h2 className="text-xs">
-                                                                                    {dataLang?.import_Warehouse || "import_Warehouse"}  : {option?.label}
-                                                                                </h2>
-                                                                                <h2 className="text-xs">
-                                                                                    {option?.name_location}
-                                                                                </h2>
+                                      {row?.stage_name && (
+                                        <TagColorProduct name={row?.stage_name} lang={false} dataKey={5} />
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="p-2 text-sm text-center border">
+                                  {formatNumber(row?.quantity_total_quota)}/{' '}
+                                  <span className="relative text-xs top-1">{row?.unit_name}</span>
+                                </td>
+                                <td className="p-2 text-sm text-center border">
+                                  {formatNumber(row?.quantity_quota_primary)}/{' '}
+                                  <span className="relative text-xs top-1">{row?.unit_name_primary}</span>
+                                </td>
+                                <td className="p-2 text-sm text-center border">
+                                  {formatNumber(row?.quantity_warehouse)}
+                                </td>
+                                <td className="p-2 text-sm border w-[290px]">
+                                  <SelectComponent
+                                    options={row?.list_warehouse_bom || []}
+                                    value={row?.warehouseId}
+                                    maxShowMuti={1}
+                                    isClearable={false}
+                                    isMulti={true}
+                                    components={{ MultiValue }}
+                                    onChange={(e) =>
+                                      handleChange({
+                                        table: 'bom',
+                                        type: 'warehouseId',
+                                        row,
+                                        value: e,
+                                      })
+                                    }
+                                    className={`${
+                                      row?.warehouseId?.length == 0 ? 'border-red-500 border' : ''
+                                    }  my-1  text-xs placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
+                                    noOptionsMessage={() => dataLang?.returns_nodata || 'returns_nodata'}
+                                    menuPortalTarget={document.body}
+                                    placeholder={'Kho xuất - Vị trí xuất'}
+                                    formatOptionLabel={(option) => {
+                                      return (
+                                        <>
+                                          <h2 className="text-xs">
+                                            {dataLang?.import_Warehouse || 'import_Warehouse'} : {option?.label}
+                                          </h2>
+                                          <h2 className="text-xs">{option?.name_location}</h2>
 
-                                                                                <div className="">
-                                                                                    <div className="flex items-center">
-                                                                                        <h4 className="text-[10px]">
-                                                                                            {dataLang?.returns_survive}:
-                                                                                        </h4>
-                                                                                        <h4 className="pl-1 text-[10px]">
-                                                                                            {formatNumber(option?.quantity_warehouse)}
-                                                                                        </h4>
-                                                                                    </div>
-                                                                                    {dataProductSerial?.is_enable === "1" && (
-                                                                                        <div className="flex items-center">
-                                                                                            <h4 className="text-[10px] italic">
-                                                                                                {"Serial"}:
-                                                                                            </h4>
-                                                                                            <h4 className="pl-1 text-[10px] italic">
-                                                                                                {option?.serial}
-                                                                                            </h4>
-                                                                                        </div>
-                                                                                    )}
-                                                                                    {
-                                                                                        (dataMaterialExpiry.is_enable === "1" || dataProductExpiry?.is_enable === "1") && (
-                                                                                            <>
-                                                                                                <div className="flex items-center justify-start">
-                                                                                                    <h4 className="text-[10px] italic">
-                                                                                                        {"Lot"}:
-                                                                                                    </h4>
-                                                                                                    <h4 className="pl-1 text-[10px] italic">
-                                                                                                        {option?.lot}
-                                                                                                    </h4>
-                                                                                                </div>
-                                                                                                <div className="flex items-center">
-                                                                                                    <h4 className="text-[10px] italic">
-                                                                                                        {dataLang?.warehouses_detail_date || "warehouses_detail_date"}:
-                                                                                                    </h4>
-                                                                                                    <h4 className="pl-1 text-[10px] italic">
-                                                                                                        {option?.expiration_date}
-                                                                                                    </h4>
-                                                                                                </div>
-                                                                                            </>
-                                                                                        )
-                                                                                    }
-                                                                                </div>
-                                                                            </>
-                                                                        );
-                                                                    }}
-                                                                    style={{
-                                                                        border: "none",
-                                                                        boxShadow: "none",
-                                                                        outline: "none",
-                                                                    }}
-                                                                    styles={{
-                                                                        placeholder: (base) => ({
-                                                                            ...base,
-                                                                            color: "#cbd5e1",
-                                                                        }),
-                                                                        menuPortal: (base) => ({
-                                                                            ...base,
-                                                                            zIndex: 9999,
-                                                                            position: "absolute",
-                                                                        }),
-                                                                        menu: (provided, state) => ({
-                                                                            ...provided,
-                                                                            width: "100%",
-                                                                        }),
-
-
-                                                                    }}
-                                                                    theme={(theme) => ({
-                                                                        ...theme,
-                                                                        colors: {
-                                                                            ...theme.colors,
-                                                                            primary25: "#EBF5FF",
-                                                                            primary50: "#92BFF7",
-                                                                            primary: "#0F4F9E",
-                                                                        },
-                                                                    })}
-                                                                    classNamePrefix="customDropdow classNamePrefixLotDateSerial"
-                                                                />
-                                                            </td>
-                                                            <td className="p-2 text-sm text-center border">
-                                                                <button
-                                                                    title="Xóa"
-                                                                    onClick={() => handleRemove("bom", row)}
-                                                                    className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
-                                                                >
-                                                                    <Trash size={24} />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan="7" className="p-2 text-center text-red-500 border">
-                                                            Không có mặt hàng
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                    </tbody>
-                                </table>
-                            </Customscrollbar>
-                        </div> */}
-                  {/* <div className="flex items-center justify-end gap-2">
-                            <ButtonCancel
-                                onClick={() => { queryState({ open: false }) }}
-                                dataLang={dataLang}
-                            />
-                           
-                        </div> */}
+                                          <div className="">
+                                            <div className="flex items-center">
+                                              <h4 className="text-[10px]">{dataLang?.returns_survive}:</h4>
+                                              <h4 className="pl-1 text-[10px]">
+                                                {formatNumber(option?.quantity_warehouse)}
+                                              </h4>
+                                            </div>
+                                            {dataProductSerial?.is_enable === '1' && (
+                                              <div className="flex items-center">
+                                                <h4 className="text-[10px] italic">{'Serial'}:</h4>
+                                                <h4 className="pl-1 text-[10px] italic">{option?.serial}</h4>
+                                              </div>
+                                            )}
+                                            {(dataMaterialExpiry.is_enable === '1' ||
+                                              dataProductExpiry?.is_enable === '1') && (
+                                              <>
+                                                <div className="flex items-center justify-start">
+                                                  <h4 className="text-[10px] italic">{'Lot'}:</h4>
+                                                  <h4 className="pl-1 text-[10px] italic">{option?.lot}</h4>
+                                                </div>
+                                                <div className="flex items-center">
+                                                  <h4 className="text-[10px] italic">
+                                                    {dataLang?.warehouses_detail_date || 'warehouses_detail_date'}:
+                                                  </h4>
+                                                  <h4 className="pl-1 text-[10px] italic">{option?.expiration_date}</h4>
+                                                </div>
+                                              </>
+                                            )}
+                                          </div>
+                                        </>
+                                      )
+                                    }}
+                                    style={{
+                                      border: 'none',
+                                      boxShadow: 'none',
+                                      outline: 'none',
+                                    }}
+                                    styles={{
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: '#cbd5e1',
+                                      }),
+                                      menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        position: 'absolute',
+                                      }),
+                                      menu: (provided, state) => ({
+                                        ...provided,
+                                        width: '100%',
+                                      }),
+                                    }}
+                                    theme={(theme) => ({
+                                      ...theme,
+                                      colors: {
+                                        ...theme.colors,
+                                        primary25: '#EBF5FF',
+                                        primary50: '#92BFF7',
+                                        primary: '#0F4F9E',
+                                      },
+                                    })}
+                                    classNamePrefix="customDropdow classNamePrefixLotDateSerial"
+                                  />
+                                </td>
+                                <td className="p-2 text-sm text-center border">
+                                  <button
+                                    title="Xóa"
+                                    onClick={() => handleRemove('bom', row)}
+                                    className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
+                                  >
+                                    <Trash size={24} />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <td colSpan="7" className="p-2 text-center text-red-500 border">
+                              Không có mặt hàng
+                            </td>
+                          )}
+                        </tbody>
+                      </table>
+                    </Customscrollbar>
+                  </div> */}
                 </div>
               </div>
             </div>
