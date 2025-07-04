@@ -1,8 +1,7 @@
-import formatNumber from '@/utils/helpers/formatnumber'
-import React, { useCallback, useEffect, useState } from 'react'
+import useToast from '@/hooks/useToast'
+import { useCallback, useEffect, useState } from 'react'
 import { FaMinus, FaPlus } from 'react-icons/fa'
 import { twMerge } from 'tailwind-merge'
-import useToast from '@/hooks/useToast'
 
 const InputCustom = ({
   state = 0,
@@ -15,6 +14,7 @@ const InputCustom = ({
   disabled = false,
   isError = false,
   step = 1,
+  allowDecimal = false,
 }) => {
   const [inputValue, setInputValue] = useState(state || 0)
   const [formattedValue, setFormattedValue] = useState(state?.toString() || '0')
@@ -30,9 +30,9 @@ const InputCustom = ({
       if (value === '' || value === '-' || value === null) return 0
       const cleaned = value.toString().replace(/[^\d.,]/g, '').replace(',', '.')
       const parsed = parseFloat(cleaned)
-      return isNaN(parsed) ? 0 : parsed
+      return isNaN(parsed) ? 0 : allowDecimal ? parsed : Math.floor(parsed)
     },
-    []
+    [allowDecimal]
   )
 
   const handleChange = useCallback(
@@ -63,9 +63,9 @@ const InputCustom = ({
       if (disabled) return
       const value = e.target.value
 
-      // Cho phép nhập số âm và số thập phân
-      const isValidDecimal = /^-?\d*[.,]?\d*$/.test(value)
-      if (!isValidDecimal) return
+      // Kiểm tra định dạng dựa vào allowDecimal
+      const pattern = allowDecimal ? /^-?\d*[.,]?\d*$/ : /^-?\d*$/
+      if (!pattern.test(value)) return
 
       const numericValue = value.replace(',', '.')
       setInputValue(numericValue)
@@ -74,7 +74,7 @@ const InputCustom = ({
       const parsedValue = parseToNumber(numericValue)
       setState(parsedValue)
     },
-    [disabled, setState]
+    [disabled, setState, allowDecimal, parseToNumber]
   )
 
   const handleBlur = useCallback(() => {
@@ -84,10 +84,15 @@ const InputCustom = ({
     if (number < min) finalValue = min
     if (number > max) finalValue = max
 
+    // Nếu không cho phép số thập phân, làm tròn xuống
+    if (!allowDecimal) {
+      finalValue = Math.floor(finalValue)
+    }
+
     setInputValue(finalValue)
     setFormattedValue(finalValue.toString())
     setState(finalValue)
-  }, [inputValue, min, max, setState])
+  }, [inputValue, min, max, setState, allowDecimal, parseToNumber])
 
   const handleButtonClick = useCallback(
     (e, type) => {
@@ -118,7 +123,7 @@ const InputCustom = ({
         onClick={(e) => handleButtonClick(e, 'decrement')}
         onMouseDown={(e) => e.preventDefault()}
         className={twMerge(
-          'size-9 rounded-full flex-shrink-0 cursor-pointer bg-primary-05 flex justify-center items-center flex-row',
+          'size-9 rounded-full flex-shrink-0 cursor-pointer bg-primary-05 hover:bg-typo-blue-4/50 flex justify-center items-center flex-row',
           classNameButton
         )}
       >
@@ -141,7 +146,7 @@ const InputCustom = ({
         onClick={(e) => handleButtonClick(e, 'increment')}
         onMouseDown={(e) => e.preventDefault()}
         className={twMerge(
-          'size-9 rounded-full flex-shrink-0 cursor-pointer bg-primary-05 flex justify-center items-center flex-row',
+          'size-9 rounded-full flex-shrink-0 cursor-pointer bg-primary-05 hover:bg-typo-blue-4/50 flex justify-center items-center flex-row',
           classNameButton
         )}
       >

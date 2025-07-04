@@ -5,7 +5,7 @@ import { Empty, Radio, Select } from 'antd'
 
 const { Option } = Select
 
-const SelectWarehouse = ({
+const SelectCustomLabel = ({
   dataLang,
   placeholder,
   options,
@@ -25,7 +25,7 @@ const SelectWarehouse = ({
         {renderOption ? (
           renderOption(opt, isLabel)
         ) : (
-          <div className={`text-[#1C252E] ${isLabel ? 'py-2' : ''} `}>
+          <div className={`text-[#1C252E] ${isLabel ? 'py-1 2xl:py-2' : ''} `}>
             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-bold">
               {opt?.warehouse_name}
             </h2>
@@ -41,16 +41,16 @@ const SelectWarehouse = ({
             </div>
             <div className="flex flex-col gap-1 italic">
               {dataProductSerial.is_enable === '1' && (
-                <div className="text-[11px] text-[#667085] font-[500] leading-normal">
+                <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
                   Serial: {opt?.serial ? opt?.serial : '-'}
                 </div>
               )}
               {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
                 <div className="flex flex-col">
-                  <div className="text-[11px] text-[#667085] font-[500] leading-normal">
+                  <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
                     Lot: {opt?.lot ? opt?.lot : '-'}
                   </div>
-                  <div className="text-[11px] text-[#667085] font-[500] leading-normal">
+                  <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
                     Date: {opt?.date ? formatMoment(opt?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : '-'}
                   </div>
                 </div>
@@ -78,12 +78,12 @@ const SelectWarehouse = ({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full select-warehouse">
+    <div className="flex flex-col items-center justify-center h-full select-custom-label">
       <Select
-        className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer w-full select-warehouse"
+        className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer w-full select-custom-label"
         placeholder={placeholder}
         allowClear
-        value={valueCustom}
+        value={valueCustom || null}
         onChange={handleChange}
         onClear={onClear}
         disabled={disabled}
@@ -117,4 +117,4 @@ const SelectWarehouse = ({
   )
 }
 
-export default SelectWarehouse
+export default SelectCustomLabel
