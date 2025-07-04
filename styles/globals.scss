@@ -964,6 +964,7 @@ body {
   border-radius: 8px;
 }
 
+.select-with-sort,
 .select-with-radio {
   .ant-select-single {
     height: auto;
@@ -977,6 +978,7 @@ body {
     min-height: 40px;
   }
 }
+
 .select-with-radio,
 .select-with-sort,
 .select-custom-label {

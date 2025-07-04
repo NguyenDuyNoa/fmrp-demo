@@ -1,17 +1,14 @@
 import apiDeliveryReceipt from '@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
-import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
-import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
-import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
-import { Container } from '@/components/UI/common/layout'
 import EmptyData from '@/components/UI/emptyData'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
 import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
+import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
@@ -29,14 +26,13 @@ import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
 import { useQuery } from '@tanstack/react-query'
-import { Button, ConfigProvider, DatePicker, Dropdown, Empty } from 'antd'
+import { ConfigProvider, DatePicker, Dropdown, Empty } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Add, ArrowDown2, ArrowUp2, Minus, TableDocument } from 'iconsax-react'
 import { debounce } from 'lodash'
 import moment from 'moment/moment'
-import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -146,6 +142,14 @@ const DeliveryReceiptForm = (props) => {
   const [errSurvivePrice, sErrSurvivePrice] = useState(false)
 
   const [searchClient, sSearchClient] = useState(null)
+
+  const [isTotalMoney, sIsTotalMoney] = useState({
+    totalPrice: 0,
+    totalDiscountPrice: 0,
+    totalDiscountAfterPrice: 0,
+    totalTax: 0,
+    totalAmount: 0,
+  })
 
   // API Hooks
   const { data: dataTasxes = [] } = useTaxList()
@@ -527,6 +531,67 @@ const DeliveryReceiptForm = (props) => {
 
   useFetchingEffect(onFetchingProductOrder, _ServerFetching_ProductOrder)
   useFetchingEffect(onFetchingAddress, _ServerFetching_Address)
+
+  const totalMoney = (listData) => {
+    const totalPrice = listData?.reduce((accumulator, item) => {
+      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+        const product = Number(childItem?.price) * Number(childItem?.quantity)
+        return childAccumulator + product
+      }, 0)
+      return accumulator + childTotal
+    }, 0)
+
+    const totalDiscountPrice = listData?.reduce((accumulator, item) => {
+      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+        const product = Number(childItem?.price) * (Number(childItem?.discount) / 100) * Number(childItem?.quantity)
+        return childAccumulator + product
+      }, 0)
+      return accumulator + childTotal
+    }, 0)
+
+    const totalDiscountAfterPrice = listData?.reduce((accumulator, item) => {
+      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+        const product = Number(childItem?.price * (1 - childItem?.discount / 100)) * Number(childItem?.quantity)
+        return childAccumulator + product
+      }, 0)
+      return accumulator + childTotal
+    }, 0)
+
+    const totalTax = listData?.reduce((accumulator, item) => {
+      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+        const product =
+          Number(childItem?.price * (1 - childItem?.discount / 100)) *
+          (isNaN(childItem?.tax?.tax_rate) ? 0 : Number(childItem?.tax?.tax_rate) / 100) *
+          Number(childItem?.quantity)
+        return childAccumulator + product
+      }, 0)
+      return accumulator + childTotal
+    }, 0)
+
+    const totalAmount = listData?.reduce((accumulator, item) => {
+      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
+        const product =
+          Number(childItem?.price * (1 - childItem?.discount / 100)) *
+          (1 + Number(childItem?.tax?.tax_rate) / 100) *
+          Number(childItem?.quantity)
+        return childAccumulator + product
+      }, 0)
+      return accumulator + childTotal
+    }, 0)
+
+    return {
+      totalPrice: totalPrice || 0,
+      totalDiscountPrice: totalDiscountPrice || 0,
+      totalDiscountAfterPrice: totalDiscountAfterPrice || 0,
+      totalTax: totalTax || 0,
+      totalAmount: totalAmount || 0,
+    }
+  }
+
+  useEffect(() => {
+    const totalPrice = totalMoney(listData)
+    sIsTotalMoney(totalPrice)
+  }, [listData])
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
 
@@ -997,876 +1062,713 @@ const DeliveryReceiptForm = (props) => {
   ]
 
   return (
-    <div className="overflow-hidden">
-      <Head>
-        <title>
-          {id
-            ? dataLang?.delivery_receipt_edit || 'delivery_receipt_edit'
-            : dataLang?.delivery_receipt_add || 'delivery_receipt_add'}
-        </title>
-      </Head>
-      <Container className="!h-max py-6 bg-gray-color">
-        {statusExprired ? (
-          <EmptyExprired />
-        ) : (
-          <Breadcrumb items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
-        )}
-        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-typo-gray-5 capitalize font-medium mt-1 2xl:!mb-5 lg:!mb-3">
-          {id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
-        </h2>
-        <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-20 relative">
-          {/* Cột trái */}
-          <div className="w-4/5">
-            <div className="min-h-full max-h-[1132px] flex flex-col gap-6 bg-white border border-[#919EAB3D] rounded-2xl p-4">
-              {/* Thông tin mặt hàng */}
-              <div className="flex justify-between items-center">
-                {/* Heading */}
-                <h2 className="w-full 2xl:text-[20px] xl:text-lg font-medium text-brand-color capitalize">
-                  {dataLang?.item_information || 'item_information'}
-                </h2>
-                {/* Search Bar */}
-                <div className="relative w-full">
-                  <Select
-                    options={idProductOrder ? options : []}
-                    closeMenuOnSelect={false}
-                    onChange={_HandleChangeInput.bind(this, 'itemAll')}
-                    value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
-                    isMulti
-                    maxShowMuti={0}
-                    components={{ MenuList, MultiValue }}
-                    formatOptionLabel={(option) => selectItemsLabel(option)}
-                    placeholder={'Chọn nhanh mặt hàng'}
-                    hideSelectedOptions={false}
-                    className="rounded-md bg-white 3xl:text-[16px] 2xl:text-[10px] xl:text-[13px] text-[12.5px]"
-                    isSearchable={true}
-                    noOptionsMessage={() => (
-                      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />
-                    )}
-                    menuPortalTarget={document.body}
-                    style={{
-                      border: 'none',
-                      boxShadow: 'none',
-                      outline: 'none',
-                    }}
-                    theme={(theme) => ({
-                      ...theme,
-                      colors: {
-                        ...theme.colors,
-                        primary25: '#0000000A',
-                        primary50: 'transparent',
-                        primary: '#C7DFFB',
-                      },
-                    })}
-                    styles={{
-                      placeholder: (base) => ({
-                        ...base,
-                        color: '#cbd5e1',
-                      }),
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 100,
-                      }),
-                      control: (base, state) => ({
-                        ...base,
-                        boxShadow: 'none',
-                        padding: '0.7px',
-                        borderRadius: '8px',
-                        boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : '0 0 0 1px #D0D5DD',
-                      }),
-                    }}
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
-                    <CiSearch className="text-white responsive-text-lg" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Table */}
-              {listData.length === 0 ? (
-                <EmptyData />
-              ) : (
-                <div>
-                  {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
-                    <TableHeader className="text-left">
-                      {dataLang?.import_from_items || 'import_from_items'}
-                    </TableHeader>
-                    <TableHeader className="text-center">Kho - Vị trí kho</TableHeader>
-                    <TableHeader className="text-center">Số lượng</TableHeader>
-                    <TableHeader className="text-center">Đơn giá</TableHeader>
-                    <Dropdown
-                      overlay={
-                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                            Chọn hoàng loạt % chiết khấu
-                          </p>
-                          <div className="flex items-center justify-center col-span-1 text-center">
-                            <InPutNumericFormat
-                              value={generalDiscount}
-                              onValueChange={_HandleChangeInput.bind(this, 'generalDiscount')}
-                              className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
-                              isAllowed={isAllowedDiscount}
-                            />
-                          </div>
-                        </div>
-                      }
-                      trigger={['click']}
-                      placement="bottomCenter"
-                      arrow
-                    >
-                      <div className="inline-flex items-center justify-between cursor-pointer w-full">
-                        <TableHeader className="text-left">% CK</TableHeader>
-                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                      </div>
-                    </Dropdown>
-                    <TableHeader className="text-center">Đơn giá sau CK</TableHeader>
-                    <Dropdown
-                      overlay={
-                        <div className="px-4 py-5 shadow-lg bg-white rounded-lg">
-                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                            Chọn hoàng loạt % thuế
-                          </p>
-                          <SelectCustomLabel
-                            placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                            options={taxOptions}
-                            value={generalTax}
-                            onChange={(value) => _HandleChangeInput('generalTax', value)}
-                            renderOption={(option, isLabel) => (
-                              <div
-                                className={`flex items-center justify-start gap-1 text-[#1C252E]${
-                                  isLabel ? ' py-2' : ''
-                                }`}
-                              >
-                                <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
-                                {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
-                                  <h2 className="responsive-text-sm leading-normal">
-                                    {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
-                                  </h2>
-                                )}
-                              </div>
-                            )}
-                            isLabel={true}
-                            isPopupMatchSelectWidth={false}
-                          />
-                        </div>
-                      }
-                      trigger={['click']}
-                      placement="bottomCenter"
-                      arrow
-                    >
-                      <div className="inline-flex items-center justify-between cursor-pointer w-full">
-                        <TableHeader className="text-left">% Thuế</TableHeader>
-                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                      </div>
-                    </Dropdown>
-                    <TableHeader className="text-center">Thành tiền</TableHeader>
-                  </div>
-
-                  {/* Thông tin mặt hàng Body */}
-                  <Customscrollbar className="max-h-[400px] h-[400px]  pb-2">
-                    <div className="w-full h-full">
-                      {isFetching ? (
-                        <Loading className="w-full h-10" color="#0f4f9e" />
-                      ) : (
-                        <>
-                          {listData?.map((e) => {
-                            const option = e?.matHang
-                            const firstChild = e?.child[0]
-                            return (
-                              <div
-                                key={e?.id?.toString()}
-                                className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-3 2xl:gap-4 my-1 py-4 border-b border-[#F3F3F4]"
-                              >
-                                {/* Mặt hàng */}
-                                <div className="h-full p-2">
-                                  <div className="flex items-center justify-between gap-1 xl:gap-2">
-                                    <div className="flex items-start">
-                                      <div className="flex xl:flex-row flex-col items-start gap-3">
-                                        <img
-                                          src={option.e?.images ?? '/icon/noimagelogo.png'}
-                                          alt={option?.e.name}
-                                          className="size-16 object-cover rounded-md"
-                                        />
-                                        <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full text-neutral-03 font-normal">
-                                          <h4 className="font-semibold responsive-text-sm text-brand-color">
-                                            {option.e.name}
-                                          </h4>
-                                          <h5>
-                                            {option.e?.code}: {option.e?.product_variation}
-                                          </h5>
-                                          <h5>ĐVT: {option.e?.unit_name}</h5>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <button
-                                      onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
-                                      className="flex items-center justify-center 2xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
-                                    >
-                                      <Add />
-                                    </button>
-                                  </div>
-                                  {/* Ghi chú */}
-                                  <div className="flex items-center justify-center mt-2">
-                                    <Image
-                                      src={'/icon/pen.svg'}
-                                      alt="icon pen"
-                                      width={16}
-                                      height={16}
-                                      className="size-3 object-cover"
-                                    />
-                                    <input
-                                      value={firstChild?.note}
-                                      onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
-                                      placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
-                                      name="optionEmail"
-                                      type="text"
-                                      className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
-                                    />
-                                  </div>
-                                  {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
-                                    <button
-                                      onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
-                                      className="text-xs text-center w-full rounded-lg mt-2 px-5 py-2 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white transition-all ease-out duration-300"
-                                    >
-                                      Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
-                                    </button>
-                                  )}
-                                </div>
-
-                                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center">
-                                  {e?.child?.map((ce) => {
-                                    const discountedPrice = formatMoney(
-                                      Number(ce?.price) * (1 - Number(ce?.discount) / 100)
-                                    )
-                                    return (
-                                      <React.Fragment key={ce?.id?.toString()}>
-                                        {/* Kho - Vị trí kho */}
-                                        <div className="flex flex-col justify-center h-full">
-                                          <SelectCustomLabel
-                                            dataLang={dataLang}
-                                            placeholder={dataLang?.PDF_house || 'PDF_house'}
-                                            options={ce?.dataWarehouse}
-                                            value={ce?.warehouse}
-                                            onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'warehouse', value)}
-                                            formatNumber={formatNumber}
-                                            isError={errWarehouse}
-                                          />
-                                        </div>
-                                        {/* Số lượng */}
-                                        <div className="flex items-center justify-center">
-                                          <div
-                                            className={`relative flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
-                                              errQuantity &&
-                                              (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
-                                                ? 'border-red-500'
-                                                : errSurvive
-                                                ? ' border-red-500'
-                                                : 'border-border-gray-2'
-                                            }  ${
-                                              (ce?.quantity == 0 && 'border-red-500') ||
-                                              (ce?.quantity == '' && 'border-red-500')
-                                            } `}
-                                          >
-                                            <button
-                                              disabled={
-                                                ce?.quantity === 1 ||
-                                                ce?.quantity === '' ||
-                                                ce?.quantity === null ||
-                                                ce?.quantity === 0
-                                              }
-                                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
-                                              onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
-                                            >
-                                              <Minus size="14" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                            </button>
-                                            <InPutNumericFormat
-                                              onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
-                                              value={ce?.quantity || null}
-                                              className={` appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
-                                              isAllowed={(values) => {
-                                                const { value } = values
-                                                const newValue = +value
-                                                const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
-
-                                                if (newValue > +ce?.warehouse?.qty) {
-                                                  isShow(
-                                                    'error',
-                                                    `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                      +ce?.warehouse?.qty
-                                                    )} số lượng tồn kho`
-                                                  )
-                                                  return
-                                                } else if (newValue > quantityAmount) {
-                                                  isShow(
-                                                    'error',
-                                                    `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                                      quantityAmount
-                                                    )} số lượng chưa giao`
-                                                  )
-                                                  return
-                                                }
-                                                return true
-                                              }}
-                                            />
-                                            <button
-                                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
-                                              onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
-                                            >
-                                              <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                            </button>
-                                            <div className="absolute -top-4 -right-2 p-1 cursor-pointer">
-                                              <PopupParent
-                                                trigger={
-                                                  <div className="relative ">
-                                                    <TableDocument size="18" color="#4f46e5" className="font-medium" />
-                                                    <span className="h-2 w-2 absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                                      <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
-                                                        <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
-                                                      </span>
-                                                    </span>
-                                                  </div>
-                                                }
-                                                position="bottom center"
-                                                on={['hover', 'focus']}
-                                              >
-                                                <div className="flex flex-col bg-primary-06 px-2.5 py-0.5 rounded-lg font-deca">
-                                                  <span className="text-xs font-medium">
-                                                    Sl tồn:{' '}
-                                                    {ce?.warehouse == null ? 0 : formatNumber(+ce?.warehouse?.qty)}
-                                                  </span>
-
-                                                  <span className="text-xs font-medium">
-                                                    Sl đã giao: {formatNumber(ce?.quantityDelive)}
-                                                  </span>
-                                                  <span className="text-xs font-medium">
-                                                    Sl chưa giao: {formatNumber(ce?.quantityStock - ce?.quantityDelive)}
-                                                  </span>
-                                                </div>
-                                              </PopupParent>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        {/* Đơn giá */}
-                                        <div
-                                          className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
-                                            errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
-                                              ? 'border-red-500'
-                                              : errSurvivePrice &&
-                                                (ce?.price == null || ce?.price == '' || ce?.price == 0)
-                                              ? 'border-red-500'
-                                              : 'border-neutral-N400'
-                                          } ${
-                                            (ce?.price == 0 && 'border-red-500') ||
-                                            (ce?.price == '' && 'border-red-500')
-                                          } `}
-                                        >
-                                          <InPutMoneyFormat
-                                            className={`appearance-none text-right responsive-text-sm font-semibold w-full focus:outline-none `}
-                                            onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
-                                            isAllowed={isAllowedNumber}
-                                            value={ce?.price}
-                                          />
-                                          <span className="pl-1 text-right responsive-text-sm font-semibold underline">
-                                            đ
-                                          </span>
-                                        </div>
-                                        {/* % Chiết khấu */}
-                                        <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
-                                          <InPutNumericFormat
-                                            className="appearance-none w-full focus:outline-none text-right"
-                                            onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
-                                            value={ce?.discount}
-                                            isAllowed={isAllowedDiscount}
-                                          />
-                                          <span className="2xl:pl-1">%</span>
-                                        </div>
-                                        {/* Đơn giá sau CK */}
-                                        <div className={`flex items-center text-left responsive-text-sm font-semibold`}>
-                                          <h3>{discountedPrice}</h3>
-                                          <span className="pl-1 underline">đ</span>
-                                        </div>
-                                        {/* % Thuế */}
-                                        <div className="flex flex-col justify-center h-full">
-                                          <SelectCustomLabel
-                                            placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                            options={taxOptions}
-                                            value={ce?.tax}
-                                            onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
-                                            renderOption={(option, isLabel) => (
-                                              <div
-                                                className={`flex items-center justify-start gap-1 text-[#1C252E] ${
-                                                  isLabel ? 'py-1 2xl:py-2' : ''
-                                                }`}
-                                              >
-                                                <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
-                                                {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
-                                                  <h2 className="responsive-text-sm leading-normal">
-                                                    {option?.tax_rate === '20'
-                                                      ? `(${option?.tax_rate}%)`
-                                                      : `${option?.tax_rate}%`}
-                                                  </h2>
-                                                )}
-                                              </div>
-                                            )}
-                                          />
-                                        </div>
-                                        {/* Thành tiền và nút xóa*/}
-                                        <div className="flex items-center justify-between gap-2 pr-1 p-0.5">
-                                          <span className="text-left responsive-text-sm font-semibold">
-                                            {formatNumber(
-                                              ce?.price *
-                                                (1 - Number(ce?.discount) / 100) *
-                                                (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                                Number(ce?.quantity)
-                                            )}
-                                            <span className="pl-1 underline">đ</span>
-                                          </span>
-                                          {/* Nút xoá */}
-                                          <div className="flex items-center">
-                                            <button
-                                              type="button"
-                                              title="Xóa"
-                                              onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                              className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                                            >
-                                              <MdClear />
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </React.Fragment>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </>
-                      )}
-                    </div>
-                  </Customscrollbar>
-                </div>
-              )}
-            </div>
+    <LayoutSalesPurchaseOrder
+      dataLang={dataLang}
+      titleHead={
+        id
+          ? dataLang?.delivery_receipt_edit || 'delivery_receipt_edit'
+          : dataLang?.delivery_receipt_add || 'delivery_receipt_add'
+      }
+      breadcrumbItems={breadcrumbItems}
+      titleLayout={id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
+      searchBar={
+        <div className="relative w-full">
+          <Select
+            options={idProductOrder ? options : []}
+            closeMenuOnSelect={false}
+            onChange={_HandleChangeInput.bind(this, 'itemAll')}
+            value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
+            isMulti
+            maxShowMuti={0}
+            components={{ MenuList, MultiValue }}
+            formatOptionLabel={(option) => selectItemsLabel(option)}
+            placeholder={'Chọn nhanh mặt hàng'}
+            hideSelectedOptions={false}
+            className="rounded-md bg-white 3xl:text-[16px] text-[13px]"
+            isSearchable={true}
+            noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
+            menuPortalTarget={document.body}
+            style={{
+              border: 'none',
+              boxShadow: 'none',
+              outline: 'none',
+            }}
+            theme={(theme) => ({
+              ...theme,
+              colors: {
+                ...theme.colors,
+                primary25: '#0000000A',
+                primary50: 'transparent',
+                primary: '#C7DFFB',
+              },
+            })}
+            styles={{
+              placeholder: (base) => ({
+                ...base,
+                color: '#cbd5e1',
+              }),
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 100,
+              }),
+              control: (base, state) => ({
+                ...base,
+                boxShadow: 'none',
+                padding: '0.7px',
+                borderRadius: '8px',
+                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : '0 0 0 1px #D0D5DD',
+              }),
+            }}
+          />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
+            <CiSearch className="text-white responsive-text-lg" />
           </div>
-
-          {/* Cột phải */}
-          <div className="w-1/5">
-            <div className="flex flex-col gap-y-6">
-              {/* Cột thông tin chung */}
-              <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mt-6 mb-4 capitalize">
-                  Thông tin
-                </h2>
-                {/* Tabs */}
-                <OrderFormTabs
-                  info={
-                    <div className="flex flex-col gap-4 relative">
-                      {/* Mã chứng từ */}
-                      <div className="flex flex-col flex-wrap items-center gap-y-3">
-                        <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
-                        <div className="w-full relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">
-                            #
-                          </span>
-                          <input
-                            value={code}
-                            onChange={_HandleChangeInput.bind(this, 'code')}
-                            name="fname"
-                            type="text"
-                            placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
-                            className={`2xl:text-[14px] text-[13px] placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
-                          />
-                        </div>
-                      </div>
-                      {/* Ngày chứng từ */}
-                      <div className="flex flex-col flex-wrap items-center gap-y-3 relative">
-                        <InfoFormLabel
-                          isRequired={true}
-                          label={dataLang?.import_day_vouchers || 'import_day_vouchers'}
+        </div>
+      }
+      tableLeft={
+        <>
+          {listData.length === 0 ? (
+            <EmptyData />
+          ) : (
+            <div>
+              {/* Thông tin mặt hàng Header */}
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
+                <TableHeader className="text-left">{dataLang?.import_from_items || 'import_from_items'}</TableHeader>
+                <TableHeader className="text-center">Kho - Vị trí kho</TableHeader>
+                <TableHeader className="text-center">Số lượng</TableHeader>
+                <TableHeader className="text-center">Đơn giá</TableHeader>
+                <Dropdown
+                  overlay={
+                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                        Chọn hoàng loạt % chiết khấu
+                      </p>
+                      <div className="flex items-center justify-center col-span-1 text-center">
+                        <InPutNumericFormat
+                          value={generalDiscount}
+                          onValueChange={_HandleChangeInput.bind(this, 'generalDiscount')}
+                          className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
+                          isAllowed={isAllowedDiscount}
                         />
-
-                        <div className="relative w-full flex flex-row custom-date-picker date-form">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                            <BsCalendarEvent color="#7a7a7a" />
-                          </span>
-                          <ConfigProvider locale={viVN}>
-                            <DatePicker
-                              className="sales-product-date pl-9 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                              status={errDate ? 'error' : ''}
-                              placeholder="Chọn ngày"
-                              format="DD/MM/YYYY HH:mm"
-                              showTime={{
-                                defaultValue: dayjs('00:00', 'HH:mm'),
-                                format: 'HH:mm',
-                              }}
-                              suffixIcon={null}
-                              value={dayjs(startDate)}
-                              onChange={(date) => {
-                                if (date) {
-                                  const dateString = date.toDate().toString()
-                                  sStartDate(dateString)
-                                }
-                              }}
-                            />
-                          </ConfigProvider>
-                        </div>
                       </div>
-
-                      {/* Khách hàng */}
-                      <div className="flex flex-col gap-y-2">
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel isRequired={true} label="Khách hàng" />
-                          <div className="w-full flex">
-                            <div className="relative flex flex-col select-with-radio">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <LuBriefcase color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title="Khách hàng"
-                                placeholderText="Chọn khách hàng"
-                                options={dataClient}
-                                value={idClient}
-                                onChange={(value) => {
-                                  const newValue = dataClient.find((item) => item.value === value)
-                                  _HandleChangeInput('idClient', newValue)
-                                }}
-                                isError={errClient}
-                                isShowAddNew={true}
-                                onSearch={(value) => handleSearchClient(value)}
-                                dataBranch={dataBranch}
-                                dataLang={dataLang}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        {errClient && <label className="text-sm text-red-500">{'Vui lòng chọn khách hàng'}</label>}
-                      </div>
-                      {/* Đơn hàng bán */}
-                      <div className="flex flex-col gap-y-2">
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel
-                            isRequired={true}
-                            label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                          />
-                          <div className="w-full flex">
-                            <div className="relative flex flex-col select-with-radio">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <TbNotes color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                                placeholderText="Chọn đơn hàng bán"
-                                options={dataProductOrder}
-                                value={idProductOrder}
-                                onChange={(value) => {
-                                  const newValue = dataProductOrder.find((item) => item.value === value)
-                                  _HandleChangeInput('idProductOrder', newValue)
-                                }}
-                                isError={errProductOrder}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        {errProductOrder && (
-                          <label className="text-sm text-red-500">
-                            {dataLang?.delivery_receipt_err_select_product_order ||
-                              'delivery_receipt_err_select_product_order'}
-                          </label>
-                        )}
-                      </div>
-                      {/* Địa chỉ giao hàng */}
-                      <div className="flex flex-col gap-y-2">
-                        <div className="flex flex-col flex-wrap items-center gap-y-3">
-                          <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
-                          <div className="w-full flex">
-                            <div className="relative flex flex-col select-with-radio">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                                <PiMapPinLight color="#7a7a7a" />
-                              </span>
-                              <SelectWithRadio
-                                title={dataLang?.select_address || 'select_address'}
-                                placeholderText="Chọn địa chỉ giao hàng"
-                                options={dataAddress}
-                                value={idAddress}
-                                onChange={(value) => {
-                                  const newValue = dataAddress.find((item) => item.value === value)
-                                  _HandleChangeInput('idAddress', newValue)
-                                }}
-                                isError={errAddress}
-                              />
-                              <AiFillPlusCircle
-                                onClick={() => _HandleClosePopupAddress(true)}
-                                className="text-[13px] xl:text-base right-7 xl:right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
-                              />
-                              <PopupAddress
-                                dataLang={dataLang}
-                                clientId={idClient?.value || idClient}
-                                handleFetchingAddress={_ServerFetching_Address}
-                                openPopupAddress={openPopupAddress}
-                                handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
-                                className="hidden"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        {errAddress && (
-                          <label className="text-sm text-red-500">
-                            {dataLang?.delivery_receipt_err_select_address || 'delivery_receipt_err_select_address'}
-                          </label>
-                        )}
-                      </div>
-                      {/* Xem thêm thông tin */}
-                      <AnimatePresence initial={false}>
-                        {showMoreInfo && (
-                          <motion.div
-                            key="more-info"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            className="overflow-hidden"
+                    </div>
+                  }
+                  trigger={['click']}
+                  placement="bottomCenter"
+                  arrow
+                >
+                  <div className="inline-flex items-center justify-between cursor-pointer w-full">
+                    <TableHeader className="text-left">% CK</TableHeader>
+                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+                  </div>
+                </Dropdown>
+                <TableHeader className="text-center">Đơn giá sau CK</TableHeader>
+                <Dropdown
+                  overlay={
+                    <div className="px-4 py-5 shadow-lg bg-white rounded-lg">
+                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                        Chọn hoàng loạt % thuế
+                      </p>
+                      <SelectCustomLabel
+                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                        options={taxOptions}
+                        value={generalTax}
+                        onChange={(value) => _HandleChangeInput('generalTax', value)}
+                        renderOption={(option, isLabel) => (
+                          <div
+                            className={`flex items-center justify-start gap-1 text-[#1C252E]${isLabel ? ' py-2' : ''}`}
                           >
-                            <div className="flex flex-col gap-y-3">
-                              {/* Chi nhánh */}
-                              <div className="flex flex-col gap-y-2">
-                                <div className="flex flex-col flex-wrap items-center gap-y-3">
-                                  <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
-                                  <div className="w-full flex">
-                                    <div className="relative flex flex-col select-with-radio">
-                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <PiMapPinLight color="#7a7a7a" />
-                                      </div>
-                                      <SelectWithRadio
-                                        title={dataLang?.import_branch || 'import_branch'}
-                                        placeholderText="Chọn chi nhánh"
-                                        options={dataBranch}
-                                        value={idBranch}
-                                        onChange={(value) => {
-                                          const newValue = dataBranch.find((item) => item.value === value)
-                                          _HandleChangeInput('branch', newValue)
-                                        }}
-                                        isError={errBranch}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                {errBranch && (
-                                  <label className="text-sm text-red-500">
-                                    {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                                  </label>
-                                )}
-                              </div>
-                              {/* Người dùng */}
-                              <div className="flex flex-col gap-y-2">
-                                <div className="flex flex-col flex-wrap items-center gap-y-3">
-                                  <InfoFormLabel
-                                    isRequired
-                                    label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
-                                  />
-                                  <div className="w-full flex">
-                                    <div className="relative flex flex-col select-with-radio">
-                                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                        <PiUser color="#7a7a7a" />
-                                      </div>
-                                      <SelectWithRadio
-                                        title={dataLang?.import_branch || 'import_branch'}
-                                        placeholderText="Chọn người dùng"
-                                        options={dataStaff}
-                                        value={idStaff}
-                                        onChange={(value) => {
-                                          const newValue = dataStaff.find((item) => item.value === value)
-                                          _HandleChangeInput('idStaff', newValue)
-                                        }}
-                                        isError={errStaff}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                                {errStaff && (
-                                  <label className="text-sm text-red-500">
-                                    {dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
-                                  </label>
-                                )}
-                              </div>
-                            </div>
-                          </motion.div>
+                            <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
+                            {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                              <h2 className="responsive-text-sm leading-normal">
+                                {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
+                              </h2>
+                            )}
+                          </div>
                         )}
-                      </AnimatePresence>
-
-                      {/* Xem thêm Button */}
-                      <div className="flex items-center justify-center p-1 pb-6 hover:underline">
-                        <button
-                          onClick={() => setShowMoreInfo(!showMoreInfo)}
-                          className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
-                        >
-                          {showMoreInfo ? (
-                            <span className="inline-flex items-center gap-x-1">
-                              Ẩn bớt
-                              <ArrowUp2 size={16} />
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-x-1">
-                              Xem thêm
-                              <ArrowDown2 size={16} />
-                            </span>
-                          )}
-                        </button>
-                      </div>
+                        isLabel={true}
+                        isPopupMatchSelectWidth={false}
+                      />
                     </div>
                   }
-                  note={
-                    <div className="w-full mx-auto">
-                      <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
-                        {dataLang?.sales_product_note || 'sales_product_note'}
-                      </h4>
-                      <div className="w-full pb-6">
-                        <textarea
-                          value={note}
-                          placeholder={'Nhập ghi chú tại đây'}
-                          onChange={_HandleChangeInput.bind(this, 'note')}
-                          name="fname"
-                          type="text"
-                          className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
-                        />
-                      </div>
-                    </div>
-                  }
-                />
+                  trigger={['click']}
+                  placement="bottomCenter"
+                  arrow
+                >
+                  <div className="inline-flex items-center justify-between cursor-pointer w-full">
+                    <TableHeader className="text-left">% Thuế</TableHeader>
+                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+                  </div>
+                </Dropdown>
+                <TableHeader className="text-center">Thành tiền</TableHeader>
               </div>
-              {/* Cột tổng cộng */}
-              <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mb-6 capitalize">
-                  {'Tổng cộng' || dataLang?.price_quote_total}
-                </h2>
-                {/* Tổng tiền */}
-                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-black-color">
-                  <h4 className="text-left">{dataLang?.purchase_order_table_total || 'purchase_order_table_total'}</h4>
-                  <span className="text-right">
-                    {formatMoney(
-                      listData?.reduce((accumulator, item) => {
-                        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                          const product = Number(childItem?.price) * Number(childItem?.quantity)
-                          return childAccumulator + product
-                        }, 0)
-                        return accumulator + childTotal
-                      }, 0)
-                    )}
-                  </span>
+
+              {/* Thông tin mặt hàng Body */}
+              <Customscrollbar className="max-h-[400px] h-[400px]  pb-2">
+                <div className="w-full h-full">
+                  {isFetching ? (
+                    <Loading className="w-full h-10" color="#0f4f9e" />
+                  ) : (
+                    <>
+                      {listData?.map((e) => {
+                        const option = e?.matHang
+                        const firstChild = e?.child[0]
+                        return (
+                          <div
+                            key={e?.id?.toString()}
+                            className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-3 2xl:gap-4 my-1 py-4 border-b border-[#F3F3F4]"
+                          >
+                            {/* Mặt hàng */}
+                            <div className="h-full p-2">
+                              <div className="flex items-center justify-between gap-1 xl:gap-2">
+                                <div className="flex items-start">
+                                  <div className="flex xl:flex-row flex-col items-start gap-3">
+                                    <img
+                                      src={option.e?.images ?? '/icon/noimagelogo.png'}
+                                      alt={option?.e.name}
+                                      className="size-16 object-cover rounded-md"
+                                    />
+                                    <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full text-neutral-03 font-normal">
+                                      <h4 className="font-semibold responsive-text-sm text-brand-color">
+                                        {option.e.name}
+                                      </h4>
+                                      <h5>
+                                        {option.e?.code}: {option.e?.product_variation}
+                                      </h5>
+                                      <h5>ĐVT: {option.e?.unit_name}</h5>
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
+                                  className="flex items-center justify-center 2xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
+                                >
+                                  <Add />
+                                </button>
+                              </div>
+                              {/* Ghi chú */}
+                              <div className="flex items-center justify-center mt-2">
+                                <Image
+                                  src={'/icon/pen.svg'}
+                                  alt="icon pen"
+                                  width={16}
+                                  height={16}
+                                  className="size-3 object-cover"
+                                />
+                                <input
+                                  value={firstChild?.note}
+                                  onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
+                                  placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
+                                  name="optionEmail"
+                                  type="text"
+                                  className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
+                                />
+                              </div>
+                              {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
+                                <button
+                                  onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
+                                  className="text-xs text-center w-full rounded-lg mt-2 px-5 py-2 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white transition-all ease-out duration-300"
+                                >
+                                  Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
+                                </button>
+                              )}
+                            </div>
+                            {/* Body */}
+                            <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center">
+                              {e?.child?.map((ce) => {
+                                const discountedPrice = formatMoney(
+                                  Number(ce?.price) * (1 - Number(ce?.discount) / 100)
+                                )
+                                return (
+                                  <React.Fragment key={ce?.id?.toString()}>
+                                    {/* Kho - Vị trí kho */}
+                                    <div className="flex flex-col justify-center h-full">
+                                      <SelectCustomLabel
+                                        dataLang={dataLang}
+                                        placeholder={dataLang?.PDF_house || 'PDF_house'}
+                                        options={ce?.dataWarehouse}
+                                        value={ce?.warehouse}
+                                        onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'warehouse', value)}
+                                        formatNumber={formatNumber}
+                                        isError={errWarehouse}
+                                      />
+                                    </div>
+                                    {/* Số lượng */}
+                                    <div className="flex items-center justify-center">
+                                      <div
+                                        className={`relative flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                          errQuantity &&
+                                          (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
+                                            ? 'border-red-500'
+                                            : errSurvive
+                                            ? ' border-red-500'
+                                            : 'border-border-gray-2'
+                                        }  ${
+                                          (ce?.quantity == 0 && 'border-red-500') ||
+                                          (ce?.quantity == '' && 'border-red-500')
+                                        } `}
+                                      >
+                                        <button
+                                          disabled={
+                                            ce?.quantity === 1 ||
+                                            ce?.quantity === '' ||
+                                            ce?.quantity === null ||
+                                            ce?.quantity === 0
+                                          }
+                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                          onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
+                                        >
+                                          <Minus size="14" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                        </button>
+                                        <InPutNumericFormat
+                                          onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
+                                          value={ce?.quantity || null}
+                                          className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                          isAllowed={(values) => {
+                                            const { value } = values
+                                            const newValue = +value
+                                            const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
+
+                                            if (newValue > +ce?.warehouse?.qty) {
+                                              isShow(
+                                                'error',
+                                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                  +ce?.warehouse?.qty
+                                                )} số lượng tồn kho`
+                                              )
+                                              return
+                                            } else if (newValue > quantityAmount) {
+                                              isShow(
+                                                'error',
+                                                `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                                  quantityAmount
+                                                )} số lượng chưa giao`
+                                              )
+                                              return
+                                            }
+                                            return true
+                                          }}
+                                        />
+                                        <button
+                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                          onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
+                                        >
+                                          <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                        </button>
+                                        <div className="absolute -top-4 -right-2 p-1 cursor-pointer">
+                                          <PopupParent
+                                            trigger={
+                                              <div className="relative ">
+                                                <TableDocument size="18" color="#4f46e5" className="font-medium" />
+                                                <span className="h-2 w-2 absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
+                                                  <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
+                                                    <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
+                                                  </span>
+                                                </span>
+                                              </div>
+                                            }
+                                            position="bottom center"
+                                            on={['hover', 'focus']}
+                                          >
+                                            <div className="flex flex-col bg-primary-06 px-2.5 py-0.5 rounded-lg font-deca">
+                                              <span className="text-xs font-medium">
+                                                Sl tồn: {ce?.warehouse == null ? 0 : formatNumber(+ce?.warehouse?.qty)}
+                                              </span>
+
+                                              <span className="text-xs font-medium">
+                                                Sl đã giao: {formatNumber(ce?.quantityDelive)}
+                                              </span>
+                                              <span className="text-xs font-medium">
+                                                Sl chưa giao: {formatNumber(ce?.quantityStock - ce?.quantityDelive)}
+                                              </span>
+                                            </div>
+                                          </PopupParent>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* Đơn giá */}
+                                    <div
+                                      className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
+                                        errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                          ? 'border-red-500'
+                                          : errSurvivePrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                          ? 'border-red-500'
+                                          : 'border-neutral-N400'
+                                      } ${
+                                        (ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')
+                                      } `}
+                                    >
+                                      <InPutMoneyFormat
+                                        className={`appearance-none text-right responsive-text-sm font-semibold w-full focus:outline-none `}
+                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
+                                        isAllowed={isAllowedNumber}
+                                        value={ce?.price}
+                                      />
+                                      <span className="pl-1 text-right responsive-text-sm font-semibold underline">
+                                        đ
+                                      </span>
+                                    </div>
+                                    {/* % Chiết khấu */}
+                                    <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                      <InPutNumericFormat
+                                        className="appearance-none w-full focus:outline-none text-right"
+                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
+                                        value={ce?.discount}
+                                        isAllowed={isAllowedDiscount}
+                                      />
+                                      <span className="2xl:pl-1">%</span>
+                                    </div>
+                                    {/* Đơn giá sau CK */}
+                                    <div className={`flex items-center text-left responsive-text-sm font-semibold`}>
+                                      <h3>{discountedPrice}</h3>
+                                      <span className="pl-1 underline">đ</span>
+                                    </div>
+                                    {/* % Thuế */}
+                                    <div className="flex flex-col justify-center h-full">
+                                      <SelectCustomLabel
+                                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                                        options={taxOptions}
+                                        value={ce?.tax}
+                                        onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
+                                        renderOption={(option, isLabel) => (
+                                          <div
+                                            className={`flex items-center justify-start gap-1 text-[#1C252E] ${
+                                              isLabel ? 'py-1 2xl:py-2' : ''
+                                            }`}
+                                          >
+                                            <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
+                                            {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                              <h2 className="responsive-text-sm leading-normal">
+                                                {option?.tax_rate === '20'
+                                                  ? `(${option?.tax_rate}%)`
+                                                  : `${option?.tax_rate}%`}
+                                              </h2>
+                                            )}
+                                          </div>
+                                        )}
+                                      />
+                                    </div>
+                                    {/* Thành tiền và nút xóa*/}
+                                    <div className="flex items-center justify-between gap-2 pr-1 p-0.5">
+                                      <span className="text-left responsive-text-sm font-semibold">
+                                        {formatNumber(
+                                          ce?.price *
+                                            (1 - Number(ce?.discount) / 100) *
+                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                            Number(ce?.quantity)
+                                        )}
+                                        <span className="pl-1 underline">đ</span>
+                                      </span>
+                                      {/* Nút xoá */}
+                                      <div className="flex items-center">
+                                        <button
+                                          type="button"
+                                          title="Xóa"
+                                          onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                          className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                                        >
+                                          <MdClear />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </React.Fragment>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </>
+                  )}
                 </div>
-                {/* Tiền chiết khấu */}
-                <div className="flex justify-between gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="text-left">
-                    {dataLang?.purchase_order_detail_discounty || 'purchase_order_detail_discounty'}
-                  </h4>
-                  <span className="text-right">
-                    {formatMoney(
-                      listData?.reduce((accumulator, item) => {
-                        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                          const product =
-                            Number(childItem?.price) * (Number(childItem?.discount) / 100) * Number(childItem?.quantity)
-                          return childAccumulator + product
-                        }, 0)
-                        return accumulator + childTotal
-                      }, 0)
-                    )}
+              </Customscrollbar>
+            </div>
+          )}
+        </>
+      }
+      info={
+        <div className="flex flex-col gap-4 relative">
+          {/* Mã chứng từ */}
+          <div className="flex flex-col flex-wrap items-center gap-y-3">
+            <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
+            <div className="w-full relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
+              <input
+                value={code}
+                onChange={_HandleChangeInput.bind(this, 'code')}
+                name="fname"
+                type="text"
+                placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
+                className={`2xl:text-[14px] text-[13px] placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
+              />
+            </div>
+          </div>
+          {/* Ngày chứng từ */}
+          <div className="flex flex-col flex-wrap items-center gap-y-3">
+            <InfoFormLabel isRequired={true} label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
+
+            <div className="relative w-full flex flex-row custom-date-picker date-form">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                <BsCalendarEvent color="#7a7a7a" />
+              </span>
+              <ConfigProvider locale={viVN}>
+                <DatePicker
+                  className="sales-product-date pl-9 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                  status={errDate ? 'error' : ''}
+                  placeholder="Chọn ngày"
+                  format="DD/MM/YYYY HH:mm"
+                  showTime={{
+                    defaultValue: dayjs('00:00', 'HH:mm'),
+                    format: 'HH:mm',
+                  }}
+                  suffixIcon={null}
+                  value={dayjs(startDate)}
+                  onChange={(date) => {
+                    if (date) {
+                      const dateString = date.toDate().toString()
+                      sStartDate(dateString)
+                    }
+                  }}
+                />
+              </ConfigProvider>
+            </div>
+          </div>
+
+          {/* Khách hàng */}
+          <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col flex-wrap items-center gap-y-3">
+              <InfoFormLabel isRequired={true} label="Khách hàng" />
+              <div className="w-full flex">
+                <div className="relative flex select-with-radio">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                    <LuBriefcase color="#7a7a7a" />
                   </span>
-                </div>
-                {/* Tiền sau chiết khấu */}
-                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="text-left">
-                    {dataLang?.purchase_order_detail_money_after_discount ||
-                      'purchase_order_detail_money_after_discount'}
-                  </h4>
-                  <span className="text-right">
-                    {formatMoney(
-                      listData?.reduce((accumulator, item) => {
-                        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                          const product =
-                            Number(childItem?.price * (1 - childItem?.discount / 100)) * Number(childItem?.quantity)
-                          return childAccumulator + product
-                        }, 0)
-                        return accumulator + childTotal
-                      }, 0)
-                    )}
-                  </span>
-                </div>
-                {/* Tiền thuế */}
-                <div className="grid grid-cols-2 gap-2 items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="text-left">
-                    {dataLang?.purchase_order_detail_tax_money || 'purchase_order_detail_tax_money'}
-                  </h4>
-                  <span className="text-right">
-                    {formatMoney(
-                      listData?.reduce((accumulator, item) => {
-                        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                          const product =
-                            Number(childItem?.price * (1 - childItem?.discount / 100)) *
-                            (isNaN(childItem?.tax?.tax_rate) ? 0 : Number(childItem?.tax?.tax_rate) / 100) *
-                            Number(childItem?.quantity)
-                          return childAccumulator + product
-                        }, 0)
-                        return accumulator + childTotal
-                      }, 0)
-                    )}
-                  </span>
-                </div>
-                {/* Thành tiền */}
-                <div className="grid grid-cols-2 gap-2 responsive-text-base items-center mb-4">
-                  <h4 className="w-full text-black font-semibold text-left">
-                    {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
-                  </h4>
-                  <span className="text-blue-color font-semibold text-right">
-                    {formatMoney(
-                      listData?.reduce((accumulator, item) => {
-                        const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-                          const product =
-                            Number(childItem?.price * (1 - childItem?.discount / 100)) *
-                            (1 + Number(childItem?.tax?.tax_rate) / 100) *
-                            Number(childItem?.quantity)
-                          return childAccumulator + product
-                        }, 0)
-                        return accumulator + childTotal
-                      }, 0)
-                    )}
-                  </span>
+                  <SelectWithRadio
+                    title="Khách hàng"
+                    placeholderText="Chọn khách hàng"
+                    options={dataClient}
+                    value={idClient}
+                    onChange={(value) => {
+                      const newValue = dataClient.find((item) => item.value === value)
+                      _HandleChangeInput('idClient', newValue)
+                    }}
+                    isError={errClient}
+                    isShowAddNew={true}
+                    onSearch={(value) => handleSearchClient(value)}
+                    dataBranch={dataBranch}
+                    dataLang={dataLang}
+                  />
                 </div>
               </div>
             </div>
+            {errClient && <label className="text-sm text-red-500">{'Vui lòng chọn khách hàng'}</label>}
           </div>
-        </div>
-        {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-8 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
-          <div className="w-3/4"></div>
-          <div className="w-1/4 flex justify-end items-center gap-2 py-4 3xl:px-5 px-3">
+          {/* Đơn hàng bán */}
+          <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col flex-wrap items-center gap-y-3">
+              <InfoFormLabel
+                isRequired={true}
+                label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+              />
+              <div className="w-full flex">
+                <div className="relative flex flex-col select-with-radio">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                    <TbNotes color="#7a7a7a" />
+                  </span>
+                  <SelectWithRadio
+                    title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+                    placeholderText="Chọn đơn hàng bán"
+                    options={dataProductOrder}
+                    value={idProductOrder}
+                    onChange={(value) => {
+                      const newValue = dataProductOrder.find((item) => item.value === value)
+                      _HandleChangeInput('idProductOrder', newValue)
+                    }}
+                    isError={errProductOrder}
+                  />
+                </div>
+              </div>
+            </div>
+            {errProductOrder && (
+              <label className="text-sm text-red-500">
+                {dataLang?.delivery_receipt_err_select_product_order || 'delivery_receipt_err_select_product_order'}
+              </label>
+            )}
+          </div>
+          {/* Địa chỉ giao hàng */}
+          <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col flex-wrap items-center gap-y-3">
+              <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
+              <div className="w-full flex">
+                <div className="relative flex flex-col select-with-radio">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                    <PiMapPinLight color="#7a7a7a" />
+                  </span>
+                  <SelectWithRadio
+                    title={dataLang?.select_address || 'select_address'}
+                    placeholderText="Chọn địa chỉ giao hàng"
+                    options={dataAddress}
+                    value={idAddress}
+                    onChange={(value) => {
+                      const newValue = dataAddress.find((item) => item.value === value)
+                      _HandleChangeInput('idAddress', newValue)
+                    }}
+                    isError={errAddress}
+                  />
+                  <AiFillPlusCircle
+                    onClick={() => _HandleClosePopupAddress(true)}
+                    className="text-[13px] xl:text-base right-7 xl:right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
+                  />
+                  <PopupAddress
+                    dataLang={dataLang}
+                    clientId={idClient?.value || idClient}
+                    handleFetchingAddress={_ServerFetching_Address}
+                    openPopupAddress={openPopupAddress}
+                    handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            </div>
+            {errAddress && (
+              <label className="text-sm text-red-500">
+                {dataLang?.delivery_receipt_err_select_address || 'delivery_receipt_err_select_address'}
+              </label>
+            )}
+          </div>
+          {/* Xem thêm thông tin */}
+          <AnimatePresence initial={false}>
+            {showMoreInfo && (
+              <motion.div
+                key="more-info"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="flex flex-col gap-y-3">
+                  {/* Chi nhánh */}
+                  <div className="flex flex-col gap-y-2">
+                    <div className="flex flex-col flex-wrap items-center gap-y-3">
+                      <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
+                      <div className="w-full flex">
+                        <div className="relative flex flex-col select-with-radio">
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                            <PiMapPinLight color="#7a7a7a" />
+                          </div>
+                          <SelectWithRadio
+                            title={dataLang?.import_branch || 'import_branch'}
+                            placeholderText="Chọn chi nhánh"
+                            options={dataBranch}
+                            value={idBranch}
+                            onChange={(value) => {
+                              const newValue = dataBranch.find((item) => item.value === value)
+                              _HandleChangeInput('branch', newValue)
+                            }}
+                            isError={errBranch}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {errBranch && (
+                      <label className="text-sm text-red-500">
+                        {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+                      </label>
+                    )}
+                  </div>
+                  {/* Người dùng */}
+                  <div className="flex flex-col gap-y-2">
+                    <div className="flex flex-col flex-wrap items-center gap-y-3">
+                      <InfoFormLabel
+                        isRequired
+                        label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
+                      />
+                      <div className="w-full flex">
+                        <div className="relative flex flex-col select-with-radio">
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                            <PiUser color="#7a7a7a" />
+                          </div>
+                          <SelectWithRadio
+                            title={dataLang?.import_branch || 'import_branch'}
+                            placeholderText="Chọn người dùng"
+                            options={dataStaff}
+                            value={idStaff}
+                            onChange={(value) => {
+                              const newValue = dataStaff.find((item) => item.value === value)
+                              _HandleChangeInput('idStaff', newValue)
+                            }}
+                            isError={errStaff}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {errStaff && (
+                      <label className="text-sm text-red-500">
+                        {dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Xem thêm Button */}
+          <div className="flex items-center justify-center p-1 pb-6 hover:underline">
             <button
-              onClick={() => router.push(routerDeliveryReceipt.home)}
-              dataLang={dataLang}
-              className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 px-2 h-full bg-[#F2F3F5] 2xl:text-base text-sm font-normal rounded-lg"
+              onClick={() => setShowMoreInfo(!showMoreInfo)}
+              className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
             >
-              Thoát
+              {showMoreInfo ? (
+                <span className="inline-flex items-center gap-x-1">
+                  Ẩn bớt
+                  <ArrowUp2 size={16} />
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-x-1">
+                  Xem thêm
+                  <ArrowDown2 size={16} />
+                </span>
+              )}
             </button>
-            <Button
-              onClick={_HandleSubmit.bind(this)}
-              dataLang={dataLang}
-              loading={onSending}
-              className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
-            >
-              Lưu
-            </Button>
           </div>
         </div>
-      </Container>
-      <PopupConfim
-        dataLang={dataLang}
-        type="warning"
-        title={TITLE_DELETE_ITEMS}
-        subtitle={CONFIRMATION_OF_CHANGES}
-        isOpen={isOpen}
-        nameModel={'change_item'}
-        save={handleSaveStatus}
-        cancel={handleCancleStatus}
-      />
-    </div>
+      }
+      note={
+        <div className="w-full mx-auto">
+          <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
+            {dataLang?.returns_reason || 'returns_reason'}
+          </h4>
+          <div className="w-full pb-6">
+            <textarea
+              value={note}
+              placeholder={dataLang?.returns_reason || 'returns_reason'}
+              onChange={_HandleChangeInput.bind(this, 'note')}
+              name="fname"
+              type="text"
+              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+            />
+          </div>
+        </div>
+      }
+      isTotalMoney={isTotalMoney}
+      routerBack={routerDeliveryReceipt.home}
+      onSave={_HandleSubmit.bind(this)}
+      onSending={onSending}
+      popupConfim={
+        <PopupConfim
+          dataLang={dataLang}
+          type="warning"
+          title={TITLE_DELETE_ITEMS}
+          subtitle={CONFIRMATION_OF_CHANGES}
+          isOpen={isOpen}
+          nameModel={'change_item'}
+          save={handleSaveStatus}
+          cancel={handleCancleStatus}
+        />
+      }
+    />
   )
 }
 

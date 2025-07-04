@@ -1,63 +1,54 @@
 import apiProductionsOrders from "@/Api/apiManufacture/manufacture/productionsOrders/apiProductionsOrders";
+import apiMaterialsPlanning from "@/Api/apiManufacture/manufacture/materialsPlanning/apiMaterialsPlanning";
+import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import Loading from "@/components/UI/loading/loading";
+import MultiValue from "@/components/UI/mutiValue/multiValue";
 import NoData from "@/components/UI/noData/nodata";
 import PopupConfim from "@/components/UI/popupConfim/popupConfim";
+import Zoom from "@/components/UI/zoomElement/zoomElement";
 import ButtonAnimationNew from "@/components/common/button/ButtonAnimationNew";
+import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGroup";
 import FilterDropdown from "@/components/common/dropdown/FilterDropdown";
+import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
+import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
+import LoadingComponent from "@/components/common/loading/loading/LoadingComponent";
+import PopupRequestUpdateVersion from "@/components/common/popup/PopupRequestUpdateVersion";
+import SelectComponentNew from "@/components/common/select/SelectComponentNew";
+import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
+import ArrowCounterClockwiseIcon from "@/components/icons/common/ArrowCounterClockwiseIcon";
+import CalendarBlankIcon from "@/components/icons/common/CalendarBlankIcon";
 import CaretDownIcon from "@/components/icons/common/CaretDownIcon";
+import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
+import ChartDonutIcon from "@/components/icons/common/ChartDonutIcon";
+import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
+import ExportMaterialsIcon from "@/components/icons/common/ExportMaterialsIcon";
 import FunnelIcon from "@/components/icons/common/FunnelIcon";
+import KanbanIcon from "@/components/icons/common/KanbanIcon";
+import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
+import MagnifyingGlassIcon from "@/components/icons/common/MagnifyingGlassIcon";
+import PlusIcon from "@/components/icons/common/PlusIcon";
+import PrinterIcon from "@/components/icons/common/PrinterIcon";
+import StickerIcon from "@/components/icons/common/StickerIcon";
+import TrashIcon from "@/components/icons/common/TrashIcon";
 import {
   CONFIRM_DELETION,
   TITLE_DELETE_PRODUCTIONS_ORDER,
 } from "@/constants/delete/deleteTable";
 import { FORMAT_MOMENT } from "@/constants/formatDate/formatDate";
+import PopupKeepStock from "@/containers/manufacture/materials-planning/components/popup/popupKeepStock";
+import PopupPurchaseBeta from "@/containers/manufacture/materials-planning/components/popup/popupPurchaseBeta";
+import PopupExportMaterials from "@/containers/manufacture/productions-orders/components/popup/PopupExportMaterials";
+import { StateContext } from "@/context/_state/productions-orders/StateContext";
+import { useSheet } from "@/context/ui/SheetContext";
 import { useBranchList } from "@/hooks/common/useBranch";
 import { useInternalPlansSearchCombobox } from "@/hooks/common/useInternalPlans";
 import { useItemsVariantSearchCombobox } from "@/hooks/common/useItems";
 import { useOrdersSearchCombobox } from "@/hooks/common/useOrder";
+import useSetingServer from "@/hooks/useConfigNumber";
+import useStatusExprired from "@/hooks/useStatusExprired";
 import useToast from "@/hooks/useToast";
 import { useToggle } from "@/hooks/useToggle";
-import { formatMoment } from "@/utils/helpers/formatMoment";
-import { debounce } from "lodash";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { v4 as uddid } from "uuid";
-import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
-import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
-import ModalDetail from "../modal/modalDetail";
-import PopupConfimStage from "../popup/PopupConfimStage";
-
-import MagnifyingGlassIcon from "@/components/icons/common/MagnifyingGlassIcon";
-import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/router";
-import DatePicker from "react-datepicker";
-
-// const PopupConfimStage = dynamic(() => import("../popup/PopupConfimStage"), { ssr: false });
-import MultiValue from "@/components/UI/mutiValue/multiValue";
-import StatusCheckboxGroup from "@/components/common/checkbox/StatusCheckboxGroup";
-import RadioDropdown from "@/components/common/dropdown/RadioDropdown";
-import SelectComponentNew from "@/components/common/select/SelectComponentNew";
-import TabSwitcherWithUnderline from "@/components/common/tab/TabSwitcherWithUnderline";
-import CalendarBlankIcon from "@/components/icons/common/CalendarBlankIcon";
-import ChartDonutIcon from "@/components/icons/common/ChartDonutIcon";
-import useStatusExprired from "@/hooks/useStatusExprired";
-
-import BreadcrumbCustom from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import LimitListDropdown from "@/components/common/dropdown/LimitListDropdown";
-import LoadingComponent from "@/components/common/loading/loading/LoadingComponent";
-import PopupRequestUpdateVersion from "@/components/common/popup/PopupRequestUpdateVersion";
-import ArrowCounterClockwiseIcon from "@/components/icons/common/ArrowCounterClockwiseIcon";
-import CaretDropdownThinIcon from "@/components/icons/common/CaretDropdownThinIcon";
-import CheckThinIcon from "@/components/icons/common/CheckThinIcon";
-import KanbanIcon from "@/components/icons/common/KanbanIcon";
-import ListChecksIcon from "@/components/icons/common/ListChecksIcon";
-import PrinterIcon from "@/components/icons/common/PrinterIcon";
-import StickerIcon from "@/components/icons/common/StickerIcon";
-import TrashIcon from "@/components/icons/common/TrashIcon";
-import { StateContext } from "@/context/_state/productions-orders/StateContext";
-import { useSheet } from "@/context/ui/SheetContext";
-import useSetingServer from "@/hooks/useConfigNumber";
 import {
   fetchItemsManufactures,
   fetchPDFManufactures,
@@ -65,18 +56,29 @@ import {
 } from "@/managers/api/productions-order/useLinkFilePDF";
 import { useProductionOrderDetail } from "@/managers/api/productions-order/useProductionOrderDetail";
 import { useProductionOrdersList } from "@/managers/api/productions-order/useProductionOrdersList";
+import { formatMoment } from "@/utils/helpers/formatMoment";
+import { FnlocalStorage } from "@/utils/helpers/localStorage";
 import { CookieCore } from "@/utils/lib/cookie";
 import dayjs from "dayjs";
+import { AnimatePresence, motion } from "framer-motion";
+import { debounce } from "lodash";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import DatePicker from "react-datepicker";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import { useInView } from "react-intersection-observer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { v4 as uddid } from "uuid";
+import { useProductionOrdersCombobox } from "../../hooks/useProductionOrdersCombobox";
+import { useProductionOrdersComboboxDetail } from "../../hooks/useProductionOrdersComboboxDetail";
+import ModalDetail from "../modal/modalDetail";
 import PopupCompleteCommand from "../popup/PopupCompleteCommand";
+import PopupConfimStage from "../popup/PopupConfimStage";
 import PopupPrintTemProduct from "../popup/PopupPrintTemProduct";
 import SheetProductionsOrderDetail from "../sheet/SheetProductionsOrderDetail";
 import DetailProductionOrderList from "../ui/DetailProductionOrderList";
 import PlaningProductionOrder from "../ui/PlaningProductionOrder";
-import ExportMaterialsIcon from "@/components/icons/common/ExportMaterialsIcon";
-import PopupExportMaterials from "@/containers/manufacture/productions-orders/components/popup/PopupExportMaterials";
-import { FnlocalStorage } from "@/utils/helpers/localStorage";
+import TabKeepStock from "../ui/tabKeepStock";
 
 const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const statusExprired = useStatusExprired();
@@ -109,6 +111,65 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     },
   ];
 
+  const arrButton = [
+    {
+        id: 1,
+        name: dataLang?.salesOrder_keep_stock || "salesOrder_keep_stock",
+        icon: <PlusIcon className="text-white" />,
+    },
+    {
+        id: 2,
+        name: "Thêm mua hàng",
+        icon: <PlusIcon className="text-white" />,
+    }
+];
+
+const [isValue, sIsValue] = useState({
+  page: 1,
+  limit: 15,
+  search: "",
+});
+
+const queryValue = (key) => sIsValue((prve) => ({ ...prve, ...key }));
+
+const fetchDataTable = async (page = 1, type) => {
+  try {
+    if (!isStateProvider?.productionsOrders?.idDetailProductionOrder) return;
+    
+    if (type == "submit") {
+      await refetchProductionOrderDetail();
+      isShow("success", dataLang?.data_updated_success || "Dữ liệu đã được cập nhật thành công");
+    }
+    
+  } catch (error) {
+    console.error("Error fetching data for keep stock/purchase:", error);
+    isShow("error", dataLang?.update_failed || "Cập nhật dữ liệu thất bại");
+    throw error;
+  }
+};
+
+const initialState = {
+  isTab: "item",
+  countAll: 0,
+  productionOrdersList: [],
+  listDataRight: {
+      title: "",
+      poId: null,
+      referenceNoPo: "",
+      dataPPItems: [],
+      dataBom: {
+          materialsBom: [],
+          productsBom: [],
+      },
+      dataKeepStock: [],
+      dataPurchase: [],
+  },
+  next: null,
+};
+
+const [dataTable, sDataTable] = useState(initialState);
+const queryState = (key) => sDataTable((prve) => ({ ...prve, ...key }));
+
   const listLsxTab = [
     {
       id: "2323",
@@ -121,6 +182,12 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       name: "Kế hoạch BTP & NVL",
       count: 0,
       type: "semiProduct",
+    },
+    {
+      id: "3",
+      name: "Giữ kho & Mua hàng",
+      count: 0,
+      type: "keepStock",
     },
   ];
 
@@ -189,9 +256,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const { isOpen: isOpenSheet, openSheet, closeSheet, sheetData } = useSheet();
   const { isOpen, handleQueryId, isIdChild, isId } = useToggle();
 
-  // const { isStateProvider: isStateProvider?.productionsOrders, queryStateProvider } = useContext(ProductionsOrdersContext);
   const { isStateProvider, queryStateProvider } = useContext(StateContext);
-  console.log("🚀 ~ ProductionsOrderMain ~ isStateProvider.productionsOrders.dataProductionOrderDetail.title:", isStateProvider)
 
   const params = useMemo(
     () => ({
@@ -255,11 +320,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const { data: comboboxProductionOrders = [] } = useProductionOrdersCombobox(
     isStateProvider?.productionsOrders.searchProductionOrders
   );
-  //lấy mã QR code để nhảy qua app  ở button tổng lệnh sản xuất
-  // const { data: QRCode } = useQRCodProductCompleted(
-  //     isStateProvider?.productionsOrders.idDetailProductionOrder
-  // );
-  //lấy link print lệnh sản xuất
 
   // call api list production
   const {
@@ -282,13 +342,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     id: isStateProvider?.productionsOrders?.idDetailProductionOrder,
     enabled: !!isStateProvider?.productionsOrders?.idDetailProductionOrder,
   });
-
-  // const handleFilter = (type, value) => queryStateProvider({
-  //     productionsOrders: {
-  //         ...isStateProvider?.productionsOrders,
-  //         [type]: value, page: 1
-  //     }
-  // });
 
   const handleFilter = (type, value) => {
     if (isStateProvider?.productionsOrders?.[type] === value) return; // không update nếu không thay đổi
@@ -739,14 +792,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       content: <SheetProductionsOrderDetail {...shareProps} />,
       className: "w-[90vw] md:w-[700px] xl:w-[70%] lg:w-[75%]",
     });
-
-    // router.push({
-    //     pathname: router.route,
-    //     query: {
-    //         ...router.query,
-    //         poi_id: item.poi_id,
-    //     },
-    // });
   };
 
   const shareProps = {
@@ -1547,7 +1592,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         />
       </div>
 
-      <div className="flex items-start w-full gap-4 overflow-y-hidden  3xl:gap-6">
+      <div className="flex items-start w-full gap-4 overflow-y-hidden 3xl:gap-6">
         <div className="2xl:max-w-[15%] xl:max-w-[15%] max-w-[22%] size-full space-y-4 border-none border-[#D0D5DD] border">
           <Customscrollbar
             className="h-full"
@@ -1586,23 +1631,23 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                     key={item?.id}
                     onClick={() => handleShowListDetail(item)}
                     className={`
-                                                        ${typePageMoblie
+                      ${typePageMoblie
                         ? "px-px"
                         : "pl-1 pr-3"
                       }
-                                                        ${item?.id ==
+                      ${item?.id ==
                       isStateProvider
                         ?.productionsOrders
                         .idDetailProductionOrder &&
                       "bg-[#F0F7FF]"
                       }
-                                                        ${flagProductionOrders?.length -
+                      ${flagProductionOrders?.length -
                         1 ==
                         eIndex
                         ? "border-b-none"
                         : "border-b"
                       }
-                                                        py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
+                      py-2 hover:bg-[#F0F7FF] border-[#F7F8F9] cursor-pointer transition-all ease-linear relative`}
                     style={{
                       background:
                         item?.id ===
@@ -1732,16 +1777,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 ref={groupButtonRef}
                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
               >
-                {/* <PopupConfimStage
-                                    dataLang={dataLang}
-                                    dataRight={isStateProvider?.productionsOrders}
-                                    typePageMoblie={typePageMoblie}
-                                    refetch={() => {
-                                        refetchProductionOrderList();
-                                        refetch()
-                                    }} 
-                                    /> */}
-
                 <FilterDropdown
                   trigger={triggerCompleteStage}
                   style={{
@@ -1755,7 +1790,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 >
                   {listDropdownCompleteStage &&
                     listDropdownCompleteStage?.map((tab, index) => {
-                      // const isChecked = selected.includes(item.value);
                       const isFirst = index === 0;
                       const isLast =
                         index === listDropdownCompleteStage.length - 1;
@@ -1796,12 +1830,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                               </span>
                             </div>
                           )}
-
-                          {/* {tab.isPremium && (
-                                                        <span className="text-[10px] font-normal bg-[#1F2329]/10 text-[#646A73] rounded-[4px] px-2.5 py-1">
-                                                            Premium
-                                                        </span>
-                                                    )} */}
                         </div>
                       );
                     })}
@@ -1839,19 +1867,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-medium text-[#11315B] border border-[#D0D5DD] hover:bg-[#F7F8F9] hover:shadow-hover-button rounded-lg"
                 />
 
-                {/* <ButtonAnimationNew
-                  icon={
-                    <div className="3xl:size-5 size-4">
-                      <ArrowCounterClockwiseIcon className="size-full" />
-                    </div>
-                  }
-                  onClick={() => {
-                    refetchProductionOrderDetail();
-                  }}
-                  title="Tải lại"
-                  className="3xl:h-10 h-9 xl:px-4 px-2 flex items-center gap-2 xl:text-sm text-xs font-normal text-[#0BAA2E] border border-[#0BAA2E] hover:bg-[#EBFEF2] hover:shadow-hover-button rounded-lg"
-                /> */}
-
                 <ButtonAnimationNew
                   icon={
                     <div className="3xl:size-5 size-4">
@@ -1879,6 +1894,56 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 ref={groupButtonRef}
                 className="flex items-center justify-end gap-2 p-0.5 mb-2"
               >
+                {arrButton.map((e) => (
+                  <Zoom
+                      key={e.id}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 1.08 }}
+                      className="w-fit"
+                  >
+                      {
+                      (e.id == 1 && (
+                          <PopupKeepStock
+                              id={e.id}
+                              queryValue={queryValue}
+                              fetchDataTable={fetchDataTable}
+                              dataLang={dataLang}
+                              title={e.name}
+                              dataTable={{
+                                listDataRight: {
+                                  idCommand: isStateProvider?.productionsOrders?.idDetailProductionOrder,
+                                  title: isStateProvider?.productionsOrders?.dataProductionOrderDetail?.title,
+                                  dataBom: {
+                                    materialsBom: dataProductionOrderDetail?.listBom?.materialsBom || [],
+                                    productsBom: dataProductionOrderDetail?.listBom?.productsBom || []
+                                  }
+                                }
+                              }}
+                              icon={e.icon}
+                          />
+                      )) ||
+                      (e.id == 2 && (
+                          <PopupPurchaseBeta
+                              id={e.id}
+                              queryValue={queryValue}
+                              fetchDataTable={fetchDataTable}
+                              dataLang={dataLang}
+                              title={e.name}
+                              dataTable={{
+                                listDataRight: {
+                                  idCommand: isStateProvider?.productionsOrders?.idDetailProductionOrder,
+                                  title: isStateProvider?.productionsOrders?.dataProductionOrderDetail?.title,
+                                  dataBom: {
+                                    materialsBom: dataProductionOrderDetail?.listBom?.materialsBom || [],
+                                    productsBom: dataProductionOrderDetail?.listBom?.productsBom || []
+                                  }
+                                }
+                              }}
+                              icon={e.icon}
+                          />
+                      ))}
+                      </Zoom>
+                  ))}
                 <ButtonAnimationNew
                   icon={
                     <div className="size-4">
@@ -1917,7 +1982,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                   "products" && <DetailProductionOrderList {...shareProps} />}
                 {isStateProvider?.productionsOrders?.isTabList?.type ==
                   "semiProduct" && <PlaningProductionOrder {...shareProps} />}
-                {/* {isStateProvider?.productionsOrders.isTab == "semiProduct" && <PlaningProductionOrder {...shareProps} />} */}
+                {isStateProvider?.productionsOrders?.isTabList?.type ==
+                  "keepStock" && <TabKeepStock {...shareProps} />}
               </React.Fragment>
             ) : (
               <NoData className="mt-0" />
@@ -1927,7 +1993,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       </div>
 
       <ModalDetail {...shareProps} />
-      {/* <SheetProductionsOrderDetail {...shareProps} /> */}
       <PopupConfim
         dataLang={dataLang}
         type="warning"
