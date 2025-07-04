@@ -1,7 +1,4 @@
 import apiSalesOrder from '@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder'
-import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
-import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
-import { Container } from '@/components/UI/common/layout'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
@@ -15,7 +12,6 @@ import { useContactCombobox } from '@/hooks/common/useContacts'
 import { useStaffComboboxByBranch } from '@/hooks/common/useStaffs'
 import { useTaxList } from '@/hooks/common/useTaxs'
 import useSetingServer from '@/hooks/useConfigNumber'
-import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { routerSalesOrder } from '@/routers/sellingGoods'
@@ -26,7 +22,6 @@ import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
 import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
 import moment from 'moment'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { BsCalendarEvent } from 'react-icons/bs'
@@ -39,11 +34,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
-import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
 import EmptyData from '@/components/UI/emptyData'
-import { Button, ConfigProvider, DatePicker, Dropdown } from 'antd'
+import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
+import { ConfigProvider, DatePicker, Dropdown } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
@@ -134,8 +129,6 @@ const SalesOrderForm = (props) => {
   const [option, setOption] = useState([])
 
   const [dataItems, setDataItems] = useState([])
-
-  const statusExprired = useStatusExprired()
 
   const [note, setNote] = useState('')
 
@@ -942,668 +935,565 @@ const SalesOrderForm = (props) => {
   })
 
   return (
-    <div className="overflow-hidden">
-      <Head>
-        <title>
-          {id
-            ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
-            : dataLang?.sales_product_add_order || 'sales_product_add_order'}
-        </title>
-      </Head>
-      <Container className="!h-max py-6 bg-gray-color">
-        {statusExprired ? (
-          <EmptyExprired />
-        ) : (
-          <React.Fragment>
-            <Breadcrumb items={breadcrumbItems} className="3xl:text-sm 2xl:text-xs xl:text-[10px] lg:text-[10px]" />
-          </React.Fragment>
-        )}
-        <h2 className="3xl:text-2xl 2xl:text-xl xl:text-lg text-typo-gray-5 capitalize font-medium mt-1 2xl:!mb-5 lg:!mb-3">
-          {id
-            ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
-            : dataLang?.sales_product_add_order || 'sales_product_add_order'}
-        </h2>
-        <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-40 relative">
-          {/* Cột trái */}
-          <div className="w-3/4">
-            {/* Thông tin mặt hàng */}
-            <div className="min-h-full max-h-[1132px] flex flex-col bg-white border border-[#919EAB3D] rounded-2xl p-4">
-              <div className="flex justify-between items-center">
-                {/* Heading */}
-                <h2 className="w-full 2xl:text-[20px] xl:text-lg font-medium text-brand-color capitalize">
-                  {dataLang?.item_information || 'item_information'}
-                </h2>
-                {/* Search Bar */}
-                <SelectBySearch
-                  placeholderText="Tìm kiếm mặt hàng"
-                  selectedOptions={itemsAll}
-                  idProductSale={idProductSale}
-                  onChange={(value) => {
-                    handleOnChangeInput('itemAll', value)
-                  }}
-                  options={option}
-                  handleIncrease={handleIncrease}
-                >
-                  {options?.map((opt) => {
-                    const e = opt.e
-                    return (
-                      <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
-                        <OptionSelectBySearch e={e} formatNumber={formatNumber} />
-                      </Option>
-                    )
-                  })}
-                </SelectBySearch>
-              </div>
-
-              {sortedArr.length <= 0 && <EmptyData />}
-              {sortedArr.length > 0 && (
-                <React.Fragment>
-                  {/* Thông tin mặt hàng Header */}
-                  <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-left truncate font-[400]">
-                      {dataLang?.sales_product_item || 'sales_product_item'}
-                    </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
-                      {dataLang?.sales_product_quantity || 'sales_product_quantity'}
-                    </h4>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
-                      {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
-                    </h4>
-                    {/* Chọn hoàng loạt % chiết khấu */}
-                    <Dropdown
-                      overlay={
-                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                            Chọn hoàng loạt % chiết khấu
-                          </p>
-                          <div className="flex items-center justify-center col-span-1 text-center">
-                            <InPutNumericFormat
-                              value={totalDiscount}
-                              onValueChange={handleOnChangeInput.bind(this, 'totaldiscount')}
-                              className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
-                              isAllowed={isAllowedDiscount}
-                            />
-                          </div>
-                        </div>
-                      }
-                      trigger={['click']}
-                      placement="bottomLeft"
-                      arrow
-                    >
-                      <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
-                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
-                          {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
-                        </h4>
-                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                      </div>
-                    </Dropdown>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start font-[400] whitespace-nowrap">
-                      {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                    </h4>
-                    {/* Chọn hoàng loạt % thuế */}
-                    <Dropdown
-                      overlay={
-                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg relative z-0 group min-h-auto focus-within:min-h-[270px]">
-                          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                            Chọn hoàng loạt % thuế
-                          </p>
-                          <SelectComponent
-                            options={taxOptions}
-                            onChange={(value) => handleOnChangeInput('total_tax', value)}
-                            value={totalTax ? '' : ''}
-                            formatOptionLabel={(option) => (
-                              <div className="flex items-center justify-start gap-1">
-                                <h2>{option?.label}</h2>
-                                <h2>{`(${option?.tax_rate})`}</h2>
-                              </div>
-                            )}
-                            placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
-                            hideSelectedOptions={false}
-                            className={`3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 w-full bg-white rounded text-typo-gray-5 font-normal outline-none`}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            closeMenuOnSelect={true}
-                            menuPlacement="auto"
-                            menuPosition="fixed"
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: '#cbd5e1',
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 9999,
-                              }),
-                              control: (base, state) => ({
-                                ...base,
-                                boxShadow: 'none',
-                                padding: '2.7px',
-                                ...(state.isFocused && {
-                                  border: '0 0 0 1px #92BFF7',
-                                }),
-                              }),
-                            }}
-                          />
-                        </div>
-                      }
-                      trigger={['click']}
-                      placement="bottomLeft"
-                      arrow
-                    >
-                      <div className="inline-flex items-center justify-between cursor-pointer">
-                        <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
-                          {dataLang?.sales_product_tax || 'sales_product_tax'}
-                        </h4>
-                        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                      </div>
-                    </Dropdown>
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
-                      {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
-                    </h4>
-                  </div>
-                  {/* Thông tin mặt hàng Body */}
-                  <div className="scroll-bar-products-sale overflow-y-auto pr-4 divide-slate-200">
-                    {sortedArr.map((e) => (
-                      <div
-                        className="grid items-center grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 py-1"
-                        key={e?.id}
-                      >
-                        {/* Mặt hàng */}
-                        <div className="">
-                          <div className="flex">
-                            <div className="w-16 h-16 flex items-center justify-center">
-                              <img
-                                src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
-                                alt={e?.item?.e?.name}
-                                className="w-10 h-10 rounded-lg"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <h2 className="responsive-text-sm font-semibold text-brand-color mb-1 line-clamp-1">
-                                {e?.item?.e?.name}
-                              </h2>
-                              <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal mb-1">
-                                Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
-                                <span>
-                                  {e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}
-                                </span>
-                              </p>
-                              <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
-                                ĐVT: <span>{e?.unit}</span> - Tồn:{' '}
-                                <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
-                              </p>
-                              <div className="flex items-center justify-center col-span-1">
-                                <FaPencilAlt size={10} />
-                                <input
-                                  value={e?.note}
-                                  onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
-                                  name="optionEmail"
-                                  placeholder="Ghi chú"
-                                  type="text"
-                                  className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Số lượng */}
-                        <div className="flex items-center justify-center">
-                          <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
-                            <button
-                              onClick={() => handleDecrease(e?.id)}
-                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
-                            >
-                              <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                            </button>
-                            <InPutNumericFormat
-                              value={e?.quantity}
-                              onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
-                              isAllowed={({ floatValue }) => {
-                                if (floatValue == 0) {
-                                  return true
-                                } else {
-                                  return true
-                                }
-                              }}
-                              allowNegative={false}
-                              className={`${
-                                (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                              } cursor-default appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
-                            />
-                            <button
-                              onClick={() => handleIncrease(e.id)}
-                              className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
-                            >
-                              <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                            </button>
-                          </div>
-                        </div>
-                        {/* Đơn giá */}
-                        <div className="flex items-center justify-center text-center">
-                          <InPutMoneyFormat
-                            value={e?.price}
-                            onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
-                            isAllowed={isAllowedNumber}
-                            allowNegative={false}
-                            className={`price-input-number ${
-                              (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                            } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal w-full 3xl:my-2 my-1 mx-0 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
-                          />
-                        </div>
-                        {/* % Chiết khấu */}
-                        <div className="flex items-center justify-center text-center">
-                          <InPutNumericFormat
-                            value={e?.discount}
-                            onValueChange={(value) => {
-                              handleOnChangeInputOption(e?.id, 'discount', value)
-                            }}
-                            className={`cursor-text appearance-none text-end 3xl:my-2 my-1 3xl:p-2 p-1 font-normal w-full focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
-                            isAllowed={isAllowedDiscount}
-                            isNumericString={true}
-                          />
-                        </div>
-                        {/* Đơn giá sau chiết khấu */}
-                        <div className="flex items-center justify-start text-right">
-                          <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm text-black-color`}>
-                            {formatNumber(e?.price_after_discount)}
-                          </h3>
-                        </div>
-                        {/* % Thuế */}
-                        <div className="w-full 3xl:px-2 px-0">
-                          <SelectComponent
-                            options={taxOptions}
-                            onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
-                            value={
-                              e?.tax
-                                ? {
-                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
-                                    value: e?.tax?.value,
-                                    tax_rate: e?.tax?.tax_rate,
-                                  }
-                                : null
-                            }
-                            placeholder={'Chọn % thuế'}
-                            hideSelectedOptions={false}
-                            formatOptionLabel={taxRateLabel}
-                            className={`border-transparent w-full bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            menuPortalTarget={document.body}
-                            closeMenuOnSelect={true}
-                            styles={{
-                              placeholder: (base) => ({
-                                ...base,
-                                color: '#cbd5e1',
-                              }),
-                              menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 20,
-                              }),
-                              control: (base) => ({
-                                ...base,
-                                boxShadow: 'none',
-                                padding: '0px',
-                                margin: '0px',
-                                borderRadius: '8px',
-                              }),
-                            }}
-                          />
-                        </div>
-                        {/* Thành tiền và nút xoá */}
-                        <div className="flex items-center justify-between text-right">
-                          <h3
-                            className={`cursor-text px-2 3xl:font-semibold responsive-text-sm z-[99] text-black-color`}
-                          >
-                            {formatMoney(e?.total_amount)}
-                          </h3>
-                          {/* Nút xoá */}
-                          <div className="flex items-center justify-center">
-                            <button
-                              onClick={() => {
-                                setIdProductSale(e?.item?.value)
-                                _HandleDelete.bind(this, e?.id)()
-                              }}
-                              type="button"
-                              title="Xóa"
-                              className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                            >
-                              <MdClear />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </React.Fragment>
-              )}
-            </div>
-          </div>
-          {/* Cột phải */}
-          <div className="w-1/4">
-            <div className="flex flex-col gap-y-6">
-              {/* Cột thông tin chung */}
-              <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mt-6 mb-4 capitalize">
-                  Thông tin
-                </h2>
-                {/* Tabs */}
-                <OrderFormTabs
-                  info={
-                    <div className="relative">
-                      {/* Số đơn hàng */}
-                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                        <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
-                        <div className="w-full relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">
-                            #
-                          </span>
-                          <input
-                            value={codeProduct}
-                            onChange={handleOnChangeInput.bind(this, 'codeProduct')}
-                            name="fname"
-                            type="text"
-                            placeholder={dataLang?.system_default || 'system_default'}
-                            className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
-                          />
-                        </div>
-                      </div>
-                      {/* Ngày tạo đơn */}
-                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                        <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
-                        <div className="w-full">
-                          <div className="relative w-full flex flex-row custom-date-picker">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                              <BsCalendarEvent color="#7a7a7a" />
-                            </span>
-                            <ConfigProvider locale={viVN}>
-                              <DatePicker
-                                className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                                status={errDate ? 'error' : ''}
-                                placeholder="Chọn ngày"
-                                format="DD/MM/YYYY HH:mm"
-                                showTime={{
-                                  defaultValue: dayjs('00:00', 'HH:mm'),
-                                  format: 'HH:mm',
-                                }}
-                                suffixIcon={null}
-                                value={dayjs(startDate)}
-                                onChange={(date) => {
-                                  if (date) {
-                                    const dateString = date.toDate().toString()
-                                    setStartDate(dateString)
-                                  }
-                                }}
-                              />
-                            </ConfigProvider>
-                          </div>
-                        </div>
-
-                        {errDate && (
-                          <label className="text-sm text-red-500">
-                            {dataLang?.price_quote_errDate || 'price_quote_errDate'}
-                          </label>
-                        )}
-                      </div>
-                      {/* Ngày cần hàng */}
-                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
-                        <InfoFormLabel
-                          isRequired
-                          label={dataLang?.sales_product_item_date || 'sales_product_item_date'}
+    <LayoutSalesPurchaseOrder
+      dataLang={dataLang}
+      titleHead={
+        id
+          ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
+          : dataLang?.sales_product_add_order || 'sales_product_add_order'
+      }
+      breadcrumbItems={breadcrumbItems}
+      titleLayout={
+        id
+          ? dataLang?.sales_product_edit_order || 'sales_product_edit_order'
+          : dataLang?.sales_product_add_order || 'sales_product_add_order'
+      }
+      searchBar={
+        <SelectBySearch
+          placeholderText="Tìm kiếm mặt hàng"
+          selectedOptions={itemsAll}
+          idProductSale={idProductSale}
+          onChange={(value) => {
+            handleOnChangeInput('itemAll', value)
+          }}
+          options={option}
+          handleIncrease={handleIncrease}
+        >
+          {options?.map((opt) => {
+            const e = opt.e
+            return (
+              <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
+                <OptionSelectBySearch e={e} formatNumber={formatNumber} />
+              </Option>
+            )
+          })}
+        </SelectBySearch>
+      }
+      tableLeft={
+        <>
+          {sortedArr.length <= 0 && <EmptyData />}
+          {sortedArr.length > 0 && (
+            <React.Fragment>
+              {/* Thông tin mặt hàng Header */}
+              <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
+                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-left truncate font-[400]">
+                  {dataLang?.sales_product_item || 'sales_product_item'}
+                </h4>
+                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+                  {dataLang?.sales_product_quantity || 'sales_product_quantity'}
+                </h4>
+                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+                  {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
+                </h4>
+                {/* Chọn hoàng loạt % chiết khấu */}
+                <Dropdown
+                  overlay={
+                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                        Chọn hoàng loạt % chiết khấu
+                      </p>
+                      <div className="flex items-center justify-center col-span-1 text-center">
+                        <InPutNumericFormat
+                          value={totalDiscount}
+                          onValueChange={handleOnChangeInput.bind(this, 'totaldiscount')}
+                          className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
+                          isAllowed={isAllowedDiscount}
                         />
-                        <div className="w-full">
-                          <div className="relative flex flex-row custom-date-picker">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                              <BsCalendarEvent color="#7a7a7a" />
-                            </span>
-                            <ConfigProvider locale={viVN}>
-                              <DatePicker
-                                className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                                placeholder="Chọn ngày"
-                                format="DD/MM/YYYY"
-                                suffixIcon={null}
-                                value={deliveryDate ? dayjs(deliveryDate) : null}
-                                onChange={(date) => {
-                                  if (date) {
-                                    const dateString = date.toDate().toString()
-                                    setDeliveryDate(dateString)
-                                  } else {
-                                    setDeliveryDate(null) // Xử lý khi user xóa date
-                                  }
-                                }}
-                                status={errDeliveryDate ? 'error' : ''}
-                              />
-                            </ConfigProvider>
-                          </div>
-                          {errDeliveryDate && (
-                            <label className="text-sm text-red-500">
-                              {dataLang?.sales_product_err_delivery_date || 'Vui lòng chọn ngày giao hàng'}
-                            </label>
-                          )}
-                        </div>
                       </div>
-                      {/* Khách hàng */}
-                      <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                        <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
-                        <div className="w-full">
-                          <div className="relative flex flex-row">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                              <LuBriefcase color="#7a7a7a" />
-                            </span>
-                            <SelectWithSort
-                              title="Khách hàng"
-                              placeholderText="Chọn khách hàng"
-                              options={!!flagStateChange ? [] : dataCustomer}
-                              value={selectedCustomer}
-                              onChange={(value) => setSelectedCustomer(value)}
-                              isError={errCustomer}
+                    </div>
+                  }
+                  trigger={['click']}
+                  placement="bottomLeft"
+                  arrow
+                >
+                  <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
+                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
+                    </h4>
+                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+                  </div>
+                </Dropdown>
+                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start font-[400] whitespace-nowrap">
+                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
+                </h4>
+                {/* Chọn hoàng loạt % thuế */}
+                <Dropdown
+                  overlay={
+                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg relative z-0 group min-h-auto focus-within:min-h-[270px]">
+                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+                        Chọn hoàng loạt % thuế
+                      </p>
+                      <SelectComponent
+                        options={taxOptions}
+                        onChange={(value) => handleOnChangeInput('total_tax', value)}
+                        value={totalTax ? '' : ''}
+                        formatOptionLabel={(option) => (
+                          <div className="flex items-center justify-start gap-1">
+                            <h2>{option?.label}</h2>
+                            <h2>{`(${option?.tax_rate})`}</h2>
+                          </div>
+                        )}
+                        placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
+                        hideSelectedOptions={false}
+                        className={`3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 w-full bg-white rounded text-typo-gray-5 font-normal outline-none`}
+                        isSearchable={true}
+                        noOptionsMessage={() => 'Không có dữ liệu'}
+                        closeMenuOnSelect={true}
+                        menuPlacement="auto"
+                        menuPosition="fixed"
+                        styles={{
+                          placeholder: (base) => ({
+                            ...base,
+                            color: '#cbd5e1',
+                          }),
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                          control: (base, state) => ({
+                            ...base,
+                            boxShadow: 'none',
+                            padding: '2.7px',
+                            ...(state.isFocused && {
+                              border: '0 0 0 1px #92BFF7',
+                            }),
+                          }),
+                        }}
+                      />
+                    </div>
+                  }
+                  trigger={['click']}
+                  placement="bottomLeft"
+                  arrow
+                >
+                  <div className="inline-flex items-center justify-between cursor-pointer">
+                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
+                      {dataLang?.sales_product_tax || 'sales_product_tax'}
+                    </h4>
+                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+                  </div>
+                </Dropdown>
+                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
+                  {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
+                </h4>
+              </div>
+              {/* Thông tin mặt hàng Body */}
+              <div className="scroll-bar-products-sale overflow-y-auto pr-4 divide-slate-200">
+                {sortedArr.map((e) => (
+                  <div
+                    className="grid items-center grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 py-1"
+                    key={e?.id}
+                  >
+                    {/* Mặt hàng */}
+                    <div className="">
+                      <div className="flex">
+                        <div className="w-16 h-16 flex items-center justify-center">
+                          <img
+                            src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
+                            alt={e?.item?.e?.name}
+                            className="w-10 h-10 rounded-lg"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="responsive-text-sm font-semibold text-brand-color mb-1 line-clamp-1">
+                            {e?.item?.e?.name}
+                          </h2>
+                          <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal mb-1">
+                            Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
+                            <span>{e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}</span>
+                          </p>
+                          <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
+                            ĐVT: <span>{e?.unit}</span> - Tồn: <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
+                          </p>
+                          <div className="flex items-center justify-center col-span-1">
+                            <FaPencilAlt size={10} />
+                            <input
+                              value={e?.note}
+                              onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
+                              name="optionEmail"
+                              placeholder="Ghi chú"
+                              type="text"
+                              className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
                             />
                           </div>
-                          {errCustomer && (
-                            <label className="text-sm text-red-500">
-                              {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
-                            </label>
-                          )}
                         </div>
                       </div>
-                      {/* Xem thêm thông tin */}
-                      <AnimatePresence initial={false}>
-                        {showMoreInfo && (
-                          <motion.div
-                            key="more-info"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            className="overflow-hidden"
-                          >
-                            <React.Fragment>
-                              {/* Chi nhánh */}
-                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
-                                <div className="w-full">
-                                  <div className="relative flex flex-row">
-                                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                      <PiMapPinLight color="#7a7a7a" />
-                                    </div>
-                                    <SelectWithSort
-                                      title="Chi nhánh"
-                                      placeholderText="Chọn chi nhánh"
-                                      options={dataBranch}
-                                      value={selectedBranch}
-                                      onChange={(value) => setSelectedBranch(value)}
-                                      isError={errBranch}
-                                    />
-                                  </div>
-                                  {errBranch && (
-                                    <label className="text-sm text-red-500">
-                                      {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
-                                    </label>
-                                  )}
-                                </div>
-                              </div>
-                              {/* Nhân viên */}
-                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                <InfoFormLabel
-                                  isRequired
-                                  label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
-                                />
-                                <div className="w-full">
-                                  <div className="relative flex flex-row">
-                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                      <FiUser color="#7a7a7a" />
-                                    </span>
-                                    <SelectWithSort
-                                      title="Nhân viên"
-                                      placeholderText="Chọn nhân viên"
-                                      options={!!flagStateChange ? [] : dataStaffs}
-                                      value={selectedStaff}
-                                      onChange={(value) => setSelectedStaff(value)}
-                                      isError={errStaff}
-                                    />
-                                  </div>
-                                  {errStaff && (
-                                    <label className="text-sm text-red-500">
-                                      {dataLang?.sales_product_err_staff_in_charge ||
-                                        'sales_product_err_staff_in_charge'}
-                                    </label>
-                                  )}
-                                </div>
-                              </div>
-                              {/* Người liên lạc */}
-                              <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                                <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
-                                <div className="w-full relative">
-                                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                                    <FiUser color="#7a7a7a" />
-                                  </span>
-                                  <SelectWithSort
-                                    title="Người liên lạc"
-                                    placeholderText="Chọn người liên lạc"
-                                    options={!!flagStateChange ? [] : dataPersonContact}
-                                    value={selectedPersonalContact || contactPerson}
-                                    onChange={(value) => setSelectedPersonalContact(value)}
-                                  />
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                      {/* Xem thêm Button */}
-                      <div className="flex items-center justify-center p-1 pb-6 hover:underline">
+                    </div>
+                    {/* Số lượng */}
+                    <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
                         <button
-                          onClick={() => setShowMoreInfo(!showMoreInfo)}
-                          className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
+                          onClick={() => handleDecrease(e?.id)}
+                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
                         >
-                          {showMoreInfo ? (
-                            <span className="inline-flex items-center gap-x-1">
-                              Ẩn bớt
-                              <ArrowUp2 size={16} />
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-x-1">
-                              Xem thêm
-                              <ArrowDown2 size={16} />
-                            </span>
-                          )}
+                          <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                        </button>
+                        <InPutNumericFormat
+                          value={e?.quantity}
+                          onValueChange={(value) => handleOnChangeInputOption(e?.id, 'quantity', value)}
+                          isAllowed={({ floatValue }) => {
+                            if (floatValue == 0) {
+                              return true
+                            } else {
+                              return true
+                            }
+                          }}
+                          allowNegative={false}
+                          className={`${
+                            (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
+                          } cursor-default appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                        />
+                        <button
+                          onClick={() => handleIncrease(e.id)}
+                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                        >
+                          <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                         </button>
                       </div>
                     </div>
-                  }
-                  note={
-                    <div className="w-full mx-auto">
-                      <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
-                        {dataLang?.sales_product_note || 'sales_product_note'}
-                      </h4>
-                      <div className="w-full pb-6">
-                        <textarea
-                          value={note}
-                          placeholder="Nhập ghi chú tại đây"
-                          onChange={handleOnChangeInput.bind(this, 'note')}
-                          name="fname"
-                          type="text"
-                          className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
-                        />
+                    {/* Đơn giá */}
+                    <div className="flex items-center justify-center text-center">
+                      <InPutMoneyFormat
+                        value={e?.price}
+                        onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
+                        isAllowed={isAllowedNumber}
+                        allowNegative={false}
+                        className={`price-input-number ${
+                          (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
+                        } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal w-full 3xl:my-2 my-1 mx-0 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                      />
+                    </div>
+                    {/* % Chiết khấu */}
+                    <div className="flex items-center justify-center text-center">
+                      <InPutNumericFormat
+                        value={e?.discount}
+                        onValueChange={(value) => {
+                          handleOnChangeInputOption(e?.id, 'discount', value)
+                        }}
+                        className={`cursor-text appearance-none text-end 3xl:my-2 my-1 3xl:p-2 p-1 font-normal w-full focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
+                        isAllowed={isAllowedDiscount}
+                        isNumericString={true}
+                      />
+                    </div>
+                    {/* Đơn giá sau chiết khấu */}
+                    <div className="flex items-center justify-start text-right">
+                      <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm text-black-color`}>
+                        {formatNumber(e?.price_after_discount)}
+                      </h3>
+                    </div>
+                    {/* % Thuế */}
+                    <div className="w-full 3xl:px-2 px-0">
+                      <SelectComponent
+                        options={taxOptions}
+                        onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
+                        value={
+                          e?.tax
+                            ? {
+                                label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                value: e?.tax?.value,
+                                tax_rate: e?.tax?.tax_rate,
+                              }
+                            : null
+                        }
+                        placeholder={'Chọn % thuế'}
+                        hideSelectedOptions={false}
+                        formatOptionLabel={taxRateLabel}
+                        className={`border-transparent w-full bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
+                        isSearchable={true}
+                        noOptionsMessage={() => 'Không có dữ liệu'}
+                        menuPortalTarget={document.body}
+                        closeMenuOnSelect={true}
+                        styles={{
+                          placeholder: (base) => ({
+                            ...base,
+                            color: '#cbd5e1',
+                          }),
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 20,
+                          }),
+                          control: (base) => ({
+                            ...base,
+                            boxShadow: 'none',
+                            padding: '0px',
+                            margin: '0px',
+                            borderRadius: '8px',
+                          }),
+                        }}
+                      />
+                    </div>
+                    {/* Thành tiền và nút xoá */}
+                    <div className="flex items-center justify-between text-right">
+                      <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm z-[99] text-black-color`}>
+                        {formatMoney(e?.total_amount)}
+                      </h3>
+                      {/* Nút xoá */}
+                      <div className="flex items-center justify-center">
+                        <button
+                          onClick={() => {
+                            setIdProductSale(e?.item?.value)
+                            _HandleDelete.bind(this, e?.id)()
+                          }}
+                          type="button"
+                          title="Xóa"
+                          className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
+                        >
+                          <MdClear />
+                        </button>
                       </div>
                     </div>
-                  }
-                />
+                  </div>
+                ))}
               </div>
-              {/* Cột tổng cộng */}
-              <div className="w-full mx-auto px-4 pt-6 pb-4 bg-white border border-gray-200 rounded-2xl">
-                <h2 className="2xl:text-[20px] xl:text-lg font-medium text-brand-color mb-6 capitalize">
-                  {'Tổng cộng' || dataLang?.price_quote_total}
-                </h2>
-                {/* Tổng tiền */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
-                  <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
-                  <span>{isTotalMoney.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
-                </div>
-                {/* Tiền chiết khấu */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
-                  <span>{isTotalMoney.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
-                </div>
-                {/* Tiền sau chiết khấu */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="w-full">
-                    {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
-                  </h4>
-                  <span>
-                    {isTotalMoney.totalDiscountAfterPrice ? formatMoney(isTotalMoney.totalDiscountAfterPrice) : '-'}
-                  </span>
-                </div>
-                {/* Tiền thuế */}
-                <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
-                  <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
-                  <span>{isTotalMoney.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
-                </div>
-                {/* Thành tiền */}
-                <div className="flex justify-between responsive-text-base items-center mb-4">
-                  <h4 className="w-full text-black font-semibold">
-                    {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
-                  </h4>
-                  <span className="text-blue-color font-semibold">
-                    {isTotalMoney.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
-                  </span>
-                </div>
-              </div>
+            </React.Fragment>
+          )}
+        </>
+      }
+      info={
+        <div className="relative">
+          {/* Số đơn hàng */}
+          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+            <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
+            <div className="w-full relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
+              <input
+                value={codeProduct}
+                onChange={handleOnChangeInput.bind(this, 'codeProduct')}
+                name="fname"
+                type="text"
+                placeholder={dataLang?.system_default || 'system_default'}
+                className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
+              />
             </div>
           </div>
-        </div>
-        {/* Nút lưu và thoát */}
-        <div className="fixed bottom-0 left-0 z-[999] w-full h-[68px] bg-white border-t border-gray-color flex gap-x-8 shadow-[0_-3px_12px_0_rgba(0,0,0,0.1)]">
-          <div className="w-3/4"></div>
-          <div className="w-1/4 flex justify-end items-center gap-2 py-4 3xl:px-5 px-3">
+          {/* Ngày tạo đơn */}
+          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+            <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
+            <div className="w-full">
+              <div className="relative w-full flex flex-row custom-date-picker">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                  <BsCalendarEvent color="#7a7a7a" />
+                </span>
+                <ConfigProvider locale={viVN}>
+                  <DatePicker
+                    className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                    status={errDate ? 'error' : ''}
+                    placeholder="Chọn ngày"
+                    format="DD/MM/YYYY HH:mm"
+                    showTime={{
+                      defaultValue: dayjs('00:00', 'HH:mm'),
+                      format: 'HH:mm',
+                    }}
+                    suffixIcon={null}
+                    value={dayjs(startDate)}
+                    onChange={(date) => {
+                      if (date) {
+                        const dateString = date.toDate().toString()
+                        setStartDate(dateString)
+                      }
+                    }}
+                  />
+                </ConfigProvider>
+              </div>
+            </div>
+
+            {errDate && (
+              <label className="text-sm text-red-500">{dataLang?.price_quote_errDate || 'price_quote_errDate'}</label>
+            )}
+          </div>
+          {/* Ngày cần hàng */}
+          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+            <InfoFormLabel isRequired label={dataLang?.sales_product_item_date || 'sales_product_item_date'} />
+            <div className="w-full">
+              <div className="relative flex flex-row custom-date-picker">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                  <BsCalendarEvent color="#7a7a7a" />
+                </span>
+                <ConfigProvider locale={viVN}>
+                  <DatePicker
+                    className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
+                    placeholder="Chọn ngày"
+                    format="DD/MM/YYYY"
+                    suffixIcon={null}
+                    value={deliveryDate ? dayjs(deliveryDate) : null}
+                    onChange={(date) => {
+                      if (date) {
+                        const dateString = date.toDate().toString()
+                        setDeliveryDate(dateString)
+                      } else {
+                        setDeliveryDate(null) // Xử lý khi user xóa date
+                      }
+                    }}
+                    status={errDeliveryDate ? 'error' : ''}
+                  />
+                </ConfigProvider>
+              </div>
+              {errDeliveryDate && (
+                <label className="text-sm text-red-500">
+                  {dataLang?.sales_product_err_delivery_date || 'Vui lòng chọn ngày giao hàng'}
+                </label>
+              )}
+            </div>
+          </div>
+          {/* Khách hàng */}
+          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+            <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
+            <div className="w-full">
+              <div className="relative flex flex-row select-with-sort">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
+                  <LuBriefcase color="#7a7a7a" />
+                </span>
+                <SelectWithSort
+                  title="Khách hàng"
+                  placeholderText="Chọn khách hàng"
+                  options={!!flagStateChange ? [] : dataCustomer}
+                  value={selectedCustomer}
+                  onChange={(value) => setSelectedCustomer(value)}
+                  isError={errCustomer}
+                />
+              </div>
+              {errCustomer && (
+                <label className="text-sm text-red-500">
+                  {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
+                </label>
+              )}
+            </div>
+          </div>
+          {/* Xem thêm thông tin */}
+          <AnimatePresence initial={false}>
+            {showMoreInfo && (
+              <motion.div
+                key="more-info"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <React.Fragment>
+                  {/* Chi nhánh */}
+                  <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                    <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
+                    <div className="w-full">
+                      <div className="relative flex flex-row">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                          <PiMapPinLight color="#7a7a7a" />
+                        </div>
+                        <SelectWithSort
+                          title="Chi nhánh"
+                          placeholderText="Chọn chi nhánh"
+                          options={dataBranch}
+                          value={selectedBranch}
+                          onChange={(value) => setSelectedBranch(value)}
+                          isError={errBranch}
+                        />
+                      </div>
+                      {errBranch && (
+                        <label className="text-sm text-red-500">
+                          {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                  {/* Nhân viên */}
+                  <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                    <InfoFormLabel isRequired label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'} />
+                    <div className="w-full">
+                      <div className="relative flex flex-row">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                          <FiUser color="#7a7a7a" />
+                        </span>
+                        <SelectWithSort
+                          title="Nhân viên"
+                          placeholderText="Chọn nhân viên"
+                          options={!!flagStateChange ? [] : dataStaffs}
+                          value={selectedStaff}
+                          onChange={(value) => setSelectedStaff(value)}
+                          isError={errStaff}
+                        />
+                      </div>
+                      {errStaff && (
+                        <label className="text-sm text-red-500">
+                          {dataLang?.sales_product_err_staff_in_charge || 'sales_product_err_staff_in_charge'}
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                  {/* Người liên lạc */}
+                  <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                    <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
+                    <div className="w-full relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                        <FiUser color="#7a7a7a" />
+                      </span>
+                      <SelectWithSort
+                        title="Người liên lạc"
+                        placeholderText="Chọn người liên lạc"
+                        options={!!flagStateChange ? [] : dataPersonContact}
+                        value={selectedPersonalContact || contactPerson}
+                        onChange={(value) => setSelectedPersonalContact(value)}
+                      />
+                    </div>
+                  </div>
+                </React.Fragment>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {/* Xem thêm Button */}
+          <div className="flex items-center justify-center p-1 pb-6 hover:underline">
             <button
-              onClick={() => router.push(routerSalesOrder.home)}
-              dataLang={dataLang}
-              className="2xl:px-5 2xl:pt-[10px] 2xl:pb-[30px] xl:px-4 xl:py-2 px-2 h-full bg-[#F2F3F5] 2xl:text-base text-sm font-normal rounded-lg"
+              onClick={() => setShowMoreInfo(!showMoreInfo)}
+              className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"
             >
-              Thoát
+              {showMoreInfo ? (
+                <span className="inline-flex items-center gap-x-1">
+                  Ẩn bớt
+                  <ArrowUp2 size={16} />
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-x-1">
+                  Xem thêm
+                  <ArrowDown2 size={16} />
+                </span>
+              )}
             </button>
-            <Button
-              onClick={handleSubmitValidate.bind(this)}
-              dataLang={dataLang}
-              loading={onSending}
-              className="sale-order-btn-submit 3xl:p-5 2xl:p-4 xl:pt-[10px] xl:pb-[10px] h-full bg-light-blue-color text-white 2xl:text-base xl:text-sm font-medium rounded-lg"
-            >
-              Lưu
-            </Button>
           </div>
         </div>
-      </Container>
-      <PopupConfim
-        dataLang={dataLang}
-        nameModel={'change_item'}
-        type="warning"
-        title={TITLE_DELETE_ITEMS}
-        subtitle={CONFIRMATION_OF_CHANGES}
-        isOpen={isOpen}
-        save={resetValue}
-        cancel={() => handleQueryId({ status: false })}
-      />
-    </div>
+      }
+      note={
+        <div className="w-full mx-auto">
+          <h4 className="responsive-text-base font-normal text-secondary-color-text mb-3 capitalize">
+            {dataLang?.sales_product_note || 'sales_product_note'}
+          </h4>
+          <div className="w-full pb-6">
+            <textarea
+              value={note}
+              placeholder="Nhập ghi chú tại đây"
+              onChange={handleOnChangeInput.bind(this, 'note')}
+              name="fname"
+              type="text"
+              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+            />
+          </div>
+        </div>
+      }
+      isTotalMoney={isTotalMoney}
+      routerBack={routerSalesOrder.home}
+      onSave={handleSubmitValidate.bind(this)}
+      onSending={onSending}
+      popupConfim={
+        <PopupConfim
+          dataLang={dataLang}
+          nameModel={'change_item'}
+          type="warning"
+          title={TITLE_DELETE_ITEMS}
+          subtitle={CONFIRMATION_OF_CHANGES}
+          isOpen={isOpen}
+          save={resetValue}
+          cancel={() => handleQueryId({ status: false })}
+        />
+      }
+    />
   )
 }
 

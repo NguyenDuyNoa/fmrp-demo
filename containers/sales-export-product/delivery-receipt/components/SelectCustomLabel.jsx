@@ -16,6 +16,7 @@ const SelectCustomLabel = ({
   isError = false,
   formatNumber,
   renderOption = null,
+  isVisibleLotDate = true,
 }) => {
   const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
 
@@ -34,30 +35,35 @@ const SelectCustomLabel = ({
                 Vị trí kho: {opt?.label}
               </h2>
             </div>
-            <div className="flex gap-1">
-              <h2 className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-medium">
-                {dataLang?.returns_survive || 'returns_survive'}: {formatNumber(opt?.qty)}
-              </h2>
-            </div>
-            <div className="flex flex-col gap-1 italic">
-              {dataProductSerial.is_enable === '1' && (
-                <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
-                  Serial: {opt?.serial ? opt?.serial : '-'}
+            {isVisibleLotDate && (
+              <>
+                <div className="flex gap-1">
+                  <h2 className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-medium">
+                    {dataLang?.returns_survive || 'returns_survive'}: {formatNumber(opt?.qty)}
+                  </h2>
                 </div>
-              )}
-              {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
-                <div className="flex flex-col">
-                  <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
-                    Lot: {opt?.lot ? opt?.lot : '-'}
-                  </div>
-                  <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
-                    Date: {opt?.date ? formatMoment(opt?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : '-'}
-                  </div>
+
+                <div className="flex flex-col gap-1 italic">
+                  {dataProductSerial.is_enable === '1' && (
+                    <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
+                      Serial: {opt?.serial ? opt?.serial : '-'}
+                    </div>
+                  )}
+                  {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
+                    <div className="flex flex-col">
+                      <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
+                        Lot: {opt?.lot ? opt?.lot : '-'}
+                      </div>
+                      <div className="text-[8px] 2xl:text-[11px] text-[#667085] font-[500] leading-normal">
+                        Date: {opt?.date ? formatMoment(opt?.date, FORMAT_MOMENT.DATE_SLASH_LONG) : '-'}
+                      </div>
+                    </div>
+                  ) : (
+                    ''
+                  )}
                 </div>
-              ) : (
-                ''
-              )}
-            </div>
+              </>
+            )}
           </div>
         )}
       </>

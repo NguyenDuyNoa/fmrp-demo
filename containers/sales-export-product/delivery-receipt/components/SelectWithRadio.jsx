@@ -32,9 +32,7 @@ const SelectWithRadio = ({
 }) => {
   const router = useRouter()
 
-  const [isState, setIsState] = useState(initalState)
-
-  const queryState = (key) => setIsState((prev) => ({ ...prev, ...key }))
+  const [isState, _setIsState] = useState(initalState)
 
   // phân quyền
   const { is_admin: role, permissions_current: auth } = useSelector((state) => state.auth)
