@@ -1,31 +1,30 @@
-import ButtonCancel from '@/components/UI/button/buttonCancel'
+import InputCustom from '@/components/common/input/InputCustom'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
+import KanbanIcon from '@/components/icons/common/KanbanIcon'
+import SaveIcon from '@/components/icons/common/SaveIcon'
 import ButtonSubmit from '@/components/UI/button/buttonSubmit'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
-import { TagColorProduct } from '@/components/UI/common/Tag/TagStatus'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
-import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
-import MultiValue from '@/components/UI/mutiValue/multiValue'
 import NoData from '@/components/UI/noData/nodata'
 import PopupCustom from '@/components/UI/popup'
-import KanbanIcon from '@/components/icons/common/KanbanIcon'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
 import useToast from '@/hooks/useToast'
-import { isAllowedNumber } from '@/utils/helpers/common'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { Calendar, Trash } from 'iconsax-react'
+import { Trash } from 'iconsax-react'
 import { debounce } from 'lodash'
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { FaCheckCircle } from 'react-icons/fa'
+import { PiWarehouseLight } from 'react-icons/pi'
 import { useActiveStages } from '../../hooks/useActiveStages'
 import { useHandingFinishedStages } from '../../hooks/useHandingFinishedStages'
 import { useListFinishedStages } from '../../hooks/useListFinishedStages'
 import { useLoadOutOfStock } from '../../hooks/useLoadOutOfStock'
 import { PopupOrderCompleted } from './PopupCompleteCommand'
-import SaveIcon from '@/components/icons/common/SaveIcon'
+import TrashIcon from '@/components/icons/common/TrashIcon'
 
 const initialState = {
   open: false,
@@ -476,7 +475,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
               />
             </div>
           }
-          classNameModeltime="px-8 2xl:px-10 3xl:px-12 py-4 2xl:py-5 3xl:py-6 flex flex-col gap-6"
+          classNameModeltime="px-6 2xl:px-10 3xl:px-12 py-4 2xl:py-5 3xl:py-6 flex flex-col gap-6"
           button={
             <div className="flex items-center gap-2 w-full">
               <span className="3xl:size-5 size-4 text-[#0375F3] shrink-0">
@@ -501,242 +500,269 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           }}
         >
           {/* <div className="flex items-center space-x-4 my-2 border-[#E7EAEE] border-opacity-70 border-b-[1px]" /> */}
-          <div className={`w-[85vw] xl:h-[80vh] h-[575px] overflow-hidden `}>
-            <div className="grid grid-cols-16 h-full gap-4 overflow-hidden">
+          <div className="w-[85vw] xl:h-[80vh] h-[575px] overflow-">
+            <div className="grid grid-cols-16 h-full gap-4">
               {/* Left Panels */}
-              <div className="flex flex-col h-full col-span-3 border border-primary-05 rounded-lg">
-                {/* Công đoạn BTP */}
-                <div className="h-1/2">
-                  <div className="p-3 font-medium responsive-text-base border-b border-primary-05">Công đoạn BTP</div>
-                  <Customscrollbar className="hover:overflow-y-auto overflow-y-hidden">
-                    {data?.stage_semi_products?.length > 0 ? (
-                      data?.stage_semi_products?.map((e) => (
-                        <li
-                          key={e?.stage_id}
-                          onClick={() => handleSelectStep('BTP', e, 'click')}
-                          className={`p-3 cursor-pointer ${
-                            activeStep.type == 'BTP' && activeStep?.item?.stage_id == e?.stage_id
-                              ? 'bg-gradient-to-r from-[#0375F336] to-[#C4C4C400] border-l-4 border-[#0375F3]'
-                              : 'hover:bg-gray-100'
-                          } ${
-                            e?.active == '1' ? 'text-typo-blue-4' : 'text-gray-500'
-                          } responsive-text-base list-none flex items-center gap-2 transition-all duration-200 ease-linear select-none`}
-                        >
-                          <div className="min-w-[16px] flex items-center justify-center">
-                            {e?.active == '1' ? (
-                              <FaCheckCircle size="16" className="text-typo-blue-4" />
-                            ) : (
-                              <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            )}
-                          </div>
-                          <p>{e?.name_stage}</p>
-                        </li>
-                      ))
-                    ) : (
-                      <NoData classNameTitle="!text-[13px]" />
-                    )}
-                  </Customscrollbar>
-                </div>
+              <div className="flex col-span-3 max-h-full min-h-0 overflow-auto">
+                <div className="flex flex-col h-full max-h-full border border-primary-05 rounded-lg flex-1">
+                  {/* Công đoạn BTP */}
+                  {data?.stage_semi_products?.length > 0 && (
+                    <div className="flex-1 border-b border-primary-05">
+                      <div className="p-3 font-medium responsive-text-base border-b border-primary-05">
+                        Công đoạn BTP
+                      </div>
+                      <Customscrollbar className="hover:overflow-y-auto overflow-y-hidden">
+                        {data?.stage_semi_products?.length > 0 ? (
+                          data?.stage_semi_products?.map((e) => (
+                            <li
+                              key={e?.stage_id}
+                              onClick={() => handleSelectStep('BTP', e, 'click')}
+                              className={`p-3 cursor-pointer ${
+                                activeStep.type == 'BTP' && activeStep?.item?.stage_id == e?.stage_id
+                                  ? 'bg-gradient-to-r from-[#0375F336] to-[#C4C4C400] border-l-4 border-[#0375F3]'
+                                  : 'hover:bg-gray-100'
+                              } ${
+                                e?.active == '1' ? 'text-typo-blue-4' : 'text-gray-500'
+                              } responsive-text-base list-none flex items-center gap-2 transition-all duration-200 ease-linear select-none`}
+                            >
+                              <div className="min-w-[16px] flex items-center justify-center">
+                                {e?.active == '1' ? (
+                                  <FaCheckCircle size="16" className="text-typo-blue-4" />
+                                ) : (
+                                  <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
+                                )}
+                              </div>
+                              <p>{e?.name_stage}</p>
+                            </li>
+                          ))
+                        ) : (
+                          <NoData classNameTitle="!text-[13px]" />
+                        )}
+                      </Customscrollbar>
+                    </div>
+                  )}
 
-                {/* Công đoạn TP */}
-                <div className="h-1/2 border-t border-primary-05">
-                  <div className="p-3 font-medium responsive-text-base border-b border-primary-05">Công đoạn TP</div>
-                  <Customscrollbar className="hover:overflow-y-auto overflow-y-hidden">
-                    {data?.stage_products?.length > 0 ? (
-                      data?.stage_products?.map((e) => (
-                        <li
-                          key={e?.stage_id}
-                          onClick={() => handleSelectStep('TP', e, 'click')}
-                          className={`p-3 cursor-pointer ${
-                            activeStep.type == 'TP' && activeStep?.item?.stage_id == e?.stage_id
-                              ? 'bg-gradient-to-r from-[#0375F336] to-[#C4C4C400] border-l-4 border-[#0375F3]'
-                              : 'hover:bg-gray-100 '
-                          } ${
-                            e?.active == '1' ? 'text-typo-blue-4' : 'text-gray-500'
-                          } responsive-text-base list-none flex items-center gap-2 transition-all duration-150 ease-linear select-none`}
-                        >
-                          <div className="min-w-[16px] flex items-center justify-center">
-                            {e?.active == '1' ? (
-                              <FaCheckCircle size="16" className="text-typo-blue-4" />
-                            ) : (
-                              <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            )}
-                          </div>
-                          <p>{e?.name_stage}</p>
-                        </li>
-                      ))
-                    ) : (
-                      <NoData classNameTitle="!text-[13px]" />
-                    )}
-                  </Customscrollbar>
+                  {/* Công đoạn TP */}
+                  {data?.stage_products?.length > 0 && (
+                    <div className="flex-1">
+                      <div className="p-3 font-medium responsive-text-base border-b border-primary-05">
+                        Công đoạn TP
+                      </div>
+                      <Customscrollbar className="hover:overflow-y-auto overflow-y-hidden">
+                        {data?.stage_products?.length > 0 ? (
+                          data?.stage_products?.map((e) => (
+                            <li
+                              key={e?.stage_id}
+                              onClick={() => handleSelectStep('TP', e, 'click')}
+                              className={`p-3 cursor-pointer ${
+                                activeStep.type == 'TP' && activeStep?.item?.stage_id == e?.stage_id
+                                  ? 'bg-gradient-to-r from-[#0375F336] to-[#C4C4C400] border-l-4 border-[#0375F3]'
+                                  : 'hover:bg-gray-100 '
+                              } ${
+                                e?.active == '1' ? 'text-typo-blue-4' : 'text-gray-500'
+                              } responsive-text-base list-none flex items-center gap-2 transition-all duration-150 ease-linear select-none`}
+                            >
+                              <div className="min-w-[16px] flex items-center justify-center">
+                                {e?.active == '1' ? (
+                                  <FaCheckCircle size="16" className="text-typo-blue-4" />
+                                ) : (
+                                  <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
+                                )}
+                              </div>
+                              <p>{e?.name_stage}</p>
+                            </li>
+                          ))
+                        ) : (
+                          <NoData classNameTitle="!text-[13px]" />
+                        )}
+                      </Customscrollbar>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Right Panel */}
-              <div className="flex flex-col col-span-13 gap-6">
-                {/* Nhập thành phẩm */}
-                <div className="flex flex-col gap-2">
+              <div className="flex col-span-13 h-full w-full max-h-full overflow-auto">
+                <div className="flex flex-col gap-6 max-h-full w-full">
+                  {/* Nhập thành phẩm */}
                   <div className="flex items-center justify-between">
                     <div className="responsive-text-xl font-normal">Nhập thành phẩm</div>
-                    <div className="w-1/3">
+                    <div className="w-1/3 m-0.5">
                       <SelectComponent
                         options={data?.warehouses || []}
                         onChange={(e) => queryState({ objectWareHouse: e })}
                         value={isState.objectWareHouse}
                         isClearable={true}
+                        icon={<PiWarehouseLight color="#9295A4" className="size-4" />}
                         closeMenuOnSelect={true}
                         hideSelectedOptions={false}
                         placeholder={'Kho thành phẩm'}
-                        className={`${
-                          !isState.objectWareHouse ? 'border-red-500' : 'border-transparent'
-                        } placeholder:text-slate-300 w-full z-30 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                        styles={{
+                          control: (base, state) => ({
+                            ...base,
+                            borderColor: state.isFocused
+                              ? '#0F4F9E'
+                              : isState.objectWareHouse == null
+                              ? '#ef4444'
+                              : base.borderColor,
+                            borderRadius: '8px',
+                            '&:hover': {
+                              borderColor: state.isFocused
+                                ? '#0F4F9E'
+                                : isState.objectWareHouse == null
+                                ? '#ef4444'
+                                : base.borderColor,
+                            },
+                          }),
+                        }}
                         isSearchable={true}
-                        type="form"
                       />
                     </div>
                   </div>
-                  <div className="">
-                    <Customscrollbar ref={tableRef} className="overflow-auto bg-white">
-                      <div className="flex flex-col">
-                        <div className="grid grid-cols-25 items-center border-b border-[#F3F3F4]">
-                          <h3 className="col-span-1 responsive-text-sm text-neutral-02 py-2 px-1 font-semibold text-center">
-                            STT
-                          </h3>
-                          <h3
-                            className={`responsive-text-sm text-neutral-02 p-2 font-semibold ${
-                              showExpiryColumns ? 'col-span-5' : 'col-span-6'
-                            }`}
-                          >
-                            Mặt hàng
-                          </h3>
-                          <h3 className="col-span-2 responsive-text-sm text-neutral-02 font-semibold ">Đơn vị tính</h3>
-                          <h3
-                            className={`responsive-text-sm text-neutral-02 p-2 font-semibold
+
+                  <div className="flex flex-col overflow-hidden flex-1">
+                    <div className="grid grid-cols-25 items-center border-b border-[#F3F3F4]">
+                      <h3 className="col-span-1 responsive-text-sm text-neutral-02 py-2 px-1 font-semibold text-center">
+                        STT
+                      </h3>
+                      <h3
+                        className={`responsive-text-sm text-neutral-02 p-2 font-semibold ${
+                          showExpiryColumns ? 'col-span-4' : 'col-span-6'
+                        }`}
+                      >
+                        Mặt hàng
+                      </h3>
+                      <h3 className="col-span-2 responsive-text-sm text-neutral-02 font-semibold ">Đơn vị tính</h3>
+                      <h3
+                        className={`responsive-text-sm text-neutral-02 p-2 font-semibold text-center
                             ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
                             `}
-                          >
-                            SL hoàn thành
-                          </h3>
-                          {showSerialColumns && (
-                            <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
-                              Serial hoàn thành
-                            </div>
-                          )}
-                          <div
-                            className={`responsive-text-sm text-neutral-02 p-2 font-semibold
+                      >
+                        SL hoàn thành
+                      </h3>
+                      {showSerialColumns && (
+                        <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
+                          Serial hoàn thành
+                        </div>
+                      )}
+                      <div
+                        className={`responsive-text-sm text-neutral-02 p-2 font-semibold text-center
                             ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
                             `}
-                          >
-                            SL lỗi
+                      >
+                        SL lỗi
+                      </div>
+                      {showSerialColumns && (
+                        <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
+                          Serial lỗi
+                        </div>
+                      )}
+                      {showExpiryColumns && (
+                        <>
+                          <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 font-semibold">Lot</div>
+                          <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 font-semibold">
+                            {dataLang?.warehouses_detail_date ?? 'warehouses_detail_date'}
                           </div>
-                          {showSerialColumns && (
-                            <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
-                              Serial lỗi
-                            </div>
-                          )}
-                          {showExpiryColumns && (
-                            <>
-                              <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold">
-                                {'Lot'}
-                              </div>
-                              <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 font-semibold">
-                                {dataLang?.warehouses_detail_date ?? 'warehouses_detail_date'}
-                              </div>
-                            </>
-                          )}
-                          <div
-                            className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 font-semibold
+                        </>
+                      )}
+                      <div
+                        className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 font-semibold
                             ${showExpiryColumns ? 'col-span-2' : 'col-span-3 p-2'}
                             `}
-                          >
-                            SL cần nhập
-                          </div>
-                          <div
-                            className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 p-2 font-semibold
+                      >
+                        SL cần nhập
+                      </div>
+                      <div
+                        className={`whitespace-nowrap text-center responsive-text-sm text-neutral-02 p-1 font-semibold
                             ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
                             `}
-                          >
-                            SL đã nhập
-                          </div>
-                          <div className="col-span-2 responsive-text-sm text-neutral-02 p-2 font-semibold ">
-                            Thao tác
-                          </div>
+                      >
+                        SL đã nhập
+                      </div>
+                      <div className="col-span-2 responsive-text-sm text-neutral-02 text-center font-semibold ">
+                        Thao tác
+                      </div>
+                    </div>
+                    <Customscrollbar className="flex-1 max-h-full">
+                      {isLoadingActiveStages && activeStep.type == 'TP' ? (
+                        <div className="flex justify-center items-center h-40">
+                          <Loading className="!h-[100px] w-full mx-auto" />
                         </div>
-                        {isLoadingActiveStages && activeStep.type == 'TP' ? (
-                          <tr>
-                            <td colSpan={9}>
-                              <Loading className="!h-[100px] w-full mx-auto" />
-                            </td>
-                          </tr>
-                        ) : isState.dataTableProducts?.data?.items?.length > 0 ? (
-                          isState.dataTableProducts?.data?.items?.map((row, index) => (
-                            <div className="grid grid-cols-25 items-center" key={index}>
-                              <div className="col-span-1 py-2 px-1 bg-white flex justify-center items-center">
-                                <p className="responsive-text-sm text-neutral-07 font-semibold">{index + 1}</p>
-                              </div>
-                              <div
-                                className={`flex gap-2 p-2 bg-white
-                                    ${showExpiryColumns ? 'col-span-5' : 'col-span-6'}
+                      ) : isState.dataTableProducts?.data?.items?.length > 0 ? (
+                        isState.dataTableProducts?.data?.items?.map((row, index) => (
+                          <div className="grid grid-cols-25 items-center" key={index}>
+                            <div className="col-span-1 py-2 px-1 flex justify-center items-center">
+                              <p className="responsive-text-sm text-neutral-07 font-semibold">{index + 1}</p>
+                            </div>
+                            <div
+                              className={`flex gap-2 p-2
+                                    ${showExpiryColumns ? 'col-span-4' : 'col-span-6'}
                                 `}
-                              >
-                                <Image
-                                  src={row?.images ? row?.images : '/icon/noimagelogo.png'}
-                                  width={100}
-                                  height={100}
-                                  alt={row?.images ? row?.images : '/icon/noimagelogo.png'}
-                                  className="object-cover rounded-md min-w-10 min-h-10 w-10 h-10 max-w-10 max-h-10"
-                                />
-                                <div className="flex flex-col gap-1">
-                                  <p className="responsive-text-sm text-neutral-07 font-semibold">{row?.item_name}</p>
-                                  <p className="responsive-text-xs text-neutral-03 font-normal">
-                                    {row?.product_variation}
-                                  </p>
-                                  <p className="responsive-text-xs text-typo-blue-2 font-normal">
-                                    {row?.reference_no_detail}
-                                  </p>
-                                </div>
+                            >
+                              <Image
+                                src={row?.images ? row?.images : '/icon/noimagelogo.png'}
+                                width={100}
+                                height={100}
+                                alt={row?.images ? row?.images : '/icon/noimagelogo.png'}
+                                className="object-cover rounded-md min-w-10 min-h-10 w-10 h-10 max-w-10 max-h-10"
+                              />
+                              <div className="flex flex-col gap-1">
+                                <p className="responsive-text-sm text-neutral-07 font-semibold">{row?.item_name}</p>
+                                <p className="responsive-text-xs text-neutral-03 font-normal">
+                                  {row?.product_variation}
+                                </p>
+                                <p className="responsive-text-xs text-typo-blue-2 font-normal">
+                                  {row?.reference_no_detail}
+                                </p>
                               </div>
+                            </div>
 
-                              <h3 className="col-span-2 p-2 responsive-text-sm text-neutral-07 font-semibold">
-                                {row?.unit_name}
-                              </h3>
-                              <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
-                                <InPutNumericFormat
-                                  onValueChange={(e) =>
-                                    handleChange({
-                                      table: 'product',
-                                      type: 'quantityEnterClient',
-                                      row,
-                                      value: e,
-                                    })
-                                  }
-                                  value={row?.quantityEnterClient || ''}
-                                  className={`${
-                                    !row?.quantityEnterClient && !row?.quantityError
-                                      ? 'border-red-500'
-                                      : 'border-gray-200'
-                                  } w-full appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none border-b-2`}
-                                  isAllowed={isAllowedNumber}
-                                />
-                              </div>
-                              {showSerialColumns && (
-                                <div className="col-span-3 p-2 text-sm">
-                                  <div className="flex flex-col gap-1">
-                                    {[...Array(row?.quantityEnterClient || 0)].map((_, sIndex) => {
-                                      return (
-                                        <input
-                                          key={sIndex}
-                                          value={row.serial?.[sIndex]?.value || ''}
-                                          onChange={(e) => {
-                                            handleChange({
-                                              table: 'product',
-                                              type: 'serial',
-                                              value: e.target.value.trim(),
-                                              row,
-                                              index: sIndex,
-                                            })
-                                          }}
-                                          className={`
+                            <h3 className="col-span-2 p-2 responsive-text-sm text-neutral-07 font-semibold">
+                              {row?.unit_name}
+                            </h3>
+                            <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
+                              <InputCustom
+                                state={row?.quantityEnterClient || 0}
+                                setState={(value) =>
+                                  handleChange({
+                                    table: 'product',
+                                    type: 'quantityEnterClient',
+                                    row,
+                                    value: { floatValue: value },
+                                  })
+                                }
+                                className={`${
+                                  !row?.quantityEnterClient && !row?.quantityError
+                                    ? '!border-red-500'
+                                    : '!border-gray-200'
+                                } !w-full p-1`}
+                                classNameInput="w-full !responsive-text-sm"
+                                classNameButton="size-6 2xl:size-8"
+                                min={0}
+                                max={Infinity}
+                                disabled={false}
+                                isError={false}
+                                step={1}
+                              />
+                            </div>
+                            {showSerialColumns && (
+                              <div className="col-span-3 p-2 text-sm">
+                                <div className="flex flex-col gap-1">
+                                  {[...Array(row?.quantityEnterClient || 0)].map((_, sIndex) => {
+                                    return (
+                                      <input
+                                        key={sIndex}
+                                        value={row.serial?.[sIndex]?.value || ''}
+                                        onChange={(e) => {
+                                          handleChange({
+                                            table: 'product',
+                                            type: 'serial',
+                                            value: e.target.value.trim(),
+                                            row,
+                                            index: sIndex,
+                                          })
+                                        }}
+                                        className={`
                                                     border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
                                                     ${
                                                       row.serial?.[sIndex]?.isDuplicate
@@ -744,50 +770,56 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                                         : 'border-gray-200 border-b-2'
                                                     }
                                                 `}
-                                        />
-                                      )
-                                    })}
-                                  </div>
+                                      />
+                                    )
+                                  })}
                                 </div>
-                              )}
-
-                              <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
-                                <InPutNumericFormat
-                                  onValueChange={(e) =>
-                                    handleChange({
-                                      table: 'product',
-                                      type: 'quantityError',
-                                      row,
-                                      value: e,
-                                    })
-                                  }
-                                  value={row?.quantityError ? row?.quantityError : ''}
-                                  className={`${
-                                    !row?.quantityEnterClient && !row?.quantityError
-                                      ? 'border-red-500'
-                                      : 'border-gray-200'
-                                  } appearance-none text-center text-sm 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal focus:outline-none w-full border-b-2`}
-                                  isAllowed={isAllowedNumber}
-                                />
                               </div>
-                              {showSerialColumns && (
-                                <td className="col-span-3 p-2 text-sm">
-                                  <div className="flex flex-col gap-1">
-                                    {[...Array(row?.quantityError || 0)].map((_, sIndex) => {
-                                      return (
-                                        <input
-                                          key={sIndex}
-                                          value={row.serialError?.[sIndex]?.value || ''}
-                                          onChange={(e) => {
-                                            handleChange({
-                                              table: 'product',
-                                              type: 'serialError',
-                                              value: e.target.value.trim(),
-                                              row,
-                                              index: sIndex,
-                                            })
-                                          }}
-                                          className={`
+                            )}
+
+                            <div className={`p-2 ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}`}>
+                              <InputCustom
+                                state={row?.quantityError || 0}
+                                setState={(value) =>
+                                  handleChange({
+                                    table: 'product',
+                                    type: 'quantityError',
+                                    row,
+                                    value: { floatValue: value },
+                                  })
+                                }
+                                className={`${
+                                  !row?.quantityEnterClient && !row?.quantityError
+                                    ? '!border-red-500'
+                                    : '!border-gray-200'
+                                } !w-full p-1`}
+                                classNameInput="w-full !responsive-text-sm"
+                                classNameButton="size-6 2xl:size-8"
+                                min={0}
+                                max={Infinity}
+                                disabled={false}
+                                isError={false}
+                                step={1}
+                              />
+                            </div>
+                            {showSerialColumns && (
+                              <td className="col-span-3 p-2 text-sm">
+                                <div className="flex flex-col gap-1">
+                                  {[...Array(row?.quantityError || 0)].map((_, sIndex) => {
+                                    return (
+                                      <input
+                                        key={sIndex}
+                                        value={row.serialError?.[sIndex]?.value || ''}
+                                        onChange={(e) => {
+                                          handleChange({
+                                            table: 'product',
+                                            type: 'serialError',
+                                            value: e.target.value.trim(),
+                                            row,
+                                            index: sIndex,
+                                          })
+                                        }}
+                                        className={`
                                                     border text-center py-1 px-1 font-medium w-full focus:outline-none  text-xs
                                                     ${
                                                       row.serialError?.[sIndex]?.isDuplicate
@@ -795,131 +827,141 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                                         : 'border-gray-200 border-b-2'
                                                     }
                                                 `}
-                                        />
-                                      )
-                                    })}
-                                  </div>
-                                </td>
-                              )}
-                              {showExpiryColumns && (
-                                <>
-                                  <div className="col-span-3 p-2 text-sm">
-                                    <input
-                                      value={row?.lot || ''}
+                                      />
+                                    )
+                                  })}
+                                </div>
+                              </td>
+                            )}
+                            {showExpiryColumns && (
+                              <>
+                                <div className="col-span-3">
+                                  <input
+                                    value={row?.lot || ''}
+                                    disabled={
+                                      (dataProductExpiry?.is_enable == '1' && false) ||
+                                      (dataProductExpiry?.is_enable == '0' && true)
+                                    }
+                                    onChange={(e) => {
+                                      handleChange({
+                                        table: 'product',
+                                        type: 'lot',
+                                        value: e.target.value,
+                                        row,
+                                      })
+                                    }}
+                                    className="border text-center rounded-lg responsive-text-sm text-neutral-07 font-semibold py-2 px-1 w-full focus:outline-none border-gray-200"
+                                  />
+                                </div>
+                                <div className="col-span-3 p-2 text-sm">
+                                  <div className="relative">
+                                    <DatePicker
+                                      dateFormat="dd/MM/yyyy"
+                                      placeholderText={dataLang?.warehouses_detail_date ?? 'warehouses_detail_date'}
+                                      selected={row?.date}
                                       disabled={
                                         (dataProductExpiry?.is_enable == '1' && false) ||
                                         (dataProductExpiry?.is_enable == '0' && true)
                                       }
+                                      portalId="menu-time"
                                       onChange={(e) => {
                                         handleChange({
                                           table: 'product',
-                                          type: 'lot',
-                                          value: e.target.value,
+                                          type: 'date',
+                                          value: e,
                                           row,
                                         })
                                       }}
-                                      className={`border text-center text-xs py-1 px-1 font-medium w-full focus:outline-none border-gray-200 border-b-2} `}
+                                      className="border-gray-200 bg-transparent disabled:bg-gray-100 relative z-1 placeholder:text-slate-300 w-full rounded-lg text-[#52575E] p-2 pl-6 border outline-none responsive-text-sm"
                                     />
+                                    <CalendarBlankIcon className="size-4 absolute left-1.5 -translate-y-1/2 top-1/2 opacity-60" />
                                   </div>
-                                  <div className="col-span-3 p-2 text-sm">
-                                    <div className="relative">
-                                      <DatePicker
-                                        dateFormat="dd/MM/yyyy"
-                                        placeholderText={dataLang?.warehouses_detail_date ?? 'warehouses_detail_date'}
-                                        selected={row?.date}
-                                        disabled={
-                                          (dataProductExpiry?.is_enable == '1' && false) ||
-                                          (dataProductExpiry?.is_enable == '0' && true)
-                                        }
-                                        onChange={(e) => {
-                                          handleChange({
-                                            table: 'product',
-                                            type: 'date',
-                                            value: e,
-                                            row,
-                                          })
-                                        }}
-                                        className={`border-gray-200 bg-transparent disabled:bg-gray-100 relative z-1  placeholder:text-slate-300 w-full  rounded text-[#52575E] p-2 border outline-none text-xs `}
-                                      />
-                                      <Calendar
-                                        size={14}
-                                        className="absolute top-1/2 -translate-y-1/2 right-1 text-[#cccccc]"
-                                      />
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                              <td className="col-span-3 p-2 responsive-text-sm text-neutral-07 font-semibold text-center">
-                                {formatNumber(row?.quantity_enter)}
-                              </td>
-                              <td className="col-span-3 p-2 responsive-text-sm text-neutral-07 font-semibold text-center">
-                                {formatNumber(row?.quantity_entered)}
-                              </td>
-                              <td className="col-span-2 p-2 text-center">
-                                <button
-                                  title="Xóa"
-                                  onClick={() => handleRemove('product', row)}
-                                  className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200"
-                                >
-                                  <Trash size={24} />
-                                </button>
-                              </td>
+                                </div>
+                              </>
+                            )}
+                            <h3
+                              className={`p-2 responsive-text-sm text-neutral-07 font-semibold text-center
+                                ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                                `}
+                            >
+                              {formatNumber(row?.quantity_enter)}
+                            </h3>
+                            <h3
+                              className={`p-2 responsive-text-sm text-neutral-07 font-semibold text-center
+                                ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                                `}
+                            >
+                              {formatNumber(row?.quantity_entered)}
+                            </h3>
+                            <div className="col-span-2 p-2 flex justify-center items-center">
+                              <button
+                                onClick={() => handleRemove('product', row)}
+                                className="group hover:border-red-01 hover:bg-red-02 rounded-lg w-fit p-1 border border-transparent transition-all ease-in-out flex items-center gap-2 responsive-text-sm text-left cursor-pointer"
+                              >
+                                <TrashIcon className="size-5 2xl:size-6 text-[#EE1E1E]" />
+                              </button>
                             </div>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="9" className="p-2 text-center text-red-500 border">
-                              Không có mặt hàng để hoàn thành
-                            </td>
-                          </tr>
-                        )}
-                      </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          colSpan="25"
+                          className="p-2 text-center text-red-500 h-40 my-auto flex justify-center items-center"
+                        >
+                          Không có mặt hàng để hoàn thành
+                        </div>
+                      )}
                     </Customscrollbar>
-                    {/* <div ref={tableRefTotal} className="overflow-x-hidden">
-                                    <table className="w-full">
-                                        <tfoot className="sticky bottom-0 z-10">
-                                            <tr className="font-normal bg-gray-100">
-                                                <td
-                                                    className="sticky left-0 z-20 p-2 font-normal text-center bg-gray-100 border"
-                                                    colSpan={3}
-                                                    style={{
-                                                        minWidth: "calc(100px + 100px + 150px)",
-                                                        width: "calc(100px + 100px + 150px)",
-                                                    }}
-                                                >
-                                                    TỔNG CỘNG
-                                                </td>
-                                                <td className="p-2 text-center border font-normal min-w-[150px]"></td>
-                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantity)}</td>
-                                                {
-                                                    (checkItemFinalStage && dataProductSerial.is_enable === "1") && (
-                                                        <th className="border p-2 font-normal min-w-[120px]">
-                                                        </th>
-                                                    )
-                                                }
-                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityError)}</td>
-                                                {
-                                                    (checkItemFinalStage && (dataMaterialExpiry.is_enable === "1" || dataProductExpiry.is_enable === "1")) && (
-                                                        <>
-                                                            <th className="border p-2 font-normal min-w-[120px]">
-                                                            </th>
-                                                            <th className="border p-2 font-normal min-w-[120px]">
-                                                            </th>
-                                                        </>
-                                                    )
-                                                }
-                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEnter)}</td>
-                                                <td className="p-2 text-center border font-normal min-w-[120px]">{formatNumber(totalQuantityEntered)}</td>
-                                                <td className="p-2 text-center border font-normal min-w-[100px]"></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div> */}
+                    <div className="grid grid-cols-25 items-center bg-[#CCCCCC40] rounded">
+                      <h3
+                        className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        ${showExpiryColumns ? 'col-span-7' : 'col-span-9'}
+                        `}
+                      >
+                        TỔNG CỘNG
+                      </h3>
+                      <h3
+                        className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                        `}
+                      >
+                        {formatNumber(totalQuantity)}
+                      </h3>
+                      {checkItemFinalStage && dataProductSerial.is_enable === '1' && (
+                        <h3 className="col-span-3 p-2 text-neutral-07 responsive-text-base font-medium"></h3>
+                      )}
+                      <h3
+                        className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        ${showExpiryColumns ? 'col-span-3' : 'col-span-4'}
+                        `}
+                      >
+                        {formatNumber(totalQuantityError)}
+                      </h3>
+                      {showExpiryColumns && (
+                        <>
+                          <h3 className="col-span-3 p-2 font-normal"></h3>
+                          <h3 className="col-span-3 p-2 font-normal"></h3>
+                        </>
+                      )}
+                      <h3
+                        className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                        `}
+                      >
+                        {formatNumber(totalQuantityEnter)}
+                      </h3>
+                      <h3
+                        className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        ${showExpiryColumns ? 'col-span-2' : 'col-span-3'}
+                        `}
+                      >
+                        {formatNumber(totalQuantityEntered)}
+                      </h3>
+                    </div>
                   </div>
-                </div>
 
-                {/* Xuất kho sản xuất */}
-                {/* <div>
+                  {/* Xuất kho sản xuất */}
+                  {/* <div>
                             <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
                             <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white ">
                                 <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
@@ -1132,13 +1174,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                 </table>
                             </Customscrollbar>
                         </div> */}
-                {/* <div className="flex items-center justify-end gap-2">
+                  {/* <div className="flex items-center justify-end gap-2">
                             <ButtonCancel
                                 onClick={() => { queryState({ open: false }) }}
                                 dataLang={dataLang}
                             />
                            
                         </div> */}
+                </div>
               </div>
             </div>
           </div>

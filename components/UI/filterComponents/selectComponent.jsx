@@ -171,9 +171,9 @@ const SelectComponent = ({
     <div className={`${classParent ? classParent : ''} relative`}>
       <SelectCore
         id={id ?? 'parentSelect'}
-        //bật lên nó sẽ render ra ngoài dom gây đè header
-        //menuPortalTarget={menuPortalTarget ?? null}
-        menuPortalTarget={menuPortalTarget ?? document.body}
+        //bật lên nó sẽ render ra ngoài dom gây đè header (bật bằng cách menuPortalTarget={document.body})
+        menuPortalTarget={menuPortalTarget ?? null}
+        // menuPortalTarget={menuPortalTarget ?? document.body}
         // menuPortalTarget={null}
         options={options}
         value={value}
@@ -221,7 +221,6 @@ const SelectComponent = ({
         //     },
         // }),
         // }}
-        // bỏ nền dùm anh nha chỉ để tích màu xanh và chữ màu xanh thui
         styles={styleType}
       />
     </div>

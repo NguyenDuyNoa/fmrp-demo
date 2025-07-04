@@ -158,6 +158,7 @@ const Table = ({ dataLang, data, isLoading, handleRemoveItem, handChangeTable, d
                         const numericValue = parseFloat(value) || 0
                         handChangeTable(i.idParent, i.id, numericValue, 'quantityRemaining')
                       }}
+                      allowDecimal={true}
                       disabled={false}
                       min={0}
                       step={1}
