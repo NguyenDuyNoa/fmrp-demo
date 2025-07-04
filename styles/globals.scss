@@ -971,7 +971,7 @@ body {
   }
 }
 
-.select-warehouse {
+.select-custom-label {
   .ant-select-single {
     height: auto;
     min-height: 40px;
@@ -979,7 +979,7 @@ body {
 }
 .select-with-radio,
 .select-with-sort,
-.select-warehouse {
+.select-custom-label {
   .ant-select-selector {
     border-radius: 8px;
   }
@@ -1020,15 +1020,25 @@ body {
   }
 }
 
+@media screen and (max-width: 1439px) {
+  .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+    padding: 0 9px;
+  }
+  .date-form,
+  .select-with-radio {
+    .ant-select-single .ant-select-selector .ant-select-selection-item,
+    .ant-picker .ant-picker-input > input {
+      font-size: 13px;
+      line-height: 24px;
+    }
+  }
+}
+
 .select-with-sort,
 .select-with-radio {
   .ant-select-selection-wrap {
     margin-left: 24px;
   }
-}
-
-.ant-select-selection-item {
-  line-height: 22px;
 }
 
 .ant-picker-outlined:hover {
@@ -1180,5 +1190,6 @@ body {
 .ant-select {
   .ant-select-selection-item {
     white-space: normal;
+    line-height: 22px;
   }
 }
