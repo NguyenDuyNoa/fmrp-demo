@@ -17,6 +17,7 @@ const SelectCustomLabel = ({
   formatNumber,
   renderOption = null,
   isVisibleLotDate = true,
+  className = 'select-custom-label',
 }) => {
   const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
 
@@ -26,7 +27,7 @@ const SelectCustomLabel = ({
         {renderOption ? (
           renderOption(opt, isLabel)
         ) : (
-          <div className={`text-[#1C252E] ${isLabel ? 'py-1 2xl:py-2' : ''} `}>
+          <div className={`text-[#1C252E] ${isLabel ? 'py-[3px]' : ''} `}>
             <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-bold">
               {opt?.warehouse_name}
             </h2>
@@ -84,9 +85,9 @@ const SelectCustomLabel = ({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full select-custom-label">
+    <div className={`flex flex-col items-center justify-center h-full ${className} w-full`}>
       <Select
-        className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer w-full select-custom-label"
+        className={`placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer w-full ${className}`}
         placeholder={placeholder}
         allowClear
         value={valueCustom || null}

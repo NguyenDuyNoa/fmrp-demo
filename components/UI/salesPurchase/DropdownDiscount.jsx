@@ -1,0 +1,38 @@
+import TableHeader from '@/components/common/orderManagement/TableHeader'
+import { isAllowedDiscount } from '@/utils/helpers/common'
+import { Dropdown } from 'antd'
+import { ArrowDown2 } from 'iconsax-react'
+import InPutNumericFormat from '../inputNumericFormat/inputNumericFormat'
+
+const DropdownDiscount = ({ value, onChange, dataLang }) => {
+  return (
+    <Dropdown
+      overlay={
+        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+            Chọn hoàng loạt % chiết khấu
+          </p>
+          <div className="flex items-center font-deca font-normal 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] text-end p-2 h-9 w-full border rounded-lg border-gray-200">
+            <InPutNumericFormat
+              value={value}
+              onValueChange={onChange}
+              className="cursor-text appearance-none text-end w-full border-none focus:outline-none"
+              isAllowed={isAllowedDiscount}
+            />
+            <span className="pl-1">%</span>
+          </div>
+        </div>
+      }
+      trigger={['click']}
+      placement="bottomCenter"
+      arrow
+    >
+      <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
+        <TableHeader className="text-start">{dataLang?.import_from_discount || 'import_from_discount'}</TableHeader>
+        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+      </div>
+    </Dropdown>
+  )
+}
+
+export default DropdownDiscount

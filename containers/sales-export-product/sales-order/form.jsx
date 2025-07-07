@@ -1,5 +1,4 @@
 import apiSalesOrder from '@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder'
-import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
@@ -34,11 +33,16 @@ import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import TableHeader from '@/components/common/orderManagement/TableHeader'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
 import EmptyData from '@/components/UI/emptyData'
+import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
+import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
 import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
-import { ConfigProvider, DatePicker, Dropdown } from 'antd'
+import SelectCustomLabel from '@/components/UI/salesPurchase/SelectCustomLabel'
+import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
+import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
@@ -61,6 +65,8 @@ const SalesOrderForm = (props) => {
   const [flagStateChange, setFlagStateChange] = useState(false)
   const authState = useSelector((state) => state.auth)
 
+  const [searchClient, sSearchClient] = useState(null)
+
   // Data Fetching
   const { data: dataBranch = [] } = useBranchList()
   const { data: dataStaffs = [] } = useStaffComboboxByBranch({
@@ -70,7 +76,7 @@ const SalesOrderForm = (props) => {
     client_id: selectedCustomer != null ? selectedCustomer : null,
   })
   const { data: dataCustomer = [] } = useClientComboboxByBranch({
-    search: '',
+    search: searchClient,
     branch_id: selectedBranch !== null ? [selectedBranch]?.map((e) => e) : null,
   })
   const { data: dataTasxes = [] } = useTaxList()
@@ -971,117 +977,44 @@ const SalesOrderForm = (props) => {
       }
       tableLeft={
         <>
-          {sortedArr.length <= 0 && <EmptyData />}
-          {sortedArr.length > 0 && (
-            <React.Fragment>
+          {sortedArr.length <= 0 ? (
+            <EmptyData />
+          ) : (
+            <div>
               {/* Thông tin mặt hàng Header */}
-              <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 mb-2 border-b border-gray-100">
-                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-left truncate font-[400]">
-                  {dataLang?.sales_product_item || 'sales_product_item'}
-                </h4>
-                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+              <div className="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1.4fr)] 2xl:gap-6 gap-4 items-center sticky top-0 py-2 border-b border-gray-100">
+                <TableHeader className="text-left">{dataLang?.sales_product_item || 'sales_product_item'}</TableHeader>
+                <TableHeader className="text-center">
                   {dataLang?.sales_product_quantity || 'sales_product_quantity'}
-                </h4>
-                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-center truncate font-[400]">
+                </TableHeader>
+                <TableHeader className="text-center">
                   {dataLang?.sales_product_unit_price || 'sales_product_unit_price'}
-                </h4>
+                </TableHeader>
                 {/* Chọn hoàng loạt % chiết khấu */}
-                <Dropdown
-                  overlay={
-                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                        Chọn hoàng loạt % chiết khấu
-                      </p>
-                      <div className="flex items-center justify-center col-span-1 text-center">
-                        <InPutNumericFormat
-                          value={totalDiscount}
-                          onValueChange={handleOnChangeInput.bind(this, 'totaldiscount')}
-                          className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
-                          isAllowed={isAllowedDiscount}
-                        />
-                      </div>
-                    </div>
-                  }
-                  trigger={['click']}
-                  placement="bottomLeft"
-                  arrow
-                >
-                  <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
-                      {`${dataLang?.sales_product_rate_discount}` || 'sales_product_rate_discount'}
-                    </h4>
-                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                  </div>
-                </Dropdown>
-                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start font-[400] whitespace-nowrap">
+                <DropdownDiscount
+                  value={totalDiscount}
+                  onChange={handleOnChangeInput.bind(this, 'totaldiscount')}
+                  dataLang={dataLang}
+                />
+                <TableHeader className="text-start">
                   {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                </h4>
-                {/* Chọn hoàng loạt % thuế */}
-                <Dropdown
-                  overlay={
-                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg relative z-0 group min-h-auto focus-within:min-h-[270px]">
-                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                        Chọn hoàng loạt % thuế
-                      </p>
-                      <SelectComponent
-                        options={taxOptions}
-                        onChange={(value) => handleOnChangeInput('total_tax', value)}
-                        value={totalTax ? '' : ''}
-                        formatOptionLabel={(option) => (
-                          <div className="flex items-center justify-start gap-1">
-                            <h2>{option?.label}</h2>
-                            <h2>{`(${option?.tax_rate})`}</h2>
-                          </div>
-                        )}
-                        placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
-                        hideSelectedOptions={false}
-                        className={`3xl:text-[18px] 2xl:text-[16px] xl:text-[14px] text-[12px] border-transparent placeholder:text-slate-300 w-full bg-white rounded text-typo-gray-5 font-normal outline-none`}
-                        isSearchable={true}
-                        noOptionsMessage={() => 'Không có dữ liệu'}
-                        closeMenuOnSelect={true}
-                        menuPlacement="auto"
-                        menuPosition="fixed"
-                        styles={{
-                          placeholder: (base) => ({
-                            ...base,
-                            color: '#cbd5e1',
-                          }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 9999,
-                          }),
-                          control: (base, state) => ({
-                            ...base,
-                            boxShadow: 'none',
-                            padding: '2.7px',
-                            ...(state.isFocused && {
-                              border: '0 0 0 1px #92BFF7',
-                            }),
-                          }),
-                        }}
-                      />
-                    </div>
-                  }
-                  trigger={['click']}
-                  placement="bottomLeft"
-                  arrow
-                >
-                  <div className="inline-flex items-center justify-between cursor-pointer">
-                    <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize col-span-1 text-start truncate font-[400]">
-                      {dataLang?.sales_product_tax || 'sales_product_tax'}
-                    </h4>
-                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                  </div>
-                </Dropdown>
-                <h4 className="3xl:text-sm 3xl:font-semibold 2xl:text-[12px] xl:text-[11px] text-[10px] xl:px-3 xl:py-2 text-neutral-02 capitalize text-start truncate font-[400]">
+                </TableHeader>
+                {/* Chọn hàng loại % Thuế */}
+                <DropdownTax
+                  value={totalTax}
+                  onChange={(value) => handleOnChangeInput('total_tax', value)}
+                  dataLang={dataLang}
+                  taxOptions={taxOptions}
+                />
+                <TableHeader className="text-start">
                   {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
-                </h4>
+                </TableHeader>
               </div>
               {/* Thông tin mặt hàng Body */}
               <div className="scroll-bar-products-sale overflow-y-auto pr-4 divide-slate-200">
                 {sortedArr.map((e) => (
                   <div
-                    className="grid items-center grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] 2xl:gap-6 gap-4 py-1"
+                    className="grid items-center grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1.4fr)] 2xl:gap-6 gap-4 py-1"
                     key={e?.id}
                   >
                     {/* Mặt hàng */}
@@ -1182,10 +1115,10 @@ const SalesOrderForm = (props) => {
                       </h3>
                     </div>
                     {/* % Thuế */}
-                    <div className="w-full 3xl:px-2 px-0">
-                      <SelectComponent
+                    <div className="w-full">
+                      <SelectCustomLabel
+                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                         options={taxOptions}
-                        onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
                         value={
                           e?.tax
                             ? {
@@ -1195,31 +1128,19 @@ const SalesOrderForm = (props) => {
                               }
                             : null
                         }
-                        placeholder={'Chọn % thuế'}
-                        hideSelectedOptions={false}
-                        formatOptionLabel={taxRateLabel}
-                        className={`border-transparent w-full bg-white text-typo-gray-5 font-normal outline-none whitespace-nowrap`}
-                        isSearchable={true}
-                        noOptionsMessage={() => 'Không có dữ liệu'}
-                        menuPortalTarget={document.body}
-                        closeMenuOnSelect={true}
-                        styles={{
-                          placeholder: (base) => ({
-                            ...base,
-                            color: '#cbd5e1',
-                          }),
-                          menuPortal: (base) => ({
-                            ...base,
-                            zIndex: 20,
-                          }),
-                          control: (base) => ({
-                            ...base,
-                            boxShadow: 'none',
-                            padding: '0px',
-                            margin: '0px',
-                            borderRadius: '8px',
-                          }),
-                        }}
+                        onChange={(value) => handleOnChangeInputOption(e?.id, 'tax', value)}
+                        renderOption={(option, isLabel) => (
+                          <div
+                            className={`flex items-center justify-start gap-1 responsive-text-sm ${
+                              isLabel ? 'py-1 2xl:py-2' : ''
+                            }`}
+                          >
+                            <h2 className="">{option?.label}</h2>
+                            {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                              <h2>{option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}</h2>
+                            )}
+                          </div>
+                        )}
                       />
                     </div>
                     {/* Thành tiền và nút xoá */}
@@ -1245,7 +1166,7 @@ const SalesOrderForm = (props) => {
                   </div>
                 ))}
               </div>
-            </React.Fragment>
+            </div>
           )}
         </>
       }
@@ -1262,7 +1183,7 @@ const SalesOrderForm = (props) => {
                 name="fname"
                 type="text"
                 placeholder={dataLang?.system_default || 'system_default'}
-                className={`responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
+                className={`xl1439:text-[15px] xl1439:leading-6 text-[13px] leading-[20px] text-gray-600 font-normal responsive-text-base placeholder:text-sm z-10 pl-8 focus:border-[#0F4F9E] w-full border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-pointer`}
               />
             </div>
           </div>
@@ -1270,7 +1191,7 @@ const SalesOrderForm = (props) => {
           <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
             <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
             <div className="w-full">
-              <div className="relative w-full flex flex-row custom-date-picker">
+              <div className="relative w-full flex flex-row custom-date-picker date-form">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                   <BsCalendarEvent color="#7a7a7a" />
                 </span>
@@ -1305,7 +1226,7 @@ const SalesOrderForm = (props) => {
           <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
             <InfoFormLabel isRequired label={dataLang?.sales_product_item_date || 'sales_product_item_date'} />
             <div className="w-full">
-              <div className="relative flex flex-row custom-date-picker">
+              <div className="relative flex flex-row custom-date-picker date-form">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                   <BsCalendarEvent color="#7a7a7a" />
                 </span>
@@ -1339,19 +1260,20 @@ const SalesOrderForm = (props) => {
           <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
             <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
             <div className="w-full">
-              <div className="relative flex flex-row select-with-sort">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                  <LuBriefcase color="#7a7a7a" />
-                </span>
-                <SelectWithSort
-                  title="Khách hàng"
-                  placeholderText="Chọn khách hàng"
-                  options={!!flagStateChange ? [] : dataCustomer}
-                  value={selectedCustomer}
-                  onChange={(value) => setSelectedCustomer(value)}
-                  isError={errCustomer}
-                />
-              </div>
+              <SelectWithRadio
+                title="Khách hàng"
+                placeholderText="Chọn khách hàng"
+                options={!!flagStateChange ? [] : dataCustomer}
+                value={selectedCustomer}
+                onChange={(value) => setSelectedCustomer(value)}
+                isError={errCustomer}
+                isShowAddNew={true}
+                sSearchClient={sSearchClient}
+                dataBranch={dataBranch}
+                dataLang={dataLang}
+                icon={<LuBriefcase />}
+              />
+
               {errCustomer && (
                 <label className="text-sm text-red-500">
                   {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
@@ -1375,7 +1297,7 @@ const SalesOrderForm = (props) => {
                   <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                     <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
                     <div className="w-full">
-                      <div className="relative flex flex-row">
+                      <div className="relative flex flex-row select-with-sort">
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                           <PiMapPinLight color="#7a7a7a" />
                         </div>
@@ -1399,7 +1321,7 @@ const SalesOrderForm = (props) => {
                   <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                     <InfoFormLabel isRequired label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'} />
                     <div className="w-full">
-                      <div className="relative flex flex-row">
+                      <div className="relative flex flex-row select-with-sort">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                           <FiUser color="#7a7a7a" />
                         </span>
@@ -1422,7 +1344,7 @@ const SalesOrderForm = (props) => {
                   {/* Người liên lạc */}
                   <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                     <InfoFormLabel label={dataLang?.contact_person || 'Người liên lạc'} />
-                    <div className="w-full relative">
+                    <div className="w-full relative flex select-with-sort">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
                         <FiUser color="#7a7a7a" />
                       </span>

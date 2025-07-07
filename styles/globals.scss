@@ -952,7 +952,6 @@ body {
   background: #003da0 !important;
 }
 
-.select-with-sort,
 .sales-product-date {
   height: 42px;
 }
@@ -962,6 +961,12 @@ body {
 .select-with-radio {
   width: 100%;
   border-radius: 8px;
+  .ant-select {
+    .ant-select-selection-item {
+      white-space: normal;
+      line-height: 22px;
+    }
+  }
 }
 
 .select-with-sort,
@@ -972,10 +977,27 @@ body {
   }
 }
 
-.select-custom-label {
+.select-custom-label,
+.select-tax {
   .ant-select-single {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.select-custom-label {
+  .ant-select-single,
+  .ant-select-selector {
     height: auto;
     min-height: 40px;
+  }
+}
+
+.select-tax {
+  .ant-select-single,
+  .ant-select-selector {
+    height: auto;
+    min-height: 36px;
   }
 }
 
@@ -1022,16 +1044,27 @@ body {
   }
 }
 
+.date-form,
+.select-with-sort,
+.select-with-radio {
+  .ant-select-single .ant-select-selector .ant-select-selection-item,
+  .ant-picker .ant-picker-input > input {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}
+
 @media screen and (max-width: 1439px) {
   .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
     padding: 0 9px;
   }
   .date-form,
+  .select-with-sort,
   .select-with-radio {
     .ant-select-single .ant-select-selector .ant-select-selection-item,
     .ant-picker .ant-picker-input > input {
       font-size: 13px;
-      line-height: 24px;
+      line-height: 20px;
     }
   }
 }
@@ -1186,12 +1219,5 @@ body {
 .ant-select-dropdown {
   .ant-select-item-option-content {
     white-space: normal;
-  }
-}
-
-.ant-select {
-  .ant-select-selection-item {
-    white-space: normal;
-    line-height: 22px;
   }
 }
