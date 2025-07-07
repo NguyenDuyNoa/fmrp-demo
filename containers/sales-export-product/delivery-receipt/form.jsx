@@ -8,7 +8,11 @@ import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericF
 import Loading from '@/components/UI/loading/loading'
 import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
+import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
+import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
 import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
+import SelectCustomLabel from '@/components/UI/salesPurchase/SelectCustomLabel'
+import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
@@ -26,7 +30,7 @@ import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker, Dropdown, Empty } from 'antd'
+import { ConfigProvider, DatePicker, Empty } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -48,8 +52,6 @@ import Select, { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import PopupAddress from './components/PopupAddress'
-import SelectCustomLabel from './components/SelectCustomLabel'
-import SelectWithRadio from './components/SelectWithRadio'
 import { useDeliveryReceipItemAll } from './hooks/useDeliveryReceipItemAll'
 
 const DeliveryReceiptForm = (props) => {
@@ -532,59 +534,40 @@ const DeliveryReceiptForm = (props) => {
   useFetchingEffect(onFetchingProductOrder, _ServerFetching_ProductOrder)
   useFetchingEffect(onFetchingAddress, _ServerFetching_Address)
 
-  const totalMoney = (listData) => {
-    const totalPrice = listData?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product = Number(childItem?.price) * Number(childItem?.quantity)
-        return childAccumulator + product
-      }, 0)
-      return accumulator + childTotal
-    }, 0)
+  const totalMoney = (listData = []) => {
+    let totalPrice = 0
+    let totalDiscountPrice = 0
+    let totalDiscountAfterPrice = 0
+    let totalTax = 0
+    let totalAmount = 0
 
-    const totalDiscountPrice = listData?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product = Number(childItem?.price) * (Number(childItem?.discount) / 100) * Number(childItem?.quantity)
-        return childAccumulator + product
-      }, 0)
-      return accumulator + childTotal
-    }, 0)
+    for (const item of listData) {
+      for (const child of item.child || []) {
+        const price = Number(child?.price) || 0
+        const quantity = Number(child?.quantity) || 0
+        const discount = Number(child?.discount) || 0
+        const taxRate = Number(child?.tax?.tax_rate) || 0
 
-    const totalDiscountAfterPrice = listData?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product = Number(childItem?.price * (1 - childItem?.discount / 100)) * Number(childItem?.quantity)
-        return childAccumulator + product
-      }, 0)
-      return accumulator + childTotal
-    }, 0)
+        const priceTotal = price * quantity
+        const discountAmount = price * (discount / 100) * quantity
+        const priceAfterDiscount = price * (1 - discount / 100) * quantity
+        const taxAmount = priceAfterDiscount * (taxRate / 100)
+        const finalAmount = priceAfterDiscount * (1 + taxRate / 100)
 
-    const totalTax = listData?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.price * (1 - childItem?.discount / 100)) *
-          (isNaN(childItem?.tax?.tax_rate) ? 0 : Number(childItem?.tax?.tax_rate) / 100) *
-          Number(childItem?.quantity)
-        return childAccumulator + product
-      }, 0)
-      return accumulator + childTotal
-    }, 0)
-
-    const totalAmount = listData?.reduce((accumulator, item) => {
-      const childTotal = item.child?.reduce((childAccumulator, childItem) => {
-        const product =
-          Number(childItem?.price * (1 - childItem?.discount / 100)) *
-          (1 + Number(childItem?.tax?.tax_rate) / 100) *
-          Number(childItem?.quantity)
-        return childAccumulator + product
-      }, 0)
-      return accumulator + childTotal
-    }, 0)
+        totalPrice += priceTotal
+        totalDiscountPrice += discountAmount
+        totalDiscountAfterPrice += priceAfterDiscount
+        totalTax += taxAmount
+        totalAmount += finalAmount
+      }
+    }
 
     return {
-      totalPrice: totalPrice || 0,
-      totalDiscountPrice: totalDiscountPrice || 0,
-      totalDiscountAfterPrice: totalDiscountAfterPrice || 0,
-      totalTax: totalTax || 0,
-      totalAmount: totalAmount || 0,
+      totalPrice,
+      totalDiscountPrice,
+      totalDiscountAfterPrice,
+      totalTax,
+      totalAmount,
     }
   }
 
@@ -885,12 +868,12 @@ const DeliveryReceiptForm = (props) => {
             alt={option?.e.name}
             className="size-16 object-cover rounded-md"
           />
-          <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full">
+          <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
             <div className="font-semibold responsive-text-sm truncate text-black">{option.e.name}</div>
-            <div className="text-blue-600 font-normal truncate">
+            <div className="text-blue-600 truncate">
               {option.e?.code}: {option.e?.product_variation}
             </div>
-            <div className="flex flex-wrap items-center gap-1 text-neutral-03 font-normal">
+            <div className="flex flex-wrap items-center gap-1 text-neutral-03">
               <div className="flex items-center gap-1">
                 <h5>
                   {dataLang[option.e?.text_type]} {dataLang?.delivery_receipt_quantity || 'delivery_receipt_quantity'}:{' '}
@@ -1004,7 +987,6 @@ const DeliveryReceiptForm = (props) => {
     formData.append('note', note ? note : '')
 
     const firstChild = listData?.[0]?.child[0]
-    console.log('🚀 ~ DeliveryReceiptPage ~ firstChild?.note:', firstChild?.note)
 
     listData.forEach((item, index) => {
       formData.append(`items[${index}][id]`, id ? item?.idParenBackend : '')
@@ -1132,79 +1114,34 @@ const DeliveryReceiptForm = (props) => {
           ) : (
             <div>
               {/* Thông tin mặt hàng Header */}
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 2xl:gap-5 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
                 <TableHeader className="text-left">{dataLang?.import_from_items || 'import_from_items'}</TableHeader>
                 <TableHeader className="text-center">Kho - Vị trí kho</TableHeader>
                 <TableHeader className="text-center">Số lượng</TableHeader>
                 <TableHeader className="text-center">Đơn giá</TableHeader>
-                <Dropdown
-                  overlay={
-                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                        Chọn hoàng loạt % chiết khấu
-                      </p>
-                      <div className="flex items-center justify-center col-span-1 text-center">
-                        <InPutNumericFormat
-                          value={generalDiscount}
-                          onValueChange={_HandleChangeInput.bind(this, 'generalDiscount')}
-                          className="cursor-text appearance-none text-end 3xl:m-2 3xl:p-2 m-1 p-2 h-10 font-deca font-normal w-full focus:outline-none border rounded-lg 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] border-gray-200"
-                          isAllowed={isAllowedDiscount}
-                        />
-                      </div>
-                    </div>
-                  }
-                  trigger={['click']}
-                  placement="bottomCenter"
-                  arrow
-                >
-                  <div className="inline-flex items-center justify-between cursor-pointer w-full">
-                    <TableHeader className="text-left">% CK</TableHeader>
-                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                  </div>
-                </Dropdown>
-                <TableHeader className="text-center">Đơn giá sau CK</TableHeader>
-                <Dropdown
-                  overlay={
-                    <div className="px-4 py-5 shadow-lg bg-white rounded-lg">
-                      <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
-                        Chọn hoàng loạt % thuế
-                      </p>
-                      <SelectCustomLabel
-                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                        options={taxOptions}
-                        value={generalTax}
-                        onChange={(value) => _HandleChangeInput('generalTax', value)}
-                        renderOption={(option, isLabel) => (
-                          <div
-                            className={`flex items-center justify-start gap-1 text-[#1C252E]${isLabel ? ' py-2' : ''}`}
-                          >
-                            <h2 className="responsive-text-sm leading-normal">{option?.label}</h2>
-                            {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
-                              <h2 className="responsive-text-sm leading-normal">
-                                {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
-                              </h2>
-                            )}
-                          </div>
-                        )}
-                        isLabel={true}
-                        isPopupMatchSelectWidth={false}
-                      />
-                    </div>
-                  }
-                  trigger={['click']}
-                  placement="bottomCenter"
-                  arrow
-                >
-                  <div className="inline-flex items-center justify-between cursor-pointer w-full">
-                    <TableHeader className="text-left">% Thuế</TableHeader>
-                    <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
-                  </div>
-                </Dropdown>
-                <TableHeader className="text-center">Thành tiền</TableHeader>
+                {/* Chọn hoàng loạt % chiết khấu */}
+                <DropdownDiscount
+                  value={generalDiscount}
+                  onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
+                  dataLang={dataLang}
+                />
+                <TableHeader className="text-left">
+                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
+                </TableHeader>
+                {/* Chọn hàng loại % Thuế */}
+                <DropdownTax
+                  value={generalTax}
+                  onChange={_HandleChangeInput.bind(this, 'generalTax')}
+                  dataLang={dataLang}
+                  taxOptions={taxOptions}
+                />
+                <TableHeader className="text-center">
+                  {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
+                </TableHeader>
               </div>
 
               {/* Thông tin mặt hàng Body */}
-              <Customscrollbar className="max-h-[400px] h-[400px]  pb-2">
+              <Customscrollbar className="max-h-[780px] pb-2">
                 <div className="w-full h-full">
                   {isFetching ? (
                     <Loading className="w-full h-10" color="#0f4f9e" />
@@ -1216,7 +1153,7 @@ const DeliveryReceiptForm = (props) => {
                         return (
                           <div
                             key={e?.id?.toString()}
-                            className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-3 2xl:gap-4 my-1 py-4 border-b border-[#F3F3F4]"
+                            className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-4 2xl:gap-5 my-1 py-4 border-b border-[#F3F3F4]"
                           >
                             {/* Mặt hàng */}
                             <div className="h-full p-2">
@@ -1241,7 +1178,7 @@ const DeliveryReceiptForm = (props) => {
                                 </div>
                                 <button
                                   onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
-                                  className="flex items-center justify-center 2xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
+                                  className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
                                 >
                                   <Add />
                                 </button>
@@ -1274,7 +1211,7 @@ const DeliveryReceiptForm = (props) => {
                               )}
                             </div>
                             {/* Body */}
-                            <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4 items-center">
+                            <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 2xl:gap-5 items-center">
                               {e?.child?.map((ce) => {
                                 const discountedPrice = formatMoney(
                                   Number(ce?.price) * (1 - Number(ce?.discount) / 100)
@@ -1282,7 +1219,7 @@ const DeliveryReceiptForm = (props) => {
                                 return (
                                   <React.Fragment key={ce?.id?.toString()}>
                                     {/* Kho - Vị trí kho */}
-                                    <div className="flex flex-col justify-center h-full">
+                                    <div className="flex flex-col justify-center h-full select-custom-label">
                                       <SelectCustomLabel
                                         dataLang={dataLang}
                                         placeholder={dataLang?.PDF_house || 'PDF_house'}
@@ -1318,7 +1255,7 @@ const DeliveryReceiptForm = (props) => {
                                           className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                         >
-                                          <Minus size="14" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                          <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
                                         </button>
                                         <InPutNumericFormat
                                           onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
@@ -1499,7 +1436,7 @@ const DeliveryReceiptForm = (props) => {
                 name="fname"
                 type="text"
                 placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
-                className={`2xl:text-[14px] text-[13px] placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full text-gray-600 font-normal border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
+                className={`xl1439:text-[15px] xl1439:leading-6 text-[13px] leading-[20px] text-gray-600 font-normal placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
               />
             </div>
           </div>
@@ -1539,29 +1476,27 @@ const DeliveryReceiptForm = (props) => {
             <div className="flex flex-col flex-wrap items-center gap-y-3">
               <InfoFormLabel isRequired={true} label="Khách hàng" />
               <div className="w-full flex">
-                <div className="relative flex select-with-radio">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                    <LuBriefcase color="#7a7a7a" />
-                  </span>
-                  <SelectWithRadio
-                    title="Khách hàng"
-                    placeholderText="Chọn khách hàng"
-                    options={dataClient}
-                    value={idClient}
-                    onChange={(value) => {
-                      const newValue = dataClient.find((item) => item.value === value)
-                      _HandleChangeInput('idClient', newValue)
-                    }}
-                    isError={errClient}
-                    isShowAddNew={true}
-                    onSearch={(value) => handleSearchClient(value)}
-                    dataBranch={dataBranch}
-                    dataLang={dataLang}
-                  />
-                </div>
+                <SelectWithRadio
+                  title="Khách hàng"
+                  placeholderText="Chọn khách hàng"
+                  options={dataClient}
+                  value={idClient}
+                  onChange={(value) => {
+                    const newValue = dataClient.find((item) => item.value === value)
+                    _HandleChangeInput('idClient', newValue)
+                  }}
+                  isError={errClient}
+                  sSearchClient={sSearchClient}
+                  dataLang={dataLang}
+                  icon={<LuBriefcase />}
+                />
               </div>
             </div>
-            {errClient && <label className="text-sm text-red-500">{'Vui lòng chọn khách hàng'}</label>}
+            {errClient && (
+              <label className="text-sm text-red-500">
+                {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
+              </label>
+            )}
           </div>
           {/* Đơn hàng bán */}
           <div className="flex flex-col gap-y-2">
@@ -1571,22 +1506,18 @@ const DeliveryReceiptForm = (props) => {
                 label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
               />
               <div className="w-full flex">
-                <div className="relative flex flex-col select-with-radio">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                    <TbNotes color="#7a7a7a" />
-                  </span>
-                  <SelectWithRadio
-                    title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                    placeholderText="Chọn đơn hàng bán"
-                    options={dataProductOrder}
-                    value={idProductOrder}
-                    onChange={(value) => {
-                      const newValue = dataProductOrder.find((item) => item.value === value)
-                      _HandleChangeInput('idProductOrder', newValue)
-                    }}
-                    isError={errProductOrder}
-                  />
-                </div>
+                <SelectWithRadio
+                  title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+                  placeholderText="Chọn đơn hàng bán"
+                  options={dataProductOrder}
+                  value={idProductOrder}
+                  onChange={(value) => {
+                    const newValue = dataProductOrder.find((item) => item.value === value)
+                    _HandleChangeInput('idProductOrder', newValue)
+                  }}
+                  isError={errProductOrder}
+                  icon={<TbNotes />}
+                />
               </div>
             </div>
             {errProductOrder && (
@@ -1601,9 +1532,6 @@ const DeliveryReceiptForm = (props) => {
               <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
               <div className="w-full flex">
                 <div className="relative flex flex-col select-with-radio">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10">
-                    <PiMapPinLight color="#7a7a7a" />
-                  </span>
                   <SelectWithRadio
                     title={dataLang?.select_address || 'select_address'}
                     placeholderText="Chọn địa chỉ giao hàng"
@@ -1614,6 +1542,7 @@ const DeliveryReceiptForm = (props) => {
                       _HandleChangeInput('idAddress', newValue)
                     }}
                     isError={errAddress}
+                    icon={<PiMapPinLight />}
                   />
                   <AiFillPlusCircle
                     onClick={() => _HandleClosePopupAddress(true)}
@@ -1653,22 +1582,18 @@ const DeliveryReceiptForm = (props) => {
                     <div className="flex flex-col flex-wrap items-center gap-y-3">
                       <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
                       <div className="w-full flex">
-                        <div className="relative flex flex-col select-with-radio">
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                            <PiMapPinLight color="#7a7a7a" />
-                          </div>
-                          <SelectWithRadio
-                            title={dataLang?.import_branch || 'import_branch'}
-                            placeholderText="Chọn chi nhánh"
-                            options={dataBranch}
-                            value={idBranch}
-                            onChange={(value) => {
-                              const newValue = dataBranch.find((item) => item.value === value)
-                              _HandleChangeInput('branch', newValue)
-                            }}
-                            isError={errBranch}
-                          />
-                        </div>
+                        <SelectWithRadio
+                          title={dataLang?.import_branch || 'import_branch'}
+                          placeholderText="Chọn chi nhánh"
+                          options={dataBranch}
+                          value={idBranch}
+                          onChange={(value) => {
+                            const newValue = dataBranch.find((item) => item.value === value)
+                            _HandleChangeInput('branch', newValue)
+                          }}
+                          isError={errBranch}
+                          icon={<PiMapPinLight />}
+                        />
                       </div>
                     </div>
                     {errBranch && (
@@ -1685,22 +1610,18 @@ const DeliveryReceiptForm = (props) => {
                         label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
                       />
                       <div className="w-full flex">
-                        <div className="relative flex flex-col select-with-radio">
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                            <PiUser color="#7a7a7a" />
-                          </div>
-                          <SelectWithRadio
-                            title={dataLang?.import_branch || 'import_branch'}
-                            placeholderText="Chọn người dùng"
-                            options={dataStaff}
-                            value={idStaff}
-                            onChange={(value) => {
-                              const newValue = dataStaff.find((item) => item.value === value)
-                              _HandleChangeInput('idStaff', newValue)
-                            }}
-                            isError={errStaff}
-                          />
-                        </div>
+                        <SelectWithRadio
+                          title={dataLang?.import_branch || 'import_branch'}
+                          placeholderText="Chọn người dùng"
+                          options={dataStaff}
+                          value={idStaff}
+                          onChange={(value) => {
+                            const newValue = dataStaff.find((item) => item.value === value)
+                            _HandleChangeInput('idStaff', newValue)
+                          }}
+                          isError={errStaff}
+                          icon={<PiUser />}
+                        />
                       </div>
                     </div>
                     {errStaff && (

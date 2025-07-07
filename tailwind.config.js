@@ -160,6 +160,7 @@ module.exports = {
       },
       screens: {
         '3xl': '1600px',
+        xl1439: '1440px',
         xxl: '1400px',
         std: '1400px',
         xlg: '1366px',
@@ -218,6 +219,14 @@ module.exports = {
     },
     function ({ addComponents }) {
       addComponents({
+        '.responsive-text-xxs': {
+          fontSize: '9px',
+          lineHeight: '14px',
+          '@screen 3xl': {
+            fontSize: '10px',
+            lineHeight: '1rem',
+          },
+        },
         '.responsive-text-xs': {
           fontSize: '9px',
           lineHeight: '11px',
