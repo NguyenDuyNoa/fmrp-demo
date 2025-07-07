@@ -1,20 +1,18 @@
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
+import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import {
     ColumnTable,
     HeaderTable,
     RowItemTable,
     RowTable,
 } from "@/components/UI/common/Table";
-import TagBranch from "@/components/UI/common/Tag/TagBranch";
+import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
 import {
-    Container,
-    ContainerBody,
-    ContainerTable,
-    LayOutTableDynamic,
+    LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -27,10 +25,9 @@ import Pagination from "@/components/UI/pagination";
 import SelectOptionLever from "@/components/UI/selectOptionLever/selectOptionLever";
 import { WARNING_STATUS_ROLE } from "@/constants/warningStatus/warningStatus";
 import { useBranchList } from "@/hooks/common/useBranch";
+import { useUnitList, useVariantList } from "@/hooks/common/useItems";
 import { useProductTypeProducts } from "@/hooks/common/useProductTypeProducts";
 import { useStageList } from "@/hooks/common/useStages";
-import { useUnitList } from "@/hooks/common/useItems";
-import { useVariantList } from "@/hooks/common/useItems";
 import useFeature from "@/hooks/useConfigFeature";
 import useSetingServer from "@/hooks/useConfigNumber";
 import { useLimitAndTotalItems } from "@/hooks/useLimitAndTotalItems";
@@ -47,14 +44,12 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import ModalImage from "react-modal-image";
 import { useSelector } from "react-redux";
+import ToggleBotAI from "../botAI/components/ToggleBotAI";
 import Popup_Detail from "./components/product/PopupDetail";
 import Popup_Products from "./components/product/popupProducts";
 import { useCategoryOptions } from "./hooks/product/useCategoryOptions";
 import { useProductList } from "./hooks/product/useProductList";
-import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
-import { TagColorProduct } from "@/components/UI/common/Tag/TagStatus";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
-import ToggleBotAI from "../botAI/components/ToggleBotAI";
+
 const Products = (props) => {
     const dataLang = props.dataLang;
 
@@ -119,7 +114,7 @@ const Products = (props) => {
     const { data: dataBranchOption = [] } = useBranchList();
     // danh sách sản phẩm
     const { data, isFetching, refetch } = useProductList(params);
-
+console.log(data)
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
@@ -249,7 +244,7 @@ const Products = (props) => {
             ]),
         },
     ];
-
+console.log(data)
     const breadcrumbItems = [
         {
             label: `${dataLang?.header_category_material || "header_category_material"
@@ -402,7 +397,7 @@ const Products = (props) => {
                                     isClearable={true}
                                     placeholder={dataLang?.category_titel || "category_titel"}
                                 />
-                                <SelectComponent
+                                {/* <SelectComponent
                                     options={[
                                         {
                                             value: "",
@@ -419,7 +414,7 @@ const Products = (props) => {
                                     colSpan={3}
                                     isClearable={true}
                                     closeMenuOnSelect={false}
-                                />
+                                /> */}
                             </div>
                             <div className="flex items-center justify-end space-x-2">
                                 <OnResetData

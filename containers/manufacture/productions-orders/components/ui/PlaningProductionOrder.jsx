@@ -282,7 +282,7 @@ const TablePlaning = ({ Title, typeTable, dataLang, data }) => {
                         >
                           <ProgressBar
                             current={formatNumber(item.quantity_import)}
-                            total={formatNumber(item.quantity_rest)}
+                            total={formatNumber(item.quantity_rest_process)}
                             name={item.unit_name_primary}
                             typeProgress="tablePlaning"
                           />
