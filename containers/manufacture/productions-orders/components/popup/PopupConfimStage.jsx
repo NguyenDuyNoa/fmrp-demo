@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion'
 import InputCustom from '@/components/common/input/InputCustom'
 import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
+import CheckIcon from '@/components/icons/common/CheckIcon'
+import CloseXIcon from '@/components/icons/common/CloseXIcon'
 import KanbanIcon from '@/components/icons/common/KanbanIcon'
-import SaveIcon from '@/components/icons/common/SaveIcon'
 import TrashIcon from '@/components/icons/common/TrashIcon'
+import WarningIcon from '@/components/icons/common/WarningIcon'
 import ButtonSubmit from '@/components/UI/button/buttonSubmit'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
@@ -25,11 +26,6 @@ import { useHandingFinishedStages } from '../../hooks/useHandingFinishedStages'
 import { useListFinishedStages } from '../../hooks/useListFinishedStages'
 import { useLoadOutOfStock } from '../../hooks/useLoadOutOfStock'
 import { PopupOrderCompleted } from './PopupCompleteCommand'
-import WarningIcon from '@/components/icons/common/WarningIcon'
-import CloseXIcon from '@/components/icons/common/CloseXIcon'
-import { TagColorProduct } from '@/components/common/tag/TagStatusNew'
-import MultiValue from '@/components/UI/mutiValue/multiValue'
-import { Trash } from 'iconsax-react'
 
 const initialState = {
   open: false,
@@ -50,6 +46,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
   const [errorNVLData, setErrorNVLData] = useState({ items: [] })
   const [errorNVLDataBefore, setErrorNVLDataBefore] = useState({ items: [] })
+  const [isInputPending, setIsInputPending] = useState(false)
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
@@ -118,6 +115,12 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const handleSubmit = async () => {
+    // Nếu đang có thay đổi đang chờ xử lý, không cho phép submit
+    if (isInputPending) {
+      isToast('error', 'Vui lòng đợi xử lý dữ liệu hoàn tất')
+      return
+    }
+
     if (!isState.objectWareHouse) {
       isToast('error', 'Vui lòng kiểm tra dữ liệu')
       return
@@ -189,6 +192,12 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
   const updateQuantityAndSerial = (item, type, value, serialType) => {
     const newQuantity = value?.floatValue || 0
+    
+    // Chỉ xử lý serial nếu showSerialColumns là true
+    if (!showSerialColumns) {
+      return { ...item, [type]: newQuantity }
+    }
+
     const currentSerials = Array.isArray(item[serialType]) ? [...item[serialType]] : []
 
     // Điều chỉnh số lượng serial theo `newQuantity` và reset `isDuplicate`
@@ -204,8 +213,17 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const updateSerialsGeneric = (item, value, type) => {
-    let existingSerials = [...(item[type] || [])] // Giữ serial cũ
     const quantity = value?.floatValue ? value?.floatValue : value?.value
+
+    // Nếu không cần xử lý serial, chỉ cập nhật số lượng
+    if (!showSerialColumns) {
+      return {
+        ...item,
+        [type === 'serialError' ? 'quantityError' : 'quantityEnterClient']: quantity
+      }
+    }
+
+    let existingSerials = [...(item[type] || [])] // Giữ serial cũ
 
     // Lấy số lớn nhất từ cả hai danh sách serial và serialError
     const getMaxSerial = (list) =>
@@ -234,7 +252,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
     // Kiểm tra và cập nhật trạng thái trùng lặp
     const valuesList = existingSerials.map((s) => s?.value).filter(Boolean)
-    existingSerials = existingSerials.map((s) => ({
+    existingSerials = existingSerials.map((s, i) => ({
       ...s,
       isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value),
     }))
@@ -247,6 +265,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const handleChange = ({ table, type, value, row, index }) => {
+    // Đánh dấu đang có thay đổi đang chờ xử lý
+    setIsInputPending(true)
+
     if (table == 'product') {
       const quantityEnterClient = 'quantityEnterClient'
       const quantityError = 'quantityError'
@@ -293,12 +314,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         },
       })
 
-      if (checkType)
+      // Chỉ gọi onGetBom khi thay đổi serial hoặc serialError, không gọi khi thay đổi số lượng
+      // vì số lượng đã được xử lý thông qua onChangeComplete của InputCustom
+      if (type === 'serial' || type === 'serialError') {
         onGetBom(
           {
-            isProduct: type === 'TP' ? 1 : 0,
+            isProduct: activeStep.type === 'TP' ? 1 : 0,
             activeStep: {
-              type,
+              type: activeStep.type,
               item: activeStep.item,
             },
             poId: dataRight?.idDetailProductionOrder,
@@ -306,6 +329,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           },
           newData
         )
+      }
     }
 
     if (table == 'bom') {
@@ -371,6 +395,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
   const onGetBom = useCallback(
     debounce(async (object, items) => {
+      console.log("onGetBom - Object:", object);
+      console.log("onGetBom - Items:", items);
       try {
         const r = await onGetDataLoadOutOfStock({ object, items })
 
@@ -405,11 +431,16 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             },
           },
         })
+
+        // Đánh dấu đã xử lý xong
+        setIsInputPending(false)
       } catch (error) {
         console.error('Error in onGetBom:', error)
+        // Đánh dấu đã xử lý xong ngay cả khi có lỗi
+        setIsInputPending(false)
       }
     }, 500),
-    [isState.dataTableProducts, isState.dataTableBom]
+    [isState.dataTableProducts, isState.dataTableBom, activeStep]
   )
 
   const getPriorityItem = (semi, products) => {
@@ -453,6 +484,97 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   const showExpiryColumns =
     checkItemFinalStage && dataMaterialExpiry.is_enable === '1' && dataProductExpiry.is_enable === '1'
 
+  // Thêm hàm xử lý thay đổi số lượng
+  const handleQuantityChange = async (value, row, type) => {
+    try {
+      // Đánh dấu đang có thay đổi đang chờ xử lý
+      setIsInputPending(true);
+      
+      console.log("handleQuantityChange - Current activeStep:", activeStep);
+      console.log("handleQuantityChange - activeStep.type:", activeStep.type);
+      console.log("handleQuantityChange - isProduct value:", activeStep.type === 'TP' ? 1 : 0);
+      
+      // Tạo đối tượng value giống như trong handleChange
+      const simulatedValue = { floatValue: value };
+      
+      // Cập nhật dữ liệu tương tự như handleChange
+      const serialType = type === 'quantityEnterClient' ? 'serial' : 'serialError';
+      
+      const newData = isState.dataTableProducts?.data?.items?.map((item) => {
+        if (item?.poi_id === row?.poi_id) {
+          return updateSerialsGeneric(item, simulatedValue, serialType);
+        }
+        return item;
+      });
+      
+      // Cập nhật state
+      queryState({
+        dataTableProducts: {
+          ...isState.dataTableProducts,
+          data: {
+            ...isState.dataTableProducts?.data,
+            items: newData,
+          },
+        },
+      });
+      
+      // Gọi API trực tiếp thay vì dùng debounce
+      const object = {
+        isProduct: activeStep.type === 'TP' ? 1 : 0,
+        activeStep: {
+          type: activeStep.type,
+          item: activeStep.item,
+        },
+        poId: dataRight?.idDetailProductionOrder,
+        arrayMoveBom: isState.arrayMoveBom,
+      };
+      
+      console.log("handleQuantityChange - Calling API directly with:", object);
+      console.log("handleQuantityChange - Items data:", newData);
+      
+      // Gọi API trực tiếp
+      const r = await onGetDataLoadOutOfStock({ object, items: newData });
+      
+      const check = r?.data?.boms?.map((e, index) => {
+        // Tìm kiếm trong lịch sử hiện tại
+        const existingBom = isState.dataTableBom?.data?.bomsClientHistory?.find(
+          (item) => item?.item_id === e?.item_id && item?.pois_id === e?.pois_id
+        );
+
+        // Nếu tìm thấy trong lịch sử, giữ lại warehouseId cũ
+        if (existingBom) {
+          return {
+            ...e,
+            warehouseId: existingBom.warehouseId,
+          };
+        }
+
+        // Nếu là mới, sử dụng list_warehouse_bom từ API
+        return {
+          ...e,
+          warehouseId: e?.list_warehouse_bom,
+        };
+      });
+
+      queryState({
+        dataTableBom: {
+          ...r,
+          data: {
+            ...r?.data,
+            boms: check,
+            bomsClientHistory: check,
+          },
+        },
+      });
+      
+      // Đánh dấu đã xử lý xong
+      setIsInputPending(false);
+    } catch (error) {
+      console.error("Error in handleQuantityChange:", error);
+      setIsInputPending(false);
+    }
+  };
+
   return (
     <>
       {isOrderCompleted ? (
@@ -485,15 +607,21 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                   (Số lệnh sản xuất: {data?.po?.reference_no})
                 </span>
               </div>
-              <ButtonSubmit
-                loading={isLoadingSubmit}
-                dataLang={dataLang}
-                onClick={handleSubmit.bind(this)}
-                icon={<SaveIcon className="size-4" />}
-                className={`mr-8 py-2 2xl:py-3 px-3 2xl:px-4 text-white rounded-lg !responsive-text-base flex items-center gap-2
-                  ${isState.objectWareHouse ? 'bg-typo-blue-4' : 'bg-neutral-02 hover:bg-neutral-02 !cursor-not-allowed'}
+              <div className="mr-8">
+                <ButtonSubmit
+                  loading={isLoadingSubmit}
+                  title="Xác nhận"
+                  onClick={handleSubmit.bind(this)}
+                  icon={<CheckIcon className="size-4" />}
+                  className={`py-2.5 2xl:py-3 px-3 2xl:px-4 text-white rounded-lg !responsive-text-base flex items-center gap-2
+                  ${
+                    isState.objectWareHouse && !isInputPending
+                      ? 'bg-typo-blue-4'
+                      : 'bg-neutral-02 hover:bg-neutral-02 !cursor-not-allowed'
+                  }
                  `}
-              />
+                />
+              </div>
             </div>
           }
           classNameModeltime="px-6 2xl:px-10 3xl:px-12 py-4 2xl:py-5 3xl:py-6 flex flex-col gap-6"
@@ -832,14 +960,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                               >
                                 <InputCustom
                                   state={row?.quantityEnterClient || 0}
-                                  setState={(value) =>
-                                    handleChange({
-                                      table: 'product',
-                                      type: 'quantityEnterClient',
-                                      row,
-                                      value: { floatValue: value },
-                                    })
-                                  }
+                                  setState={(value) => handleQuantityChange(value, row, 'quantityEnterClient')}
                                   className={`${
                                     !row?.quantityEnterClient && !row?.quantityError
                                       ? '!border-red-500'
@@ -852,6 +973,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                   disabled={false}
                                   isError={false}
                                   step={1}
+                                  debounceTime={500}
                                 />
                               </div>
                               {showSerialColumns && (
@@ -862,30 +984,32 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                       : 'max-h-60'
                                   }`}
                                 >
-                                  <div className="flex flex-col gap-1">
-                                    {[...Array(Math.ceil(Math.max(0, Number(row?.quantityEnterClient) || 0)))].map(
-                                      (_, sIndex) => {
-                                        return (
-                                          <input
-                                            key={sIndex}
-                                            value={row.serial?.[sIndex]?.value || ''}
-                                            onChange={(e) => {
-                                              handleChange({
-                                                table: 'product',
-                                                type: 'serial',
-                                                value: e.target.value.trim(),
-                                                row,
-                                                index: sIndex,
-                                              })
-                                            }}
-                                            className={`border text-center py-1 px-1 w-full focus:outline-none rounded-md responsive-text-sm text-neutral-07 font-medium ${
-                                              row.serial?.[sIndex]?.isDuplicate ? 'border-red-500' : 'border-gray-200'
-                                            }`}
-                                          />
-                                        )
-                                      }
-                                    )}
-                                  </div>
+                                  {showSerialColumns ? (
+                                    <div className="flex flex-col gap-1">
+                                      {[...Array(Math.ceil(Math.max(0, Number(row?.quantityEnterClient) || 0)))].map(
+                                        (_, sIndex) => {
+                                          return (
+                                            <input
+                                              key={sIndex}
+                                              value={row.serial?.[sIndex]?.value || ''}
+                                              onChange={(e) => {
+                                                handleChange({
+                                                  table: 'product',
+                                                  type: 'serial',
+                                                  value: e.target.value.trim(),
+                                                  row,
+                                                  index: sIndex,
+                                                })
+                                              }}
+                                              className={`border text-center py-1 px-1 w-full focus:outline-none rounded-md responsive-text-sm text-neutral-07 font-medium ${
+                                                row.serial?.[sIndex]?.isDuplicate ? 'border-red-500' : 'border-gray-200'
+                                              }`}
+                                            />
+                                          )
+                                        }
+                                      )}
+                                    </div>
+                                  ) : null}
                                 </Customscrollbar>
                               )}
 
@@ -896,14 +1020,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                               >
                                 <InputCustom
                                   state={row?.quantityError || 0}
-                                  setState={(value) =>
-                                    handleChange({
-                                      table: 'product',
-                                      type: 'quantityError',
-                                      row,
-                                      value: { floatValue: value },
-                                    })
-                                  }
+                                  setState={(value) => handleQuantityChange(value, row, 'quantityError')}
                                   className={`${
                                     !row?.quantityEnterClient && !row?.quantityError
                                       ? '!border-red-500'
@@ -916,6 +1033,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                   disabled={false}
                                   isError={false}
                                   step={1}
+                                  debounceTime={500}
                                 />
                               </div>
                               {showSerialColumns && (
@@ -927,7 +1045,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                                   }`}
                                 >
                                   <div className="flex flex-col gap-1">
-                                    {[...Array(Math.ceil(Math.max(0, Number(row?.quantityError) || 0)))].map(
+                                    {showSerialColumns && [...Array(Math.ceil(Math.max(0, Number(row?.quantityError) || 0)))].map(
                                       (_, sIndex) => {
                                         return (
                                           <input
@@ -1043,241 +1161,50 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                           ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                           `}
                         >
-                          {formatNumber(totalQuantity)}
+                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnterClient)}
                         </h3>
-                        {checkItemFinalStage && dataProductSerial.is_enable === '1' && (
-                          <h3 className="col-span-3 p-2 text-neutral-07 responsive-text-base font-medium"></h3>
+                        {showSerialColumns && (
+                          <div className="col-span-3 responsive-text-sm text-neutral-02 text-center font-semibold">
+                            {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnterClient)}
+                          </div>
                         )}
-                        <h3
-                          className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
+                        <div
+                          className={`p-2 responsive-text-sm text-neutral-07 font-semibold text-center
                           ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                           `}
                         >
-                          {formatNumber(totalQuantityError)}
-                        </h3>
+                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityError)}
+                        </div>
                         {showSerialColumns && (
-                          <h3 className="col-span-3 p-2 text-neutral-07 responsive-text-base font-medium"></h3>
+                          <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 text-center font-semibold">
+                            {formatNumber(isState.dataTableProducts?.data?.totalQuantityError)}
+                          </div>
                         )}
                         {showExpiryColumns && (
                           <>
-                            <h3 className="col-span-3 p-2 font-normal"></h3>
-                            <h3 className="col-span-3 p-2 font-normal"></h3>
+                            <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 font-semibold"></div>
+                            <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 font-semibold"></div>
                           </>
                         )}
-                        <h3
-                          className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                          ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
+                        <div
+                          className={`whitespace-nowrap text-center responsive-text-sm text-neutral-07 font-semibold
+                          ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3 p-2'}
                           `}
                         >
-                          {formatNumber(totalQuantityEnter)}
-                        </h3>
-                        <h3
-                          className={`p-2 text-center text-neutral-07 responsive-text-base font-medium
-                          ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3'}
+                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnter)}
+                        </div>
+                        <div
+                          className={`whitespace-nowrap text-center responsive-text-sm text-neutral-07 font-semibold
+                          ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3 p-2'}
                           `}
                         >
-                          {formatNumber(totalQuantityEntered)}
-                        </h3>
+                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEntered)}
+                        </div>
+                        <div className="col-span-2 responsive-text-sm text-neutral-02 text-center font-semibold "></div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* <div>
-                  <div className="mb-4 text-lg font-normal">Xuất kho sản xuất</div>
-                  <Customscrollbar className="h-[calc(80vh_/_2_-_115px)] overflow-auto bg-white ">
-                    <table className="w-full text-sm [&>thead>tr>th]:font-normal border border-separate border-spacing-0 border-gray-200 table-auto">
-                      <thead className="sticky top-0 z-10 bg-gray-100">
-                        <tr>
-                          <th className="border p-2 font-normal min-w-[100px]">Hình ảnh</th>
-                          <th className="border p-2 font-normal min-w-[250px]">Mặt hàng</th>
-                          <th className="border p-2 font-normal min-w-[120px]">SL sản xuất</th>
-                          <th className="border p-2 font-normal min-w-[120px]">SL xuất kho</th>
-                          <th className="border p-2 font-normal min-w-[120px]">Tồn kho</th>
-                          <th className="border p-2 font-normal min-w-[290px]">Kho hàng</th>
-                          <th className="border p-2 font-normal min-w-[100px]">Thao tác</th>
-                        </tr>
-                      </thead>
-                      <tbody className="h-[calc(80vh_/_2_-_155px)]">
-                        {isLoadingLoadOutOfStock ? (
-                          <tr>
-                            <td colSpan="7">
-                              <Loading className="!h-[100px] w-full mx-auto" />
-                            </td>
-                          </tr>
-                        ) : isState.dataTableBom?.data?.boms?.length > 0 ? (
-                          isState.dataTableBom?.data?.boms?.map((row, index) => (
-                            <tr key={index}>
-                              <td className="p-2 border">
-                                <div className="flex items-center justify-center ">
-                                  <Image
-                                    src={row?.images ? row?.images : '/icon/noimagelogo.png'}
-                                    width={36}
-                                    height={36}
-                                    alt={row?.images ? row?.images : '/icon/noimagelogo.png'}
-                                    className="object-cover rounded-md min-w-[48px] min-h-[48px] w-[48px] h-[48px] max-w-[48px] max-h-[48px]"
-                                  />
-                                </div>
-                              </td>
-                              <td className="p-2 text-sm border">
-                                <div className="flex flex-col gap-0.5 h-full">
-                                  <p>{row?.item_name}</p>
-                                  <p className="text-xs italic">{row?.product_variation}</p>
-                                  {row?.reference_no_detail && (
-                                    <p className="text-xs text-blue-500">{row?.reference_no_detail}</p>
-                                  )}
-                                  <div className="flex items-center gap-1">
-                                    <TagColorProduct
-                                      dataKey={
-                                        row?.type_products === 'products'
-                                          ? 0
-                                          : row?.type_products === 'semi_products'
-                                          ? 1
-                                          : row?.type_products === 'out_side'
-                                          ? 2
-                                          : row?.type_products === 'materials' || row?.type_products === 'material'
-                                          ? 3
-                                          : row?.type_products === 'semi_products_outside'
-                                          ? 4
-                                          : null
-                                      }
-                                      dataLang={dataLang}
-                                      name={row?.type_products}
-                                    />
-
-                                    {row?.stage_name && (
-                                      <TagColorProduct name={row?.stage_name} lang={false} dataKey={5} />
-                                    )}
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="p-2 text-sm text-center border">
-                                {formatNumber(row?.quantity_total_quota)}/{' '}
-                                <span className="relative text-xs top-1">{row?.unit_name}</span>
-                              </td>
-                              <td className="p-2 text-sm text-center border">
-                                {formatNumber(row?.quantity_quota_primary)}/{' '}
-                                <span className="relative text-xs top-1">{row?.unit_name_primary}</span>
-                              </td>
-                              <td className="p-2 text-sm text-center border">
-                                {formatNumber(row?.quantity_warehouse)}
-                              </td>
-                              <td className="p-2 text-sm border w-[290px]">
-                                <SelectComponent
-                                  options={row?.list_warehouse_bom || []}
-                                  value={row?.warehouseId}
-                                  maxShowMuti={1}
-                                  isClearable={false}
-                                  isMulti={true}
-                                  components={{ MultiValue }}
-                                  onChange={(e) =>
-                                    handleChange({
-                                      table: 'bom',
-                                      type: 'warehouseId',
-                                      row,
-                                      value: e,
-                                    })
-                                  }
-                                  className={`${
-                                    row?.warehouseId?.length == 0 ? 'border-red-500 border' : ''
-                                  }  my-1  text-xs placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal`}
-                                  noOptionsMessage={() => dataLang?.returns_nodata || 'returns_nodata'}
-                                  menuPortalTarget={document.body}
-                                  placeholder={'Kho xuất - Vị trí xuất'}
-                                  formatOptionLabel={(option) => {
-                                    return (
-                                      <>
-                                        <h2 className="text-xs">
-                                          {dataLang?.import_Warehouse || 'import_Warehouse'} : {option?.label}
-                                        </h2>
-                                        <h2 className="text-xs">{option?.name_location}</h2>
-
-                                        <div className="">
-                                          <div className="flex items-center">
-                                            <h4 className="text-[10px]">{dataLang?.returns_survive}:</h4>
-                                            <h4 className="pl-1 text-[10px]">
-                                              {formatNumber(option?.quantity_warehouse)}
-                                            </h4>
-                                          </div>
-                                          {dataProductSerial?.is_enable === '1' && (
-                                            <div className="flex items-center">
-                                              <h4 className="text-[10px] italic">{'Serial'}:</h4>
-                                              <h4 className="pl-1 text-[10px] italic">{option?.serial}</h4>
-                                            </div>
-                                          )}
-                                          {(dataMaterialExpiry.is_enable === '1' ||
-                                            dataProductExpiry?.is_enable === '1') && (
-                                            <>
-                                              <div className="flex items-center justify-start">
-                                                <h4 className="text-[10px] italic">{'Lot'}:</h4>
-                                                <h4 className="pl-1 text-[10px] italic">{option?.lot}</h4>
-                                              </div>
-                                              <div className="flex items-center">
-                                                <h4 className="text-[10px] italic">
-                                                  {dataLang?.warehouses_detail_date || 'warehouses_detail_date'}:
-                                                </h4>
-                                                <h4 className="pl-1 text-[10px] italic">{option?.expiration_date}</h4>
-                                              </div>
-                                            </>
-                                          )}
-                                        </div>
-                                      </>
-                                    )
-                                  }}
-                                  style={{
-                                    border: 'none',
-                                    boxShadow: 'none',
-                                    outline: 'none',
-                                  }}
-                                  styles={{
-                                    placeholder: (base) => ({
-                                      ...base,
-                                      color: '#cbd5e1',
-                                    }),
-                                    menuPortal: (base) => ({
-                                      ...base,
-                                      zIndex: 9999,
-                                      position: 'absolute',
-                                    }),
-                                    menu: (provided, state) => ({
-                                      ...provided,
-                                      width: '100%',
-                                    }),
-                                  }}
-                                  theme={(theme) => ({
-                                    ...theme,
-                                    colors: {
-                                      ...theme.colors,
-                                      primary25: '#EBF5FF',
-                                      primary50: '#92BFF7',
-                                      primary: '#0F4F9E',
-                                    },
-                                  })}
-                                  classNamePrefix="customDropdow classNamePrefixLotDateSerial"
-                                />
-                              </td>
-                              <td className="p-2 text-sm text-center border">
-                                <button
-                                  title="Xóa"
-                                  onClick={() => handleRemove('bom', row)}
-                                  className="p-1 text-red-500 transition-all ease-linear rounded-md hover:scale-110 bg-red-50 hover:bg-red-200 animate-bounce-custom"
-                                >
-                                  <Trash size={24} />
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="7" className="p-2 text-center text-red-500 border">
-                              Không có mặt hàng
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </Customscrollbar>
-                </div> */}
               </div>
             </div>
           </div>

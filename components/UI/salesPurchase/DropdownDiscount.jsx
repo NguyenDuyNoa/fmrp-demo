@@ -9,10 +9,10 @@ const DropdownDiscount = ({ value, onChange, dataLang }) => {
     <Dropdown
       overlay={
         <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-          <p className="3xl:text-base font-normal font-deca text-secondary-color-text mb-2">
+          <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
             Chọn hoàng loạt % chiết khấu
           </p>
-          <div className="flex items-center font-deca font-normal 3xl:text-sm 3xl:font-semibold text-black-color 2xl:text-[12px] xl:text-[11px] text-[10px] text-end p-2 h-9 w-full border rounded-lg border-gray-200">
+          <div className="flex items-center font-deca font-normal 3xl:text-sm 3xl:font-semibold text-black-color text-[12px] text-end p-2 h-9 w-full border rounded-lg border-gray-200">
             <InPutNumericFormat
               value={value}
               onValueChange={onChange}
@@ -28,7 +28,7 @@ const DropdownDiscount = ({ value, onChange, dataLang }) => {
       arrow
     >
       <div className="inline-flex items-center justify-between cursor-pointer w-[90%]">
-        <TableHeader className="text-start">{dataLang?.import_from_discount || 'import_from_discount'}</TableHeader>
+        <TableHeader className="text-start">% CK</TableHeader>
         <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
       </div>
     </Dropdown>

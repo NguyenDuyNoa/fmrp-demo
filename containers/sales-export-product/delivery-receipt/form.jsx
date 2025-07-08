@@ -1,5 +1,6 @@
 import apiDeliveryReceipt from '@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import EmptyData from '@/components/UI/emptyData'
@@ -21,7 +22,6 @@ import { useStaffOptions } from '@/hooks/common/useStaffs'
 import { useTaxList } from '@/hooks/common/useTaxs'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
-import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { isAllowedDiscount, isAllowedNumber } from '@/utils/helpers/common'
@@ -44,7 +44,6 @@ import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase } from 'react-icons/lu'
-import { MdClear } from 'react-icons/md'
 import { PiMapPinLight, PiUser } from 'react-icons/pi'
 import { TbNotes } from 'react-icons/tb'
 import { useSelector } from 'react-redux'
@@ -68,14 +67,11 @@ const DeliveryReceiptForm = (props) => {
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
 
-  const statusExprired = useStatusExprired()
-
   const authState = useSelector((state) => state.auth)
 
-  const { dataMaterialExpiry, dataProductSerial, dataProductExpiry } = useFeature()
+  const { dataMaterialExpiry, dataProductExpiry } = useFeature()
 
   // State Variables
-  const [activeTab, setActiveTab] = useState('info')
 
   const [showMoreInfo, setShowMoreInfo] = useState(false)
 
@@ -1066,7 +1062,7 @@ const DeliveryReceiptForm = (props) => {
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={'Chọn nhanh mặt hàng'}
             hideSelectedOptions={false}
-            className="rounded-md bg-white 3xl:text-[16px] text-[13px]"
+            className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
             isSearchable={true}
             noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
             menuPortalTarget={document.body}
@@ -1091,14 +1087,17 @@ const DeliveryReceiptForm = (props) => {
               }),
               menuPortal: (base) => ({
                 ...base,
-                zIndex: 100,
+                // zIndex: 9999,
               }),
               control: (base, state) => ({
                 ...base,
-                boxShadow: 'none',
-                padding: '0.7px',
                 borderRadius: '8px',
-                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : '0 0 0 1px #D0D5DD',
+                borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
+                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
+              }),
+              menu: (provided, state) => ({
+                ...provided,
+                width: '100%',
               }),
             }}
           />
@@ -1125,7 +1124,7 @@ const DeliveryReceiptForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-left">
+                <TableHeader className="text-center">
                   {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
                 </TableHeader>
                 {/* Chọn hàng loại % Thuế */}
@@ -1336,14 +1335,12 @@ const DeliveryReceiptForm = (props) => {
                                       } `}
                                     >
                                       <InPutMoneyFormat
-                                        className={`appearance-none text-right responsive-text-sm font-semibold w-full focus:outline-none `}
+                                        className={`appearance-none text-center responsive-text-sm font-semibold w-full focus:outline-none `}
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
                                         isAllowed={isAllowedNumber}
                                         value={ce?.price}
+                                        isSuffix=" đ"
                                       />
-                                      <span className="pl-1 text-right responsive-text-sm font-semibold underline">
-                                        đ
-                                      </span>
                                     </div>
                                     {/* % Chiết khấu */}
                                     <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
@@ -1356,7 +1353,9 @@ const DeliveryReceiptForm = (props) => {
                                       <span className="2xl:pl-1">%</span>
                                     </div>
                                     {/* Đơn giá sau CK */}
-                                    <div className={`flex items-center text-left responsive-text-sm font-semibold`}>
+                                    <div
+                                      className={`flex items-center justify-center text-center responsive-text-sm font-semibold`}
+                                    >
                                       <h3>{discountedPrice}</h3>
                                       <span className="pl-1 underline">đ</span>
                                     </div>
@@ -1386,28 +1385,15 @@ const DeliveryReceiptForm = (props) => {
                                       />
                                     </div>
                                     {/* Thành tiền và nút xóa*/}
-                                    <div className="flex items-center justify-between gap-2 pr-1 p-0.5">
-                                      <span className="text-left responsive-text-sm font-semibold">
-                                        {formatNumber(
-                                          ce?.price *
-                                            (1 - Number(ce?.discount) / 100) *
-                                            (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                            Number(ce?.quantity)
-                                        )}
-                                        <span className="pl-1 underline">đ</span>
-                                      </span>
-                                      {/* Nút xoá */}
-                                      <div className="flex items-center">
-                                        <button
-                                          type="button"
-                                          title="Xóa"
-                                          onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                          className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                                        >
-                                          <MdClear />
-                                        </button>
-                                      </div>
-                                    </div>
+                                    <ItemTotalAndDelete
+                                      total={formatNumber(
+                                        ce?.price *
+                                          (1 - Number(ce?.discount) / 100) *
+                                          (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                          Number(ce?.quantity)
+                                      )}
+                                      onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                    />
                                   </React.Fragment>
                                 )
                               })}
@@ -1452,6 +1438,7 @@ const DeliveryReceiptForm = (props) => {
                 <DatePicker
                   className="sales-product-date pl-9 placeholder:text-secondary-color-text-disabled cursor-pointer"
                   status={errDate ? 'error' : ''}
+                  allowClear={false}
                   placeholder="Chọn ngày"
                   format="DD/MM/YYYY HH:mm"
                   showTime={{
@@ -1668,7 +1655,7 @@ const DeliveryReceiptForm = (props) => {
               onChange={_HandleChangeInput.bind(this, 'note')}
               name="fname"
               type="text"
-              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[80px] max-h-[80px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
             />
           </div>
         </div>
