@@ -27,12 +27,12 @@ import { BsCalendarEvent } from 'react-icons/bs'
 import { FaPencilAlt } from 'react-icons/fa'
 import { FiUser } from 'react-icons/fi'
 import { LuBriefcase } from 'react-icons/lu'
-import { MdClear } from 'react-icons/md'
 import { PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
@@ -996,7 +996,7 @@ const SalesOrderForm = (props) => {
                   onChange={handleOnChangeInput.bind(this, 'totaldiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-start">
+                <TableHeader className="text-center">
                   {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
                 </TableHeader>
                 {/* Chọn hàng loại % Thuế */}
@@ -1006,7 +1006,7 @@ const SalesOrderForm = (props) => {
                   dataLang={dataLang}
                   taxOptions={taxOptions}
                 />
-                <TableHeader className="text-start">
+                <TableHeader className="text-center">
                   {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                 </TableHeader>
               </div>
@@ -1054,7 +1054,7 @@ const SalesOrderForm = (props) => {
                     </div>
                     {/* Số lượng */}
                     <div className="flex items-center justify-center">
-                      <div className="flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
+                      <div className="flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
                         <button
                           onClick={() => handleDecrease(e?.id)}
                           className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
@@ -1073,7 +1073,7 @@ const SalesOrderForm = (props) => {
                           }}
                           allowNegative={false}
                           className={`${
-                            (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
+                            (e?.quantity <= 0 || e?.quantity == '') && 'border-red-500'
                           } cursor-default appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
                         />
                         <button
@@ -1085,34 +1085,35 @@ const SalesOrderForm = (props) => {
                       </div>
                     </div>
                     {/* Đơn giá */}
-                    <div className="flex items-center justify-center text-center">
+                    <div className="flex items-center border rounded-lg border-gray-200 font-semibold responsive-text-sm h-8 2xl:h-10 py-1 px-2 2xl:px-3">
                       <InPutMoneyFormat
                         value={e?.price}
                         onValueChange={(value) => handleOnChangeInputOption(e?.id, 'price', value)}
                         isAllowed={isAllowedNumber}
                         allowNegative={false}
-                        className={`price-input-number ${
+                        className={`price-input-number cursor-text appearance-none text-center w-full focus:outline-none m-0 ${
                           (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
-                        } cursor-default appearance-none text-end 3xl:font-semibold responsive-text-sm font-normal w-full 3xl:my-2 my-1 mx-0 3xl:p-2 p-1 focus:outline-none border rounded-lg border-gray-200`}
+                        }`}
+                        isSuffix={' đ'}
                       />
                     </div>
                     {/* % Chiết khấu */}
-                    <div className="flex items-center justify-center text-center">
+                    <div className="flex items-center justify-center border border-gray-200 rounded-lg font-semibold responsive-text-sm text-black-color h-8 2xl:h-10 py-2 px-2 2xl:px-3">
                       <InPutNumericFormat
                         value={e?.discount}
                         onValueChange={(value) => {
                           handleOnChangeInputOption(e?.id, 'discount', value)
                         }}
-                        className={`cursor-text appearance-none text-end 3xl:my-2 my-1 3xl:p-2 p-1 font-normal w-full focus:outline-none border rounded-lg 3xl:font-semibold text-black-color responsive-text-sm border-gray-200`}
+                        className={`cursor-text appearance-none text-right w-full focus:outline-none`}
                         isAllowed={isAllowedDiscount}
                         isNumericString={true}
                       />
+                      <span className="pl-[2px] 2xl:pl-1 text-right">%</span>
                     </div>
                     {/* Đơn giá sau chiết khấu */}
-                    <div className="flex items-center justify-start text-right">
-                      <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm text-black-color`}>
-                        {formatNumber(e?.price_after_discount)}
-                      </h3>
+                    <div className="flex items-center justify-center text-center font-semibold responsive-text-sm text-black-color">
+                      <h3 className={`pl-2`}>{formatNumber(e?.price_after_discount)}</h3>
+                      <span className="pl-[2px] 2xl:pl-1 underline">đ</span>
                     </div>
                     {/* % Thuế */}
                     <div className="w-full">
@@ -1144,25 +1145,13 @@ const SalesOrderForm = (props) => {
                       />
                     </div>
                     {/* Thành tiền và nút xoá */}
-                    <div className="flex items-center justify-between text-right">
-                      <h3 className={`cursor-text px-2 3xl:font-semibold responsive-text-sm z-[99] text-black-color`}>
-                        {formatMoney(e?.total_amount)}
-                      </h3>
-                      {/* Nút xoá */}
-                      <div className="flex items-center justify-center">
-                        <button
-                          onClick={() => {
-                            setIdProductSale(e?.item?.value)
-                            _HandleDelete.bind(this, e?.id)()
-                          }}
-                          type="button"
-                          title="Xóa"
-                          className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                        >
-                          <MdClear />
-                        </button>
-                      </div>
-                    </div>
+                    <ItemTotalAndDelete
+                      total={formatMoney(e?.total_amount)}
+                      onDelete={() => {
+                        setIdProductSale(e?.item?.value)
+                        _HandleDelete.bind(this, e?.id)()
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -1199,6 +1188,7 @@ const SalesOrderForm = (props) => {
                   <DatePicker
                     className="sales-product-date pl-8 placeholder:text-secondary-color-text-disabled cursor-pointer"
                     status={errDate ? 'error' : ''}
+                    allowClear={false}
                     placeholder="Chọn ngày"
                     format="DD/MM/YYYY HH:mm"
                     showTime={{
@@ -1394,7 +1384,7 @@ const SalesOrderForm = (props) => {
               onChange={handleOnChangeInput.bind(this, 'note')}
               name="fname"
               type="text"
-              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[80px] max-h-[80px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
             />
           </div>
         </div>

@@ -991,6 +991,12 @@ body {
     height: auto;
     min-height: 40px;
   }
+  @media screen and (max-width: 1535px) {
+    .ant-select-single,
+    .ant-select-selector {
+      min-height: 32px;
+    }
+  }
 }
 
 .select-tax {
@@ -1199,6 +1205,10 @@ body {
 .customDropdowTax__option,
 .customDropdowTax__single-value {
   font-family: 'Lexend Deca', sans-serif;
+}
+// react-select components
+.css-1ouq9ig-control:hover {
+  border-color: #003da0 !important;
 }
 
 .ant-picker-ok {
