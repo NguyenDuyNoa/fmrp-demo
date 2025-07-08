@@ -1116,7 +1116,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const handleConfimDeleteItem = async () => {
     const type = {
       dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
-      dataPurchases: `/api_web/Api_purchases/purchases/${isId}?csrf_protection=true`,
+      dataPurchases: `/api_web/Api_import/import/${isId}?csrf_protection=true`,
     }
     const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild])
     if (isSuccess) {

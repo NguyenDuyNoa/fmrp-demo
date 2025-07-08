@@ -11,7 +11,7 @@ const ButtonSubmit = ({ loading, dataLang, onClick, icon, ...rest }) => {
                     onClick={onClick}
                     type={rest?.type || 'submit'}
                     {...rest}
-                    className={twMerge(`button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base hover:scale-105 ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#003DA0]`, rest?.className)}
+                    className={twMerge(`button text-[#FFFFFF] hover:bg-blue-500 font-normal text-base ease-in-out transition-all btn-amination py-2 px-4 rounded-[5.5px] bg-[#003DA0]`, rest?.className)}
                 >
                     {/* {dataLang?.purchase_order_purchase_save || "purchase_order_purchase_save"} */}
                     {icon}
