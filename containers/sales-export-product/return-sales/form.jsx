@@ -1,5 +1,6 @@
 import apiReturnSales from '@/Api/apiSalesExportProduct/returnSales/apiReturnSales'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
@@ -37,7 +38,6 @@ import React, { useEffect, useState } from 'react'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase, LuRefreshCcw } from 'react-icons/lu'
-import { MdClear } from 'react-icons/md'
 import { PiMapPinLight } from 'react-icons/pi'
 import Select from 'react-select'
 import Popup from 'reactjs-popup'
@@ -125,9 +125,6 @@ const ReturnSalesForm = (props) => {
   const { data: dataWarehouse } = useWarehouseComboboxlocation({
     'filter[branch_id]': idChange?.idBranch ? idChange?.idBranch?.value : null,
   })
-  console.log('idChange?.idBranch', idChange?.idBranch)
-
-  console.log('dataWarehouse', dataWarehouse)
 
   // Gắn chi nhánh đầu tiên vào state idBranch
   useEffect(() => {
@@ -751,7 +748,7 @@ const ReturnSalesForm = (props) => {
             options={options}
             value={null}
             onChange={_HandleAddParent.bind(this)}
-            className="rounded-md bg-white 3xl:text-[16px] text-[13px]"
+            className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
             placeholder={dataLang?.returns_items || 'returns_items'}
             noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
             menuPortalTarget={document.body}
@@ -777,14 +774,17 @@ const ReturnSalesForm = (props) => {
               }),
               menuPortal: (base) => ({
                 ...base,
-                zIndex: 100,
+                // zIndex: 9999,
               }),
               control: (base, state) => ({
                 ...base,
-                boxShadow: 'none',
-                padding: '0.7px',
                 borderRadius: '8px',
-                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : '0 0 0 1px #D0D5DD',
+                borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
+                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
+              }),
+              menu: (provided, state) => ({
+                ...provided,
+                width: '100%',
               }),
             }}
           />
@@ -806,7 +806,7 @@ const ReturnSalesForm = (props) => {
                   {dataLang?.import_from_quantity || 'import_from_quantity'}
                 </TableHeader>
                 <TableHeader className="text-center">
-                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
+                  {dataLang?.import_from_unit_price || 'import_from_unit_price'}
                 </TableHeader>
                 {/* Chọn hàng loạt % Chiếu khấu */}
                 <DropdownDiscount
@@ -814,7 +814,9 @@ const ReturnSalesForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-left">{dataLang?.returns_sck || 'returns_sck'}</TableHeader>
+                <TableHeader className="text-left">
+                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
+                </TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={generalTax}
@@ -822,7 +824,7 @@ const ReturnSalesForm = (props) => {
                   dataLang={dataLang}
                   taxOptions={taxOptions}
                 />
-                <TableHeader className="text-left">{dataLang?.import_into_money || 'import_into_money'}</TableHeader>
+                <TableHeader className="text-center">{dataLang?.import_into_money || 'import_into_money'}</TableHeader>
               </div>
             </div>
           </div>
@@ -871,15 +873,12 @@ const ReturnSalesForm = (props) => {
                                   <div>Serial: {option.e?.serial ? option.e?.serial : '-'}</div>
                                 )}
                                 {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
-                                  <>
-                                    <div>Lot: {option.e?.lot ? option.e?.lot : '-'}</div>
-                                    <div>
-                                      Date:{' '}
-                                      {option.e?.expiration_date
-                                        ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                        : '-'}
-                                    </div>
-                                  </>
+                                  <div>
+                                    Lot: {option.e?.lot ? option.e?.lot : '-'} - Date:{' '}
+                                    {option.e?.expiration_date
+                                      ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                      : '-'}
+                                  </div>
                                 ) : (
                                   ''
                                 )}
@@ -949,11 +948,49 @@ const ReturnSalesForm = (props) => {
                                 isVisibleLotDate={false}
                               />
                             </div>
-
                             {/* Số lượng */}
                             <div className="flex items-center justify-center">
+                              {/* <QuantitySelector
+                                ce={ce}
+                                clsxErrorBorder={`${
+                                  errors.errQuantity &&
+                                  (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
+                                    ? 'border-red-500'
+                                    : errors.errSurvive
+                                    ? 'border-red-500'
+                                    : 'border-border-gray-2'
+                                } ${
+                                  (ce?.quantity == 0 && 'border-red-500') || (ce?.quantity == '' && 'border-red-500')
+                                }`}
+                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
+                                isAllowedNumber={({ floatValue }) => {
+                                  if (floatValue == 0) {
+                                    return true
+                                  }
+                                  if (+floatValue > +ce?.quantityLeft) {
+                                    isShow(
+                                      'error',
+                                      `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                        +ce?.quantityLeft
+                                      )} số lượng còn lại`
+                                    )
+                                    return false
+                                  } else {
+                                    return true
+                                  }
+                                }}
+                                disabledMinus={
+                                  ce?.quantity === 1 ||
+                                  ce?.quantity === '' ||
+                                  ce?.quantity === null ||
+                                  ce?.quantity === 0
+                                }
+                                onDecrease={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
+                                onIncrease={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
+                                isPopop={true}
+                              /> */}
                               <div
-                                className={`relative flex items-center justify-center h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                className={`relative flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
                                   errors.errQuantity &&
                                   (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
                                     ? 'border-red-500'
@@ -1033,10 +1070,9 @@ const ReturnSalesForm = (props) => {
                                 </div>
                               </div>
                             </div>
-
                             {/* Đơn giá */}
                             <div
-                              className={`flex items-center justify-center h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
+                              className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
                                 errors.errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
                                   ? 'border-red-500'
                                   : errors.errSurvivePrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
@@ -1045,31 +1081,30 @@ const ReturnSalesForm = (props) => {
                               } ${(ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')} `}
                             >
                               <InPutMoneyFormat
-                                className={`appearance-none text-right responsive-text-sm font-semibold w-full focus:outline-none `}
+                                className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
                                 value={ce?.price}
                                 isAllowed={isAllowedNumber}
+                                isSuffix=" đ"
                               />
-                              <span className="pl-1 text-right responsive-text-sm font-semibold underline">đ</span>
                             </div>
-
                             {/* % Chiết khấu */}
-                            <div className="flex items-center justify-end h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                            <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
                               <InPutNumericFormat
                                 className="appearance-none w-full focus:outline-none text-right"
                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                 value={ce?.discount}
                                 isAllowed={isAllowedDiscount}
                               />
-                              <span className="2xl:pl-1">%</span>
+                              <span className="pl-[2px] 2xl:pl-1">%</span>
                             </div>
-
                             {/* Đơn giá sau chiết khấu */}
-                            <div className={`flex items-center text-left responsive-text-sm font-semibold`}>
+                            <div
+                              className={`flex items-center justify-center text-center responsive-text-sm font-semibold`}
+                            >
                               <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
                               <span className="pl-1 underline">đ</span>
                             </div>
-
                             {/* % Thuế */}
                             <div className="flex items-center h-full">
                               <SelectCustomLabel
@@ -1093,31 +1128,16 @@ const ReturnSalesForm = (props) => {
                                 )}
                               />
                             </div>
-
                             {/* Thành tiền và nút xóa*/}
-                            <div className="flex items-center justify-between gap-2 pr-1 p-0.5">
-                              <div className="text-left responsive-text-sm font-semibold">
-                                <span>
-                                  {formatMoney(
-                                    ce?.price *
-                                      (1 - Number(ce?.discount) / 100) *
-                                      (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                      Number(ce?.quantity)
-                                  )}
-                                </span>
-                                <span className="pl-1 underline">đ</span>
-                              </div>
-                              {/* Nút xoá */}
-                              <div className="flex items-center">
-                                <button
-                                  title="Xóa"
-                                  onClick={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                  className="transition 3xl:size-6 size-5 responsive-text-sm bg-gray-300 text-black hover:text-typo-black-3/60 flex flex-col justify-center items-center border rounded-full"
-                                >
-                                  <MdClear />
-                                </button>
-                              </div>
-                            </div>
+                            <ItemTotalAndDelete
+                              total={formatMoney(
+                                ce?.price *
+                                  (1 - Number(ce?.discount) / 100) *
+                                  (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                  Number(ce?.quantity)
+                              )}
+                              onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                            />
                           </React.Fragment>
                         ))}
                         {/*   )} */}
@@ -1160,7 +1180,7 @@ const ReturnSalesForm = (props) => {
               <ConfigProvider locale={viVN}>
                 <DatePicker
                   className="sales-product-date pl-9 placeholder:text-secondary-color-text-disabled cursor-pointer"
-                  //   status={errDate ? 'error' : ''}
+                  allowClear={false}
                   placeholder={dataLang?.price_quote_system_default || 'price_quote_system_default'}
                   format="DD/MM/YYYY HH:mm"
                   showTime={{
@@ -1265,7 +1285,7 @@ const ReturnSalesForm = (props) => {
               onChange={_HandleChangeInput.bind(this, 'note')}
               name="fname"
               type="text"
-              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[68px] max-h-[68px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
+              className="focus:border-brand-color border-gray-200 placeholder-secondary-color-text-disabled placeholder:responsive-text-base w-full h-[80px] max-h-[80px] bg-[#ffffff] rounded-lg text-[#52575E] responsive-text-base font-normal px-3 py-2 border outline-none"
             />
           </div>
         </div>
