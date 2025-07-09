@@ -224,7 +224,6 @@ const PopupUpgradeProfessional = (props) => {
         upgradePackageData?.data?.id,
         formData
       );
-      console.log(response);
       if (response.result === false) {
         showToat("error", response.message);
       }
@@ -644,7 +643,6 @@ const PopupUpgradeProfessional = (props) => {
                       className="p-[4px]"
                       state={userCount}
                       setState={(value) => {
-                        console.log("Đã thay đổi số user:", value);
                         setUserCount(value);
                       }}
                       min={packageData?.data?.[0]?.default_user || 5}

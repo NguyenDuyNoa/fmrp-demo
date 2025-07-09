@@ -525,9 +525,6 @@ const GanttChart = ({
 
         // Hàm mở Sheet chi tiết công đoạn
         const handleToggleSheetDetail = (item) => {
-            console.log("item item:", item);
-            console.log("isStateProvider isStateProvider:", isStateProvider);
-
             // if (item.poi_id === isStateProvider?.productionsOrders?.poiId) return
 
             queryStateProvider({

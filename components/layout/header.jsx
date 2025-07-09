@@ -1,5 +1,6 @@
 import apiDashboard from '@/Api/apiDashboard/apiDashboard'
 import { WARNING_STATUS_ROLE_ADMIN } from '@/constants/warningStatus/warningStatus'
+import { useGetUpgradePackage } from '@/hooks/useAuth'
 import useSetingServer from '@/hooks/useConfigNumber'
 import useToast from '@/hooks/useToast'
 import { getColorByParam } from '@/utils/helpers/radomcolor'
@@ -9,25 +10,22 @@ import { motion } from 'framer-motion'
 import { ArrowUp } from 'iconsax-react'
 import Image from 'next/image'
 import Link from 'next/link'
-
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Tooltip } from 'react-tippy'
 import 'react-tippy/dist/tippy.css'
 import Popup from 'reactjs-popup'
+import PopupFeelsCustomer from '../common/popup/PopupFeelsCustomer'
 import ChatIcon from '../icons/common/ChatIcon'
 import PasswordIcon from '../icons/common/PasswordIcon'
 import SignOutIcon from '../icons/common/SignOutIcon'
 import SparkleIcon from '../icons/common/SparkleIcon'
+import SparkleOutlineIcon from '../icons/common/SparkleOutlineIcon'
 import UserCircleIcon from '../icons/common/UserCircleIcon'
 import AvatarText from '../UI/common/user/AvatarText'
 import { Dropdown, DropdownThongBao } from '../UI/dropdown'
-import SparkleOutlineIcon from '../icons/common/SparkleOutlineIcon'
 import PopupUpgradeProfessional from '../UI/popup/PopupUpgradeProfessional'
-import { useGetUpgradePackage } from '@/hooks/useAuth'
-import PopupCompleteCommand from '@/containers/manufacture/productions-orders/components/popup/PopupCompleteCommand'
-import PopupFeelsCustomer from '../common/popup/PopupFeelsCustomer'
 
 const Header = () => {
   const router = useRouter()
@@ -509,12 +507,12 @@ const Header = () => {
               name: 'Kế hoạch sản xuất',
               link: '/manufacture/production-plan',
             },
-            {
-              viewOwn: auth?.production_plans_fmrp?.is_view_own,
-              view: auth?.production_plans_fmrp?.is_view,
-              name: 'Kế hoạch NVL',
-              link: '/manufacture/materials-planning',
-            },
+            // {
+            //   viewOwn: auth?.production_plans_fmrp?.is_view_own,
+            //   view: auth?.production_plans_fmrp?.is_view,
+            //   name: 'Kế hoạch NVL',
+            //   link: '/manufacture/materials-planning',
+            // },
             // {
             //     viewOwn: -1,
             //     view: -1,

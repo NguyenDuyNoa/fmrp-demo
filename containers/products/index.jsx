@@ -114,7 +114,6 @@ const Products = (props) => {
     const { data: dataBranchOption = [] } = useBranchList();
     // danh sách sản phẩm
     const { data, isFetching, refetch } = useProductList(params);
-console.log(data)
     const formatNumber = (number) => {
         return formatNumberConfig(+number, dataSeting);
     };
@@ -244,7 +243,6 @@ console.log(data)
             ]),
         },
     ];
-console.log(data)
     const breadcrumbItems = [
         {
             label: `${dataLang?.header_category_material || "header_category_material"

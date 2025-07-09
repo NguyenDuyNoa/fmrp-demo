@@ -159,7 +159,7 @@ const TabKeepStock = ({ dataTable, handShowItem, handDeleteItem, isFetching, dat
                       <div>
                         {e.arrListData.map((i, index) => (
                           <motion.div
-                            key={i.id}
+                            key={i.id-index}
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.2, delay: index * 0.05 }}

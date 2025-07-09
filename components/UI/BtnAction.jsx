@@ -110,13 +110,11 @@ const Popup_Pdf = (props) => {
                 id: id,
                 type: typeNumber,
             });
-            console.log("🚀 ~ handlePrintTem ~ response:", response);
             if (response?.isSuccess === 1 && response?.pdf_url) {
                 window.open(response.pdf_url, "_blank");
             }
             setIsLoadingPrint(false);
         } catch (error) {
-            console.log("🚀 ~ handlePrintTem ~ error:", error);
             setIsLoadingPrint(false);
         }
     };
@@ -302,7 +300,6 @@ export const BtnAction = React.memo((props) => {
             }
             setLoadingButtonPrint(false);
         } catch (error) {
-            console.log("🚀 ~ handlePrintTem ~ error:", error);
             isShow("error", `Lỗi khi in phiếu: ${error.message || "Không xác định"}`);
             setLoadingButtonPrint(false);
         }
@@ -450,8 +447,6 @@ export const BtnAction = React.memo((props) => {
         }
         ///Đơn hàng bán
         else if (props?.id && props?.type === "sales_product") {
-            console.log(props?.id, props?.type)
-    console.log(props)
 
             if (props?.status !== "approved") {
                 confimDelete(typeConfig);

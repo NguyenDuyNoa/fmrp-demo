@@ -159,10 +159,6 @@ const InternalPlan = (props) => {
     };
 
     const _HandleChangeInput = (id, checkedUn, type, value) => {
-        console.log("🚀 ~ const_HandleChangeInput= ~ value:", value);
-        console.log("🚀 ~ const_HandleChangeInput= ~ type:", type);
-        console.log("🚀 ~ const_HandleChangeInput= ~ checkedUn:", checkedUn);
-        console.log("🚀 ~ const_HandleChangeInput= ~ id:", id);
 
         handleQueryId({
             status: true,

@@ -15,7 +15,6 @@ import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
 import useToast from '@/hooks/useToast'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { debounce } from 'lodash'
 import Image from 'next/image'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
@@ -37,35 +36,25 @@ const initialState = {
 
 const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, typePageMoblie }) => {
   const tableRef = useRef(null)
-
   const isToast = useToast()
-
   const tableRefTotal = useRef(null)
-
   const dataSeting = useSetingServer()
 
   const [errorNVLData, setErrorNVLData] = useState({ items: [] })
   const [errorNVLDataBefore, setErrorNVLDataBefore] = useState({ items: [] })
   const [isInputPending, setIsInputPending] = useState(false)
+  const [isState, setState] = useState(initialState)
+  const [isOrderCompleted, setIsOrderCompleted] = useState(false)
+  const [activeStep, setActiveStep] = useState({ type: null, item: null })
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
   }
 
-  const stateRef = useRef(initialState)
-
-  const [isState, setState] = useState(initialState)
-
-  const [isOrderCompleted, setIsOrderCompleted] = useState(false)
-
   const queryState = (data) => setState((prev) => ({ ...prev, ...data }))
 
-  const [activeStep, setActiveStep] = useState({ type: null, item: null })
-
   const { onGetData, isLoading: isLoadingActiveStages } = useActiveStages()
-
   const { isLoading: isLoadingSubmit, onSubmit } = useHandingFinishedStages()
-
   const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature()
 
   const { data, isLoading, refetch } = useListFinishedStages({
@@ -83,6 +72,10 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     setErrorNVLData({ items: [] })
     setErrorNVLDataBefore({ items: [] })
   }
+
+  const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some((e) => e?.final_stage == 1)
+  const showSerialColumns = checkItemFinalStage && dataProductSerial.is_enable === '1'
+  const showExpiryColumns = checkItemFinalStage && dataMaterialExpiry.is_enable === '1' && dataProductExpiry.is_enable === '1'
 
   const handleSelectStep = async (type, e, action) => {
     if (action == 'click' && e?.stage_id == activeStep?.item?.stage_id && type == activeStep?.type) return
@@ -115,7 +108,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const handleSubmit = async () => {
-    // Nếu đang có thay đổi đang chờ xử lý, không cho phép submit
     if (isInputPending) {
       isToast('error', 'Vui lòng đợi xử lý dữ liệu hoàn tất')
       return
@@ -135,7 +127,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       refetch()
       refetchMainTable()
 
-      // Kiểm tra xem lệnh sản xuất đã hoàn thành chưa
       if (r?.data?.status_manufacture == '2') {
         setIsOrderCompleted(true)
       } else {
@@ -148,7 +139,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         handleSelectStep(activeStep?.type, activeStep?.item, 'auto')
       }
     } else if (r?.data?.errors || r?.data?.errors_before) {
-      // Hiển thị lỗi NVL
       setErrorNVLData({
         items: [...(r?.data?.errors || [])],
       })
@@ -167,55 +157,31 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     }
 
     const table = tableRef.current
-
     table.addEventListener('scroll', handleScroll)
-
-    return () => {
-      table.removeEventListener('scroll', handleScroll)
-    }
-  }, [tableRef.current, tableRefTotal.current])
+    return () => table.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const { totalQuantity, totalQuantityError, totalQuantityEntered, totalQuantityEnter } = useMemo(() => {
-    const result = isState.dataTableProducts?.data?.items?.reduce(
-      (totals, item) => {
-        totals.totalQuantity += +item?.quantityEnterClient || 0
-        totals.totalQuantityError += item?.quantityError || 0
-        totals.totalQuantityEnter += +item?.quantity_enter || 0
-        totals.totalQuantityEntered += +item?.quantity_entered || 0
-        return totals
-      },
-      { totalQuantity: 0, totalQuantityError: 0, totalQuantityEntered: 0, totalQuantityEnter: 0 }
-    )
-
-    return result || { totalQuantity: 0, totalQuantityError: 0, totalQuantityEntered: 0, totalQuantityEnter: 0 }
-  }, [isState.dataTableProducts])
-
-  const updateQuantityAndSerial = (item, type, value, serialType) => {
-    const newQuantity = value?.floatValue || 0
-    
-    // Chỉ xử lý serial nếu showSerialColumns là true
-    if (!showSerialColumns) {
-      return { ...item, [type]: newQuantity }
+    if (!isState.dataTableProducts?.data?.items?.length) {
+      return {
+        totalQuantity: 0,
+        totalQuantityError: 0,
+        totalQuantityEntered: 0,
+        totalQuantityEnter: 0
+      }
     }
 
-    const currentSerials = Array.isArray(item[serialType]) ? [...item[serialType]] : []
-
-    // Điều chỉnh số lượng serial theo `newQuantity` và reset `isDuplicate`
-    const updatedSerials =
-      currentSerials.length < newQuantity
-        ? [
-            ...currentSerials.map((s) => ({ ...s, isDuplicate: false })), // Reset isDuplicate
-            ...Array(newQuantity - currentSerials.length).fill({ value: '', isDuplicate: false }),
-          ]
-        : currentSerials.slice(0, newQuantity).map((s) => ({ ...s, isDuplicate: false })) // Reset isDuplicate
-
-    return { ...item, [type]: newQuantity, [serialType]: updatedSerials }
-  }
+    return {
+      totalQuantity: isState.dataTableProducts?.data?.totalQuantityEnterClient || 0,
+      totalQuantityError: isState.dataTableProducts?.data?.totalQuantityError || 0,
+      totalQuantityEnter: isState.dataTableProducts?.data?.totalQuantityEnter || 0,
+      totalQuantityEntered: isState.dataTableProducts?.data?.totalQuantityEntered || 0
+    }
+  }, [isState.dataTableProducts?.data])
 
   const updateSerialsGeneric = (item, value, type) => {
-    const quantity = value?.floatValue ? value?.floatValue : value?.value
+    const quantity = value?.floatValue ?? value?.value ?? 0
 
-    // Nếu không cần xử lý serial, chỉ cập nhật số lượng
     if (!showSerialColumns) {
       return {
         ...item,
@@ -223,9 +189,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       }
     }
 
-    let existingSerials = [...(item[type] || [])] // Giữ serial cũ
+    let existingSerials = [...(item[type] || [])]
 
-    // Lấy số lớn nhất từ cả hai danh sách serial và serialError
     const getMaxSerial = (list) =>
       list.length > 0
         ? Math.max(...list.map((s) => parseInt(s.value.split('-').pop(), 10)).filter((n) => !isNaN(n)))
@@ -236,23 +201,18 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     const globalMaxSerial = Math.max(maxSerialFromSerial, maxSerialFromError, item?.max_serial_number ?? 0)
 
     if (quantity > existingSerials.length) {
-      const startSerial = globalMaxSerial + 1 // Bắt đầu từ số lớn nhất tìm được
-
+      const startSerial = globalMaxSerial + 1
       const additionalSerials = [...Array(quantity - existingSerials.length)].map((_, i) => ({
         value: `${item?.ref}-${(startSerial + i).toString().padStart(2, '0')}`,
         isDuplicate: false,
       }))
-
-      existingSerials = [...existingSerials, ...additionalSerials] // Giữ nguyên serial cũ + thêm mới
-    }
-    // Nếu số lượng giảm, chỉ cắt bớt serial mới, giữ nguyên serial cũ
-    else if (quantity < existingSerials.length) {
+      existingSerials = [...existingSerials, ...additionalSerials]
+    } else if (quantity < existingSerials.length) {
       existingSerials = existingSerials.slice(0, quantity).map((s) => ({ ...s, isDuplicate: false }))
     }
 
-    // Kiểm tra và cập nhật trạng thái trùng lặp
     const valuesList = existingSerials.map((s) => s?.value).filter(Boolean)
-    existingSerials = existingSerials.map((s, i) => ({
+    existingSerials = existingSerials.map((s) => ({
       ...s,
       isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value),
     }))
@@ -265,10 +225,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const handleChange = ({ table, type, value, row, index }) => {
-    // Đánh dấu đang có thay đổi đang chờ xử lý
     setIsInputPending(true)
 
-    if (table == 'product') {
+    if (table === 'product') {
       const quantityEnterClient = 'quantityEnterClient'
       const quantityError = 'quantityError'
       const checkType = [quantityEnterClient, quantityError].includes(type)
@@ -276,22 +235,19 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       const newData = isState.dataTableProducts?.data?.items?.map((item) => {
         if (item?.poi_id === row?.poi_id) {
           if (checkType) {
-            return updateSerialsGeneric(item, value, type == quantityEnterClient ? 'serial' : 'serialError')
+            return updateSerialsGeneric(item, value, type === quantityEnterClient ? 'serial' : 'serialError')
           }
 
           if (type === 'serial' || type === 'serialError') {
             let updatedArray = Array.isArray(item[type]) ? [...item[type]] : []
-
             updatedArray[index] = { value, isDuplicate: false }
 
-            // Kiểm tra trùng lặp trong cùng một hàng
             const valuesList = updatedArray.map((s) => s?.value).filter(Boolean)
-            updatedArray = updatedArray.map((s, i) => ({
+            updatedArray = updatedArray.map((s) => ({
               ...s,
               isDuplicate: valuesList.indexOf(s?.value) !== valuesList.lastIndexOf(s?.value),
             }))
 
-            // Hiển thị cảnh báo nếu trùng
             if (updatedArray[index].isDuplicate) {
               isToast('error', `${type === 'serial' ? 'Serial' : 'Serial lỗi'} đã tồn tại!`)
             }
@@ -314,8 +270,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         },
       })
 
-      // Chỉ gọi onGetBom khi thay đổi serial hoặc serialError, không gọi khi thay đổi số lượng
-      // vì số lượng đã được xử lý thông qua onChangeComplete của InputCustom
       if (type === 'serial' || type === 'serialError') {
         onGetBom(
           {
@@ -332,13 +286,10 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       }
     }
 
-    if (table == 'bom') {
-      const newData = isState.dataTableBom.data?.boms?.map((item) => {
-        if (item?._id === row?._id) {
-          return { ...item, [type]: value }
-        }
-        return item
-      })
+    if (table === 'bom' && isState.dataTableBom?.data?.boms) {
+      const newData = isState.dataTableBom.data.boms.map((item) => 
+        item?._id === row?._id ? { ...item, [type]: value } : item
+      )
 
       queryState({
         dataTableBom: {
@@ -354,13 +305,12 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   }
 
   const handleRemove = (type, row) => {
-    if (type == 'bom' && row?.type_bom == 'product_before') {
+    if (type === 'bom' && row?.type_bom === 'product_before') {
       isToast('error', 'Đây là thành phẩm công đoạn bước trước, không thể xóa')
       return
     }
 
     const stateKey = type === 'product' ? 'dataTableProducts' : 'dataTableBom'
-
     const stateData = type === 'product' ? 'items' : 'boms'
 
     const newData = isState[stateKey]?.data[stateData]?.filter(
@@ -375,9 +325,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           [stateData]: newData,
         },
       },
+      arrayMoveBom: [...isState.arrayMoveBom, row]
     })
-
-    queryState({ arrayMoveBom: [...isState.arrayMoveBom, row] })
 
     onGetBom(
       {
@@ -393,61 +342,45 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     )
   }
 
-  const onGetBom = useCallback(
-    debounce(async (object, items) => {
-      console.log("onGetBom - Object:", object);
-      console.log("onGetBom - Items:", items);
-      try {
-        const r = await onGetDataLoadOutOfStock({ object, items })
+  const onGetBom = useCallback(async (object, items) => {
+    try {
+      const r = await onGetDataLoadOutOfStock({ object, items })
 
-        const check = r?.data?.boms?.map((e, index) => {
-          // Tìm kiếm trong lịch sử hiện tại
-          const existingBom = isState.dataTableBom?.data?.bomsClientHistory?.find(
-            (item) => item?.item_id === e?.item_id && item?.pois_id === e?.pois_id
-          )
+      if (!r?.data?.boms) return
 
-          // Nếu tìm thấy trong lịch sử, giữ lại warehouseId cũ
-          if (existingBom) {
-            return {
-              ...e,
-              warehouseId: existingBom.warehouseId,
-            }
-          }
+      const check = r.data.boms.map((e) => {
+        const existingBom = isState.dataTableBom?.data?.bomsClientHistory?.find(
+          (item) => item?.item_id === e?.item_id && item?.pois_id === e?.pois_id
+        )
 
-          // Nếu là mới, sử dụng list_warehouse_bom từ API
-          return {
-            ...e,
-            warehouseId: e?.list_warehouse_bom,
-          }
-        })
+        return {
+          ...e,
+          warehouseId: existingBom?.warehouseId || e?.list_warehouse_bom,
+        }
+      })
 
-        queryState({
-          dataTableBom: {
-            ...r,
-            data: {
-              ...r?.data,
-              boms: check,
-              bomsClientHistory: check,
-            },
+      queryState({
+        dataTableBom: {
+          ...r,
+          data: {
+            ...r?.data,
+            boms: check,
+            bomsClientHistory: check,
           },
-        })
-
-        // Đánh dấu đã xử lý xong
-        setIsInputPending(false)
-      } catch (error) {
-        console.error('Error in onGetBom:', error)
-        // Đánh dấu đã xử lý xong ngay cả khi có lỗi
-        setIsInputPending(false)
-      }
-    }, 500),
-    [isState.dataTableProducts, isState.dataTableBom, activeStep]
-  )
+        },
+      })
+    } catch (error) {
+      console.error('Error in onGetBom:', error)
+    } finally {
+      setIsInputPending(false)
+    }
+  }, [isState.dataTableProducts, isState.dataTableBom, activeStep])
 
   const getPriorityItem = (semi, products) => {
-    const semiItem = semi.find((item) => item.active == '0')
+    const semiItem = semi?.find((item) => item.active === '0')
     if (semiItem) return { object: semiItem, type: 'BTP' }
 
-    const productItem = products.find((item) => item.active == '0')
+    const productItem = products?.find((item) => item.active === '0')
     if (productItem) return { object: productItem, type: 'TP' }
 
     return null
@@ -455,7 +388,6 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
   useEffect(() => {
     if (isState.open) {
-      // Kiểm tra xem lệnh SX đã hoàn thành chưa
       if (data?.po?.status_manufacture === '2') {
         setIsOrderCompleted(true)
       } else {
@@ -477,37 +409,20 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
     setIsOrderCompleted(false)
   }, [isState.open])
 
-  const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some((e) => e?.final_stage == 1)
-
-  // Thêm các biến kiểm tra điều kiện hiển thị
-  const showSerialColumns = checkItemFinalStage && dataProductSerial.is_enable === '1'
-  const showExpiryColumns =
-    checkItemFinalStage && dataMaterialExpiry.is_enable === '1' && dataProductExpiry.is_enable === '1'
-
-  // Thêm hàm xử lý thay đổi số lượng
   const handleQuantityChange = async (value, row, type) => {
     try {
-      // Đánh dấu đang có thay đổi đang chờ xử lý
-      setIsInputPending(true);
+      setIsInputPending(true)
       
-      console.log("handleQuantityChange - Current activeStep:", activeStep);
-      console.log("handleQuantityChange - activeStep.type:", activeStep.type);
-      console.log("handleQuantityChange - isProduct value:", activeStep.type === 'TP' ? 1 : 0);
-      
-      // Tạo đối tượng value giống như trong handleChange
-      const simulatedValue = { floatValue: value };
-      
-      // Cập nhật dữ liệu tương tự như handleChange
-      const serialType = type === 'quantityEnterClient' ? 'serial' : 'serialError';
+      const simulatedValue = { floatValue: value }
+      const serialType = type === 'quantityEnterClient' ? 'serial' : 'serialError'
       
       const newData = isState.dataTableProducts?.data?.items?.map((item) => {
         if (item?.poi_id === row?.poi_id) {
-          return updateSerialsGeneric(item, simulatedValue, serialType);
+          return updateSerialsGeneric(item, simulatedValue, serialType)
         }
-        return item;
-      });
+        return item
+      })
       
-      // Cập nhật state
       queryState({
         dataTableProducts: {
           ...isState.dataTableProducts,
@@ -516,9 +431,8 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             items: newData,
           },
         },
-      });
+      })
       
-      // Gọi API trực tiếp thay vì dùng debounce
       const object = {
         isProduct: activeStep.type === 'TP' ? 1 : 0,
         activeStep: {
@@ -527,34 +441,22 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
         },
         poId: dataRight?.idDetailProductionOrder,
         arrayMoveBom: isState.arrayMoveBom,
-      };
+      }
       
-      console.log("handleQuantityChange - Calling API directly with:", object);
-      console.log("handleQuantityChange - Items data:", newData);
+      const r = await onGetDataLoadOutOfStock({ object, items: newData })
       
-      // Gọi API trực tiếp
-      const r = await onGetDataLoadOutOfStock({ object, items: newData });
-      
-      const check = r?.data?.boms?.map((e, index) => {
-        // Tìm kiếm trong lịch sử hiện tại
+      if (!r?.data?.boms) return
+
+      const check = r.data.boms.map((e) => {
         const existingBom = isState.dataTableBom?.data?.bomsClientHistory?.find(
           (item) => item?.item_id === e?.item_id && item?.pois_id === e?.pois_id
-        );
+        )
 
-        // Nếu tìm thấy trong lịch sử, giữ lại warehouseId cũ
-        if (existingBom) {
-          return {
-            ...e,
-            warehouseId: existingBom.warehouseId,
-          };
-        }
-
-        // Nếu là mới, sử dụng list_warehouse_bom từ API
         return {
           ...e,
-          warehouseId: e?.list_warehouse_bom,
-        };
-      });
+          warehouseId: existingBom?.warehouseId || e?.list_warehouse_bom,
+        }
+      })
 
       queryState({
         dataTableBom: {
@@ -565,22 +467,41 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
             bomsClientHistory: check,
           },
         },
-      });
-      
-      // Đánh dấu đã xử lý xong
-      setIsInputPending(false);
+      })
     } catch (error) {
-      console.error("Error in handleQuantityChange:", error);
-      setIsInputPending(false);
+      console.error('Error in handleQuantityChange:', error)
+    } finally {
+      setIsInputPending(false)
     }
-  };
+  }
+
+  const getTotals = useMemo(() => {
+    if (!isState.dataTableProducts?.data?.items?.length) {
+      return {
+        totalQuantityEnterClient: 0,
+        totalQuantityError: 0,
+        totalQuantityEnter: 0,
+        totalQuantityEntered: 0
+      }
+    }
+
+    return isState.dataTableProducts.data.items.reduce(
+      (totals, item) => ({
+        totalQuantityEnterClient: totals.totalQuantityEnterClient + Number(item?.quantityEnterClient || 0),
+        totalQuantityError: totals.totalQuantityError + Number(item?.quantityError || 0),
+        totalQuantityEnter: totals.totalQuantityEnter + Number(item?.quantity_enter || 0),
+        totalQuantityEntered: totals.totalQuantityEntered + Number(item?.quantity_entered || 0)
+      }),
+      { totalQuantityEnterClient: 0, totalQuantityError: 0, totalQuantityEnter: 0, totalQuantityEntered: 0 }
+    )
+  }, [isState.dataTableProducts?.data?.items])
 
   return (
     <>
       {isOrderCompleted ? (
         <PopupCustom
           onClickOpen={() => {
-            if (dataRight?.listDataRight?.statusManufacture == '2') {
+            if (dataRight?.listDataRight?.statusManufacture === '2') {
               isToast('error', 'Lệnh SX đã được hoàn thành')
               return
             }
@@ -611,7 +532,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                 <ButtonSubmit
                   loading={isLoadingSubmit}
                   title="Xác nhận"
-                  onClick={handleSubmit.bind(this)}
+                  onClick={handleSubmit}
                   icon={<CheckIcon className="size-4" />}
                   className={`py-2.5 2xl:py-3 px-3 2xl:px-4 text-white rounded-lg !responsive-text-base flex items-center gap-2
                   ${
@@ -635,7 +556,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           }
           classNameBtn={'!w-full'}
           onClickOpen={() => {
-            if (dataRight?.listDataRight?.statusManufacture == '2') {
+            if (dataRight?.listDataRight?.statusManufacture === '2') {
               isToast('error', 'Lệnh SX đã được hoàn thành')
               return
             }
@@ -799,8 +720,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                               className="object-cover rounded"
                             />
                             <div className="flex flex-col gap-0.5">
-                              <h3 className="text-sm font-semibold text-neutral-07">{item.item_name}</h3>
+                              <h3 className="text-sm font-semibold text-neutral-07">
+                                {item.item_name} - <span className="responsive-text-base font-medium text-neutral-03">({item.stage_name})</span>
+                              </h3>
                               <p className="text-xs font-normal text-neutral-03">{item.product_variation}</p>
+                              <p className="responsive-text-xs font-normal text-typo-blue-2">{item.reference_no_detail}</p>
                             </div>
                           </div>
                           <p className="text-sm font-normal text-neutral-07">
@@ -1161,11 +1085,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                           ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                           `}
                         >
-                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnterClient)}
+                          {formatNumber(getTotals.totalQuantityEnterClient)}
                         </h3>
                         {showSerialColumns && (
                           <div className="col-span-3 responsive-text-sm text-neutral-02 text-center font-semibold">
-                            {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnterClient)}
+                            {formatNumber(getTotals.totalQuantityEnterClient)}
                           </div>
                         )}
                         <div
@@ -1173,11 +1097,11 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                           ${showExpiryColumns || showSerialColumns ? 'col-span-3' : 'col-span-4'}
                           `}
                         >
-                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityError)}
+                          {formatNumber(getTotals.totalQuantityError)}
                         </div>
                         {showSerialColumns && (
                           <div className="col-span-3 responsive-text-sm text-neutral-02 p-2 text-center font-semibold">
-                            {formatNumber(isState.dataTableProducts?.data?.totalQuantityError)}
+                            {formatNumber(getTotals.totalQuantityError)}
                           </div>
                         )}
                         {showExpiryColumns && (
@@ -1191,14 +1115,14 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
                           ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3 p-2'}
                           `}
                         >
-                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEnter)}
+                          {formatNumber(getTotals.totalQuantityEnter)}
                         </div>
                         <div
                           className={`whitespace-nowrap text-center responsive-text-sm text-neutral-07 font-semibold
                           ${showExpiryColumns || showSerialColumns ? 'col-span-2' : 'col-span-3 p-2'}
                           `}
                         >
-                          {formatNumber(isState.dataTableProducts?.data?.totalQuantityEntered)}
+                          {formatNumber(getTotals.totalQuantityEntered)}
                         </div>
                         <div className="col-span-2 responsive-text-sm text-neutral-02 text-center font-semibold "></div>
                       </div>

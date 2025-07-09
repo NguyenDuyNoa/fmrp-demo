@@ -261,8 +261,6 @@ const TabMaterialOutputTab = ({ dataLang, ...props }) => {
     )
   }, [searchMaterialOutput, dataMaterialOutput])
 
-  console.log('dataMaterialOutput', dataMaterialOutput)
-
   return (
     <div className="flex flex-col 3xl:gap-6 gap-4">
       <div className="flex items-center justify-between gap-2">
