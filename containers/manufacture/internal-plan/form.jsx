@@ -36,6 +36,7 @@ import { CiSearch } from 'react-icons/ci'
 import { PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 import { useInternalPlanItems } from './hooks/useInternalPlanItems'
+import { useSelector } from 'react-redux'
 
 const initsFetching = {
   onLoading: false,
@@ -100,6 +101,18 @@ const InternalPlanForm = (props) => {
   useEffect(() => {
     router.query && resetAllStates()
   }, [router.query])
+
+  // Tự động chọn chi nhánh đầu tiên từ authState khi component mount
+  const { is_admin, branch } = useSelector((state) => state.auth)
+  useEffect(() => {
+    if (branch?.length > 0 && !idChange.idBranch) {
+      const firstBranch = {
+        label: branch[0].name,
+        value: branch[0].id,
+      }
+      sIdChange((list) => ({ ...list, idBranch: firstBranch }))
+    }
+  }, [branch])
 
   const { isFetching } = useQuery({
     queryKey: ['api_internal_plan_page_detail', id],
