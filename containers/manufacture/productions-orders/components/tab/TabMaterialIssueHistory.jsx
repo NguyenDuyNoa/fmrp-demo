@@ -86,9 +86,6 @@ const TabMaterialIssueHistory = ({ dataLang, ...props }) => {
   const dataSeting = useSetingServer()
   const formatNumber = (num) => formatNumberConfig(+num, dataSeting)
 
-  console.log('dataMaterialIssueHistory: ', dataMaterialIssueHistory)
-  console.log('isStateProvider: ', isStateProvider)
-
   const multiDataSet = [
     {
       columns: [

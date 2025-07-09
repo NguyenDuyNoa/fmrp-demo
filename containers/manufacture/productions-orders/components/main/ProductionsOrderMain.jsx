@@ -139,7 +139,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
         isShow('success', dataLang?.data_updated_success || 'Dữ liệu đã được cập nhật thành công')
       }
     } catch (error) {
-      console.error('Error fetching data for keep stock/purchase:', error)
       isShow('error', dataLang?.update_failed || 'Cập nhật dữ liệu thất bại')
       throw error
     }
@@ -941,9 +940,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       if (isStateProvider?.productionsOrders?.idDetailProductionOrder) {
         await refetchProductionOrderDetail()
       }
-      isShow('success', `${dataLang?.data_updated_success || 'Dữ liệu đã được cập nhật'}`)
+      // isShow('success', `${dataLang?.data_updated_success || 'Dữ liệu đã được cập nhật'}`)
     } catch (error) {
-      console.error('Error refreshing data:', error)
       isShow('error', `${dataLang?.update_failed || 'Cập nhật dữ liệu thất bại'}`)
     }
   }
@@ -1039,7 +1037,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       }
       setLoading(false)
     } catch (error) {
-      console.log('🚀 ~ handPrintManufacture ~ error:', error)
       setLoading(false)
     }
   }
@@ -1055,7 +1052,6 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       }
       setLoading(false)
     } catch (error) {
-      console.log('🚀 ~ handPrintManufacture ~ error:', error)
       setLoading(false)
     }
   }
@@ -1116,13 +1112,14 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const handleConfimDeleteItem = async () => {
     const type = {
       dataKeepStock: `/api_web/Api_transfer/transfer/${isId}?csrf_protection=true`,
-      dataPurchases: `/api_web/Api_import/import/${isId}?csrf_protection=true`,
+      dataPurchases: `/api_web/Api_purchase_order/purchase_order/${isId}?csrf_protection=true`,
     }
     const { isSuccess, message } = await apiMaterialsPlanning.apiDeletePurchasesTransfer(type[isIdChild])
     if (isSuccess) {
       fetchDataTable(1, 'delete')
       queryValue({ page: 1 })
       isShow('success', dataLang[message] || message)
+      refreshData()
     } else {
       isShow('error', dataLang[message] || message)
     }
@@ -1212,7 +1209,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             </div>
 
             <DatePicker
-              id="start"
+              // id="start"
               portalId="menu-time"
               calendarClassName="rasta-stripes"
               clearButtonClassName=""
@@ -1799,6 +1796,8 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
             isRefetchingProductionOrderList ||
             isLoadingProductionOrderList ? (
               <Loading className="3xl:h-full 2xl:h-full xl:h-full h-full" />
+            ) : flagProductionOrders?.length === 0 ? (
+              <NoData className="mt-0" />
             ) : dataProductionOrderDetail?.listPOItems?.length > 0 ? (
               <React.Fragment>
                 {isStateProvider?.productionsOrders?.isTabList?.type == 'products' && (
