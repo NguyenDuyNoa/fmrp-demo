@@ -38,6 +38,7 @@ import DatePicker from 'react-datepicker'
 import { BsCalendarEvent } from 'react-icons/bs'
 import { MdClear } from 'react-icons/md'
 import { useOrderByPurchase } from './hooks/useOrderByPurchase'
+import LayoutForm from '@/components/layout/LayoutForm'
 
 const OrderForm = (props) => {
   const router = useRouter()
@@ -1033,13 +1034,573 @@ const OrderForm = (props) => {
 
   return (
     <React.Fragment>
-      <Head>
+      {/* <Head>
         <title>
           {id
             ? dataLang?.purchase_order_edit_order || 'purchase_order_edit_order'
             : dataLang?.purchase_order_add_order || 'purchase_order_add_order'}
         </title>
-      </Head>
+      </Head> */}
+      <LayoutForm
+        title={
+          id
+            ? dataLang?.purchase_order_edit_order || 'purchase_order_edit_order'
+            : dataLang?.purchase_order_add_order || 'purchase_order_add_order'
+        }
+        breadcrumbItems={breadcrumbItems}
+        heading={'Thông tin đơn hàng mua (PO)'}
+        dataLang={dataLang}
+        statusExprired={statusExprired}
+        leftContent={
+          <>
+            <div className="pr-2">
+              <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]  text-[#667085]   col-span-3    text-center    truncate font-[400]">
+                  {dataLang?.purchase_order_purchase_from_item || 'purchase_order_purchase_from_item'}
+                  {idPurchases?.length > 0 && (
+                    <SelectItemComponent
+                      options={[...options]}
+                      closeMenuOnSelect={false}
+                      dataLang={dataLang}
+                      onChange={_HandleChangeInput.bind(this, 'itemAll')}
+                      value={null}
+                      isMulti
+                      maxShowMuti={0}
+                      components={{
+                        MenuList: (props) => (
+                          <MenuListClickAll
+                            {...props}
+                            onClickSelectAll={_HandleSelectAll.bind(this)}
+                            onClickDeleteSelectAll={() => {
+                              setSortedArr([])
+                              sItemAll([])
+                            }}
+                          />
+                        ),
+                        MultiValue,
+                      }}
+                      placeholder={dataLang?.import_click_items || 'import_click_items'}
+                      className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20"
+                      isSearchable={true}
+                      noOptionsMessage={() => 'Không có dữ liệu'}
+                      menuPortalTarget={document.body}
+                      styles={{
+                        menu: {
+                          width: '100%',
+                        },
+                      }}
+                    />
+                  )}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_purchase_from_unit || 'purchase_order_purchase_from_unit'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_quantity || 'purchase_quantity'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_unit_price || 'purchase_order_detail_unit_price'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]">
+                  {dataLang?.purchase_order_detail_after_discount || 'purchase_order_detail_after_discount'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
+                  {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
+                  {dataLang?.purchase_order_note || 'purchase_order_note'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_table_operations || 'purchase_order_table_operations'}
+                </h4>
+              </div>
+            </div>
+            <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+              <div className="w-full h-full">
+                <React.Fragment>
+                  <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                    <div className="grid grid-cols-12 gap-1 py-1 ">
+                      <div className="col-span-3 my-auto">
+                        <SelectItemComponent
+                          onInputChange={(event) => {
+                            _HandleSeachApi(event)
+                          }}
+                          options={options}
+                          onChange={(e) => {
+                            changeItem(e)
+                          }}
+                          // isMulti
+                          // maxShowMuti={0}
+                          value={null}
+                          formatOptionLabel={(option) => (
+                            <div className="flex items-center justify-between py-2">
+                              <div className="flex items-center gap-2">
+                                <div>
+                                  {option.e?.images != null ? (
+                                    <img
+                                      src={option.e?.images}
+                                      alt="Product Image"
+                                      style={{
+                                        width: '40px',
+                                        height: '50px',
+                                      }}
+                                      className="object-cover rounded"
+                                    />
+                                  ) : (
+                                    <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
+                                      <img
+                                        src="/icon/noimagelogo.png"
+                                        alt="Product Image"
+                                        style={{
+                                          width: '40px',
+                                          height: '40px',
+                                        }}
+                                        className="object-cover rounded"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                    {option.e?.name}
+                                  </h3>
+                                  <div className="flex gap-2">
+                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                      {option.e?.code}
+                                    </h5>
+                                    <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                      {option.e?.product_variation}
+                                    </h5>
+                                  </div>
+                                  <h5
+                                    className={`${
+                                      optionType == '1' ? '' : 'flex items-center gap-1'
+                                    } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                  >
+                                    {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
+                                    {optionType == '1' ? option.e?.purchases_code : ''}{' '}
+                                    {optionType != '1' && (
+                                      <>
+                                        <h5>-</h5>
+                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {dataLang?.purchase_survive || 'purchase_survive'}:
+                                        </h5>
+                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
+                                        </h5>
+                                      </>
+                                    )}
+                                  </h5>
+                                  {optionType == '1' && (
+                                    <div className="flex items-center gap-2 text-gray-400">
+                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        Số lượng:
+                                      </h5>
+                                      <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {formatNumber(option.e?.quantity_left)}
+                                      </h5>
+                                      {'-'}
+                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {dataLang?.purchase_survive || 'purchase_survive'}:
+                                      </h5>
+                                      <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+                                      </h5>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          placeholder={dataLang?.purchase_items || 'purchase_items'}
+                          hideSelectedOptions={false}
+                          className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
+                          isSearchable={true}
+                          noOptionsMessage={() => 'Không có dữ liệu'}
+                          styles={{
+                            menu: {
+                              width: '100%',
+                            },
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-center col-span-1 text-center">
+                        <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">Cái</h3>
+                      </div>
+                      <div className="flex items-center justify-center col-span-1">
+                        <div className="flex items-center justify-center">
+                          <button
+                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                            onClick={() => {}}
+                            disabled
+                          >
+                            <Minus size="16" />
+                          </button>
+                          <InPutNumericFormat
+                            disabled
+                            value={1}
+                            isAllowed={isAllowedNumber}
+                            className={`  appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                          />
+                          <button
+                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                            onClick={() => {}}
+                            disabled
+                          >
+                            <Add size="16" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center col-span-1 text-center">
+                        <InPutMoneyFormat
+                          value={1}
+                          disabled
+                          className={` appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                        />
+                      </div>
+                      <div className="flex items-center justify-center col-span-1 text-center">
+                        <InPutNumericFormat
+                          value={1}
+                          disabled
+                          className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
+                          isAllowed={isAllowedDiscount}
+                        />
+                      </div>
+                      <div className="flex items-center justify-end col-span-1 text-right">
+                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
+                      </div>
+                      <div className="flex items-center justify-center col-span-1">
+                        <SelectItemComponent
+                          options={[]}
+                          disabled
+                          placeholder={'% Thuế'}
+                          hideSelectedOptions={false}
+                          className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                          isSearchable={true}
+                          noOptionsMessage={() => 'Không có dữ liệu'}
+                        />
+                      </div>
+                      <div className="flex items-center justify-end col-span-1 text-right">
+                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
+                        {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
+                      </div>
+                      <div className="flex items-center justify-center col-span-1">
+                        <input
+                          disabled
+                          name="optionEmail"
+                          placeholder="Ghi chú"
+                          type="text"
+                          className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                        />
+                      </div>
+                      <div className="flex items-center justify-center col-span-1">
+                        <button
+                          type="button"
+                          title="Xóa"
+                          onClick={() => {
+                            isShow('error', `${'Mặc định hệ thống, không xóa'}`)
+                          }}
+                          className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
+                        >
+                          <IconDelete />
+                        </button>
+                      </div>
+                    </div>
+                    {sortedArr.map((e, index) => (
+                      <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
+                        <div className="col-span-3 my-auto">
+                          <SelectItemComponent
+                            onInputChange={(event) => {
+                              _HandleSeachApi(event)
+                            }}
+                            options={options}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'items', index)}
+                            value={e?.items}
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center justify-between py-2">
+                                <div className="flex items-center gap-2">
+                                  <div>
+                                    {option.e?.images != null ? (
+                                      <img
+                                        src={option.e?.images}
+                                        alt="Product Image"
+                                        style={{
+                                          width: '40px',
+                                          height: '50px',
+                                        }}
+                                        className="object-cover rounded"
+                                      />
+                                    ) : (
+                                      <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
+                                        <img
+                                          src="/icon/noimagelogo.png"
+                                          alt="Product Image"
+                                          style={{
+                                            width: '40px',
+                                            height: '40px',
+                                          }}
+                                          className="object-cover rounded"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                      {option.e?.name}
+                                    </h3>
+                                    <div className="flex gap-2">
+                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {option.e?.code}
+                                      </h5>
+                                      <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {option.e?.product_variation}
+                                      </h5>
+                                    </div>
+                                    <h5
+                                      className={`${
+                                        optionType == '1' ? '' : 'flex items-center gap-1'
+                                      } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                    >
+                                      {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
+                                      {optionType == '1' ? option.e?.purchases_code : ''}{' '}
+                                      {optionType != '1' && (
+                                        <>
+                                          <h5>-</h5>
+                                          <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                            {dataLang?.purchase_survive || 'purchase_survive'}:
+                                          </h5>
+                                          <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
+                                          </h5>
+                                        </>
+                                      )}
+                                    </h5>
+                                    {optionType == '1' && (
+                                      <div className="flex items-center gap-2 text-gray-400">
+                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          Số lượng:
+                                        </h5>
+                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {formatNumber(option.e?.quantity_left)}
+                                        </h5>
+                                        {'-'}
+                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {dataLang?.purchase_survive || 'purchase_survive'}:
+                                        </h5>
+                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+                                        </h5>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            placeholder={dataLang?.purchase_items || 'purchase_items'}
+                            hideSelectedOptions={false}
+                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                            styles={{
+                              menu: {
+                                width: '100%',
+                              },
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.unit}</h3>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <div className="flex items-center justify-center">
+                            <button
+                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                              onClick={() => handleDecrease(e?.id)}
+                            >
+                              <Minus size="16" />
+                            </button>
+                            <InPutNumericFormat
+                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'quantity', e)}
+                              value={e?.quantity}
+                              readOnly={false}
+                              isAllowed={isAllowedNumber}
+                              className={`
+                                                        ${
+                                                          (e?.quantity == 0 && 'border-red-500') ||
+                                                          (e?.quantity == '' && 'border-red-500')
+                                                        } 
+                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                            />
+                            <button
+                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                              onClick={() => handleIncrease(e.id)}
+                            >
+                              <Add size="16" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <InPutMoneyFormat
+                            value={e?.price}
+                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
+                            readOnly={false}
+                            className={`${(e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')} 
+                                                appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <InPutNumericFormat
+                            value={e?.discount}
+                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
+                            className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
+                            isAllowed={isAllowedDiscount}
+                          />
+                        </div>
+                        <div className="flex items-center justify-end col-span-1 text-right">
+                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                            {formatNumber(e?.affterDiscount || 1)}
+                          </h3>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <SelectItemComponent
+                            options={taxOptions}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'tax', index)}
+                            value={
+                              e?.tax
+                                ? {
+                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                    value: e?.tax?.value,
+                                    tax_rate: e?.tax?.tax_rate,
+                                  }
+                                : null
+                            }
+                            placeholder={'% Thuế'}
+                            hideSelectedOptions={false}
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center justify-start gap-1 ">
+                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{option?.label}</h2>
+                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
+                              </div>
+                            )}
+                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                          />
+                        </div>
+                        <div className="flex items-center justify-end col-span-1 text-right">
+                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                            {formatNumber(e?.total)}
+                          </h3>
+                          {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <input
+                            value={e?.note}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
+                            name="optionEmail"
+                            placeholder="Ghi chú"
+                            type="text"
+                            className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <button
+                            onClick={_HandleDelete.bind(this, e?.id)}
+                            type="button"
+                            title="Xóa"
+                            className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
+                          >
+                            <IconDelete />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </React.Fragment>
+              </div>
+            </Customscrollbar>
+            <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
+              <div className="flex items-center col-span-2 gap-2">
+                <h2>{dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}</h2>
+                <div className="flex items-center justify-center col-span-1 text-center">
+                  <InPutNumericFormat
+                    value={discount}
+                    isAllowed={isAllowedDiscount}
+                    onValueChange={_HandleChangeInput.bind(this, 'discount')}
+                    className="w-20 px-2 py-1 font-normal text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center col-span-5 gap-2">
+                <h2 className="col-span-1">{dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}</h2>
+                <div className="col-span-4">
+                  <SelectComponent
+                    type="form"
+                    options={taxOptions}
+                    onChange={_HandleChangeInput.bind(this, 'tax')}
+                    value={tax}
+                    formatOptionLabel={(option) => (
+                      <div className="flex items-center justify-start gap-1 ">
+                        <h2>{option?.label}</h2>
+                        <h2>{`(${option?.tax_rate})`}</h2>
+                      </div>
+                    )}
+                    placeholder={dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
+                    hideSelectedOptions={false}
+                    className={` "border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                    isSearchable={true}
+                    noOptionsMessage={() => 'Không có dữ liệu'}
+                    dangerouslySetInnerHTML={{
+                      __html: option.label,
+                    }}
+                    menuPortalTarget={document.body}
+                    closeMenuOnSelect={true}
+                    style={{
+                      border: 'none',
+                      boxShadow: 'none',
+                      outline: 'none',
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: '#EBF5FF',
+                        primary50: '#92BFF7',
+                        primary: '#0F4F9E',
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: '#cbd5e1',
+                      }),
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 20,
+                      }),
+                      control: (base, state) => ({
+                        ...base,
+                        boxShadow: 'none',
+                        padding: '2.7px',
+                        ...(state.isFocused && {
+                          border: '0 0 0 1px #92BFF7',
+                        }),
+                      }),
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        }
+      />
+
       <Container className="!h-auto">
         {statusExprired ? (
           <EmptyExprired />
@@ -1213,350 +1774,95 @@ const OrderForm = (props) => {
                     <BsCalendarEvent className="absolute right-0 -translate-x-[75%] translate-y-[70%] text-[#CCCCCC] scale-110 cursor-pointer" />
                   </div>
                 </div>
-                {/* <div className="col-span-3">
-                                    <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                        {dataLang?.purchase_order_table_ordertype || "purchase_order_table_ordertype"}{" "}
-                                    </label>
-                                    <div className="flex items-center gap-5">
-                                        <div className="flex items-center ">
-                                            <input
-                                                onChange={_HandleChangeInput.bind(this, "optionType")}
-                                                id="default-radio-1"
-                                                type="radio"
-                                                value="0"
-                                                checked={optionType === "0" ? true : false}
-                                                name="default-radio"
-                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            />
-                                            <label
-                                                for="default-radio-1"
-                                                className="ml-2 text-sm font-normal text-gray-900 cursor-pointer dark:text-gray-300"
-                                            >
-                                                {dataLang?.purchase_order_new_booking || "purchase_order_new_booking"}
-                                            </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                onChange={_HandleChangeInput.bind(this, "optionType")}
-                                                checked={optionType === "1" ? true : false}
-                                                id="default-radio-2"
-                                                type="radio"
-                                                value="1"
-                                                name="default-radio"
-                                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 cursor-pointer focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            />
-                                            <label
-                                                for="default-radio-2"
-                                                className="ml-2 text-sm font-normal text-gray-900 cursor-pointer dark:text-gray-300"
-                                            >
-                                                {dataLang?.purchase_order_according_to_YCMH || "purchase_order_according_to_YCMH"}
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div> */}
-                {/* {hidden && (
-                                    <div className="col-span-3">
-                                        <label className="text-[#344054] font-normal text-sm mb-1 ">
-                                            {dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"}{" "}
-                                            <span className="text-red-500">*</span>
-                                        </label>
-                                        <SelectComponent
-                                            type="form"
-                                            options={fakeDataPurchases}
-                                            components={{ MultiValue }}
-                                            onChange={_HandleChangeInput.bind(this, "purchases")}
-                                            value={idPurchases}
-                                            placeholder={dataLang?.purchase_order_purchase_requisition_form || "purchase_order_purchase_requisition_form"}
-                                            hideSelectedOptions={false}
-                                            isClearable={true}
-                                            className={`${errPurchase ? "border-red-500" : "border-transparent"} placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-                                            isSearchable={true}
-                                            noOptionsMessage={() => "Không có dữ liệu"}
-                                            menuPortalTarget={document.body}
-                                            isMulti
-                                        />
-                                        {errPurchase && (
-                                            <label className="text-sm text-red-500">
-                                                {dataLang?.purchase_order_errYCMH || "purchase_order_errYCMH"}
-                                            </label>
-                                        )}
-                                    </div>
-                                )} */}
               </div>
             </div>
           </div>
-          <h2 className="font-normal bg-[#ECF0F4] p-2  ">
-            {dataLang?.purchase_order_purchase_item_information || 'purchase_order_purchase_item_information'}
-          </h2>
-          <div className="pr-2">
-            <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]  text-[#667085]   col-span-3    text-center    truncate font-[400]">
-                {dataLang?.purchase_order_purchase_from_item || 'purchase_order_purchase_from_item'}
-                {idPurchases?.length > 0 && (
-                  <SelectItemComponent
-                    options={[...options]}
-                    closeMenuOnSelect={false}
-                    dataLang={dataLang}
-                    onChange={_HandleChangeInput.bind(this, 'itemAll')}
-                    value={null}
-                    isMulti
-                    maxShowMuti={0}
-                    components={{
-                      MenuList: (props) => (
-                        <MenuListClickAll
-                          {...props}
-                          onClickSelectAll={_HandleSelectAll.bind(this)}
-                          onClickDeleteSelectAll={() => {
-                            setSortedArr([])
-                            sItemAll([])
-                          }}
-                        />
-                      ),
-                      MultiValue,
-                    }}
-                    placeholder={dataLang?.import_click_items || 'import_click_items'}
-                    className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20"
-                    isSearchable={true}
-                    noOptionsMessage={() => 'Không có dữ liệu'}
-                    menuPortalTarget={document.body}
-                    styles={{
-                      menu: {
-                        width: '100%',
-                      },
-                    }}
-                  />
-                )}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_order_purchase_from_unit || 'purchase_order_purchase_from_unit'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_quantity || 'purchase_quantity'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_order_detail_unit_price || 'purchase_order_detail_unit_price'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]">
-                {dataLang?.purchase_order_detail_after_discount || 'purchase_order_detail_after_discount'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
-                {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
-                {dataLang?.purchase_order_note || 'purchase_order_note'}
-              </h4>
-              <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
-                {dataLang?.purchase_order_table_operations || 'purchase_order_table_operations'}
-              </h4>
+          <>
+            <div className="pr-2">
+              <div className="grid grid-cols-12 items-center  sticky top-0  bg-[#F7F8F9] py-2 z-10">
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]  text-[#667085]   col-span-3    text-center    truncate font-[400]">
+                  {dataLang?.purchase_order_purchase_from_item || 'purchase_order_purchase_from_item'}
+                  {idPurchases?.length > 0 && (
+                    <SelectItemComponent
+                      options={[...options]}
+                      closeMenuOnSelect={false}
+                      dataLang={dataLang}
+                      onChange={_HandleChangeInput.bind(this, 'itemAll')}
+                      value={null}
+                      isMulti
+                      maxShowMuti={0}
+                      components={{
+                        MenuList: (props) => (
+                          <MenuListClickAll
+                            {...props}
+                            onClickSelectAll={_HandleSelectAll.bind(this)}
+                            onClickDeleteSelectAll={() => {
+                              setSortedArr([])
+                              sItemAll([])
+                            }}
+                          />
+                        ),
+                        MultiValue,
+                      }}
+                      placeholder={dataLang?.import_click_items || 'import_click_items'}
+                      className="rounded-md bg-white  2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20"
+                      isSearchable={true}
+                      noOptionsMessage={() => 'Không có dữ liệu'}
+                      menuPortalTarget={document.body}
+                      styles={{
+                        menu: {
+                          width: '100%',
+                        },
+                      }}
+                    />
+                  )}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_purchase_from_unit || 'purchase_order_purchase_from_unit'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_quantity || 'purchase_quantity'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_unit_price || 'purchase_order_detail_unit_price'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    font-[400]">
+                  {dataLang?.purchase_order_detail_after_discount || 'purchase_order_detail_after_discount'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
+                  {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
+                  {dataLang?.purchase_order_note || 'purchase_order_note'}
+                </h4>
+                <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-center  truncate font-[400]">
+                  {dataLang?.purchase_order_table_operations || 'purchase_order_table_operations'}
+                </h4>
+              </div>
             </div>
-          </div>
-          <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
-            <div className="w-full h-full">
-              <React.Fragment>
-                <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                  <div className="grid grid-cols-12 gap-1 py-1 ">
-                    <div className="col-span-3 my-auto">
-                      <SelectItemComponent
-                        onInputChange={(event) => {
-                          _HandleSeachApi(event)
-                        }}
-                        options={options}
-                        onChange={(e) => {
-                          changeItem(e)
-                        }}
-                        // isMulti
-                        // maxShowMuti={0}
-                        value={null}
-                        formatOptionLabel={(option) => (
-                          <div className="flex items-center justify-between py-2">
-                            <div className="flex items-center gap-2">
-                              <div>
-                                {option.e?.images != null ? (
-                                  <img
-                                    src={option.e?.images}
-                                    alt="Product Image"
-                                    style={{
-                                      width: '40px',
-                                      height: '50px',
-                                    }}
-                                    className="object-cover rounded"
-                                  />
-                                ) : (
-                                  <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                    <img
-                                      src="/icon/noimagelogo.png"
-                                      alt="Product Image"
-                                      style={{
-                                        width: '40px',
-                                        height: '40px',
-                                      }}
-                                      className="object-cover rounded"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                  {option.e?.name}
-                                </h3>
-                                <div className="flex gap-2">
-                                  <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                    {option.e?.code}
-                                  </h5>
-                                  <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                    {option.e?.product_variation}
-                                  </h5>
-                                </div>
-                                <h5
-                                  className={`${
-                                    optionType == '1' ? '' : 'flex items-center gap-1'
-                                  } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                                >
-                                  {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
-                                  {optionType == '1' ? option.e?.purchases_code : ''}{' '}
-                                  {optionType != '1' && (
-                                    <>
-                                      <h5>-</h5>
-                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {dataLang?.purchase_survive || 'purchase_survive'}:
-                                      </h5>
-                                      <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
-                                      </h5>
-                                    </>
-                                  )}
-                                </h5>
-                                {optionType == '1' && (
-                                  <div className="flex items-center gap-2 text-gray-400">
-                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      Số lượng:
-                                    </h5>
-                                    <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {formatNumber(option.e?.quantity_left)}
-                                    </h5>
-                                    {'-'}
-                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {dataLang?.purchase_survive || 'purchase_survive'}:
-                                    </h5>
-                                    <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
-                                    </h5>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        placeholder={dataLang?.purchase_items || 'purchase_items'}
-                        hideSelectedOptions={false}
-                        className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
-                        isSearchable={true}
-                        noOptionsMessage={() => 'Không có dữ liệu'}
-                        styles={{
-                          menu: {
-                            width: '100%',
-                          },
-                        }}
-                      />
-                    </div>
-                    <div className="flex items-center justify-center col-span-1 text-center">
-                      <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">Cái</h3>
-                    </div>
-                    <div className="flex items-center justify-center col-span-1">
-                      <div className="flex items-center justify-center">
-                        <button
-                          className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          onClick={() => {}}
-                          disabled
-                        >
-                          <Minus size="16" />
-                        </button>
-                        <InPutNumericFormat
-                          disabled
-                          value={1}
-                          isAllowed={isAllowedNumber}
-                          className={`  appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                        />
-                        <button
-                          className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                          onClick={() => {}}
-                          disabled
-                        >
-                          <Add size="16" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-center col-span-1 text-center">
-                      <InPutMoneyFormat
-                        value={1}
-                        disabled
-                        className={` appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                      />
-                    </div>
-                    <div className="flex items-center justify-center col-span-1 text-center">
-                      <InPutNumericFormat
-                        value={1}
-                        disabled
-                        className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
-                        isAllowed={isAllowedDiscount}
-                      />
-                    </div>
-                    <div className="flex items-center justify-end col-span-1 text-right">
-                      <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
-                    </div>
-                    <div className="flex items-center justify-center col-span-1">
-                      <SelectItemComponent
-                        options={[]}
-                        disabled
-                        placeholder={'% Thuế'}
-                        hideSelectedOptions={false}
-                        className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                        isSearchable={true}
-                        noOptionsMessage={() => 'Không có dữ liệu'}
-                      />
-                    </div>
-                    <div className="flex items-center justify-end col-span-1 text-right">
-                      <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
-                      {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
-                    </div>
-                    <div className="flex items-center justify-center col-span-1">
-                      <input
-                        disabled
-                        name="optionEmail"
-                        placeholder="Ghi chú"
-                        type="text"
-                        className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                      />
-                    </div>
-                    <div className="flex items-center justify-center col-span-1">
-                      <button
-                        type="button"
-                        title="Xóa"
-                        onClick={() => {
-                          isShow('error', `${'Mặc định hệ thống, không xóa'}`)
-                        }}
-                        className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
-                      >
-                        <IconDelete />
-                      </button>
-                    </div>
-                  </div>
-                  {sortedArr.map((e, index) => (
-                    <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
+            <Customscrollbar className="max-h-[400px] h-[400px]  overflow-auto pb-2">
+              <div className="w-full h-full">
+                <React.Fragment>
+                  <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
+                    <div className="grid grid-cols-12 gap-1 py-1 ">
                       <div className="col-span-3 my-auto">
                         <SelectItemComponent
                           onInputChange={(event) => {
                             _HandleSeachApi(event)
                           }}
                           options={options}
-                          onChange={_HandleChangeInputOption.bind(this, e?.id, 'items', index)}
-                          value={e?.items}
+                          onChange={(e) => {
+                            changeItem(e)
+                          }}
+                          // isMulti
+                          // maxShowMuti={0}
+                          value={null}
                           formatOptionLabel={(option) => (
                             <div className="flex items-center justify-between py-2">
                               <div className="flex items-center gap-2">
@@ -1650,31 +1956,27 @@ const OrderForm = (props) => {
                         />
                       </div>
                       <div className="flex items-center justify-center col-span-1 text-center">
-                        <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.unit}</h3>
+                        <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">Cái</h3>
                       </div>
                       <div className="flex items-center justify-center col-span-1">
                         <div className="flex items-center justify-center">
                           <button
                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            onClick={() => handleDecrease(e?.id)}
+                            onClick={() => {}}
+                            disabled
                           >
                             <Minus size="16" />
                           </button>
                           <InPutNumericFormat
-                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'quantity', e)}
-                            value={e?.quantity}
-                            readOnly={false}
+                            disabled
+                            value={1}
                             isAllowed={isAllowedNumber}
-                            className={`
-                                                        ${
-                                                          (e?.quantity == 0 && 'border-red-500') ||
-                                                          (e?.quantity == '' && 'border-red-500')
-                                                        } 
-                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                            className={`  appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
                           />
                           <button
                             className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            onClick={() => handleIncrease(e.id)}
+                            onClick={() => {}}
+                            disabled
                           >
                             <Add size="16" />
                           </button>
@@ -1682,60 +1984,40 @@ const OrderForm = (props) => {
                       </div>
                       <div className="flex items-center justify-center col-span-1 text-center">
                         <InPutMoneyFormat
-                          value={e?.price}
-                          onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
-                          readOnly={false}
-                          className={`${(e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')} 
-                                                appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                          value={1}
+                          disabled
+                          className={` appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
                         />
                       </div>
                       <div className="flex items-center justify-center col-span-1 text-center">
                         <InPutNumericFormat
-                          value={e?.discount}
-                          onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
+                          value={1}
+                          disabled
                           className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
                           isAllowed={isAllowedDiscount}
                         />
                       </div>
                       <div className="flex items-center justify-end col-span-1 text-right">
-                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                          {formatNumber(e?.affterDiscount || 1)}
-                        </h3>
+                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
                       </div>
                       <div className="flex items-center justify-center col-span-1">
                         <SelectItemComponent
-                          options={taxOptions}
-                          onChange={_HandleChangeInputOption.bind(this, e?.id, 'tax', index)}
-                          value={
-                            e?.tax
-                              ? {
-                                  label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
-                                  value: e?.tax?.value,
-                                  tax_rate: e?.tax?.tax_rate,
-                                }
-                              : null
-                          }
+                          options={[]}
+                          disabled
                           placeholder={'% Thuế'}
                           hideSelectedOptions={false}
-                          formatOptionLabel={(option) => (
-                            <div className="flex items-center justify-start gap-1 ">
-                              <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{option?.label}</h2>
-                              <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
-                            </div>
-                          )}
                           className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
                           isSearchable={true}
                           noOptionsMessage={() => 'Không có dữ liệu'}
                         />
                       </div>
                       <div className="flex items-center justify-end col-span-1 text-right">
-                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">{formatNumber(e?.total)}</h3>
+                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
                         {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
                       </div>
                       <div className="flex items-center justify-center col-span-1">
                         <input
-                          value={e?.note}
-                          onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
+                          disabled
                           name="optionEmail"
                           placeholder="Ghi chú"
                           type="text"
@@ -1744,92 +2026,307 @@ const OrderForm = (props) => {
                       </div>
                       <div className="flex items-center justify-center col-span-1">
                         <button
-                          onClick={_HandleDelete.bind(this, e?.id)}
                           type="button"
                           title="Xóa"
+                          onClick={() => {
+                            isShow('error', `${'Mặc định hệ thống, không xóa'}`)
+                          }}
                           className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
                         >
                           <IconDelete />
                         </button>
                       </div>
                     </div>
-                  ))}
+                    {sortedArr.map((e, index) => (
+                      <div className="grid grid-cols-12 gap-1 py-1 " key={e?.id}>
+                        <div className="col-span-3 my-auto">
+                          <SelectItemComponent
+                            onInputChange={(event) => {
+                              _HandleSeachApi(event)
+                            }}
+                            options={options}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'items', index)}
+                            value={e?.items}
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center justify-between py-2">
+                                <div className="flex items-center gap-2">
+                                  <div>
+                                    {option.e?.images != null ? (
+                                      <img
+                                        src={option.e?.images}
+                                        alt="Product Image"
+                                        style={{
+                                          width: '40px',
+                                          height: '50px',
+                                        }}
+                                        className="object-cover rounded"
+                                      />
+                                    ) : (
+                                      <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
+                                        <img
+                                          src="/icon/noimagelogo.png"
+                                          alt="Product Image"
+                                          style={{
+                                            width: '40px',
+                                            height: '40px',
+                                          }}
+                                          className="object-cover rounded"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                      {option.e?.name}
+                                    </h3>
+                                    <div className="flex gap-2">
+                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {option.e?.code}
+                                      </h5>
+                                      <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                        {option.e?.product_variation}
+                                      </h5>
+                                    </div>
+                                    <h5
+                                      className={`${
+                                        optionType == '1' ? '' : 'flex items-center gap-1'
+                                      } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
+                                    >
+                                      {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
+                                      {optionType == '1' ? option.e?.purchases_code : ''}{' '}
+                                      {optionType != '1' && (
+                                        <>
+                                          <h5>-</h5>
+                                          <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                            {dataLang?.purchase_survive || 'purchase_survive'}:
+                                          </h5>
+                                          <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
+                                          </h5>
+                                        </>
+                                      )}
+                                    </h5>
+                                    {optionType == '1' && (
+                                      <div className="flex items-center gap-2 text-gray-400">
+                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          Số lượng:
+                                        </h5>
+                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {formatNumber(option.e?.quantity_left)}
+                                        </h5>
+                                        {'-'}
+                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {dataLang?.purchase_survive || 'purchase_survive'}:
+                                        </h5>
+                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                          {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+                                        </h5>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            placeholder={dataLang?.purchase_items || 'purchase_items'}
+                            hideSelectedOptions={false}
+                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                            styles={{
+                              menu: {
+                                width: '100%',
+                              },
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.unit}</h3>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <div className="flex items-center justify-center">
+                            <button
+                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                              onClick={() => handleDecrease(e?.id)}
+                            >
+                              <Minus size="16" />
+                            </button>
+                            <InPutNumericFormat
+                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'quantity', e)}
+                              value={e?.quantity}
+                              readOnly={false}
+                              isAllowed={isAllowedNumber}
+                              className={`
+                                                        ${
+                                                          (e?.quantity == 0 && 'border-red-500') ||
+                                                          (e?.quantity == '' && 'border-red-500')
+                                                        } 
+                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
+                            />
+                            <button
+                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
+                              onClick={() => handleIncrease(e.id)}
+                            >
+                              <Add size="16" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <InPutMoneyFormat
+                            value={e?.price}
+                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
+                            readOnly={false}
+                            className={`${(e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')} 
+                                                appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1 text-center">
+                          <InPutNumericFormat
+                            value={e?.discount}
+                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
+                            className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
+                            isAllowed={isAllowedDiscount}
+                          />
+                        </div>
+                        <div className="flex items-center justify-end col-span-1 text-right">
+                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                            {formatNumber(e?.affterDiscount || 1)}
+                          </h3>
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <SelectItemComponent
+                            options={taxOptions}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'tax', index)}
+                            value={
+                              e?.tax
+                                ? {
+                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                    value: e?.tax?.value,
+                                    tax_rate: e?.tax?.tax_rate,
+                                  }
+                                : null
+                            }
+                            placeholder={'% Thuế'}
+                            hideSelectedOptions={false}
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center justify-start gap-1 ">
+                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{option?.label}</h2>
+                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
+                              </div>
+                            )}
+                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                            isSearchable={true}
+                            noOptionsMessage={() => 'Không có dữ liệu'}
+                          />
+                        </div>
+                        <div className="flex items-center justify-end col-span-1 text-right">
+                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                            {formatNumber(e?.total)}
+                          </h3>
+                          {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <input
+                            value={e?.note}
+                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
+                            name="optionEmail"
+                            placeholder="Ghi chú"
+                            type="text"
+                            className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center col-span-1">
+                          <button
+                            onClick={_HandleDelete.bind(this, e?.id)}
+                            type="button"
+                            title="Xóa"
+                            className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
+                          >
+                            <IconDelete />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </React.Fragment>
+              </div>
+            </Customscrollbar>
+            <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
+              <div className="flex items-center col-span-2 gap-2">
+                <h2>{dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}</h2>
+                <div className="flex items-center justify-center col-span-1 text-center">
+                  <InPutNumericFormat
+                    value={discount}
+                    isAllowed={isAllowedDiscount}
+                    onValueChange={_HandleChangeInput.bind(this, 'discount')}
+                    className="w-20 px-2 py-1 font-normal text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
+                  />
                 </div>
-              </React.Fragment>
-            </div>
-          </Customscrollbar>
-          <div className="grid grid-cols-12 mb-3 font-normal bg-[#ecf0f475] p-2 items-center">
-            <div className="flex items-center col-span-2 gap-2">
-              <h2>{dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}</h2>
-              <div className="flex items-center justify-center col-span-1 text-center">
-                <InPutNumericFormat
-                  value={discount}
-                  isAllowed={isAllowedDiscount}
-                  onValueChange={_HandleChangeInput.bind(this, 'discount')}
-                  className="w-20 px-2 py-1 font-normal text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
-                />
               </div>
-            </div>
-            <div className="flex items-center col-span-5 gap-2">
-              <h2 className="col-span-1">{dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}</h2>
-              <div className="col-span-4">
-                <SelectComponent
-                  type="form"
-                  options={taxOptions}
-                  onChange={_HandleChangeInput.bind(this, 'tax')}
-                  value={tax}
-                  formatOptionLabel={(option) => (
-                    <div className="flex items-center justify-start gap-1 ">
-                      <h2>{option?.label}</h2>
-                      <h2>{`(${option?.tax_rate})`}</h2>
-                    </div>
-                  )}
-                  placeholder={dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
-                  hideSelectedOptions={false}
-                  className={` "border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                  isSearchable={true}
-                  noOptionsMessage={() => 'Không có dữ liệu'}
-                  dangerouslySetInnerHTML={{
-                    __html: option.label,
-                  }}
-                  menuPortalTarget={document.body}
-                  closeMenuOnSelect={true}
-                  style={{
-                    border: 'none',
-                    boxShadow: 'none',
-                    outline: 'none',
-                  }}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary25: '#EBF5FF',
-                      primary50: '#92BFF7',
-                      primary: '#0F4F9E',
-                    },
-                  })}
-                  styles={{
-                    placeholder: (base) => ({
-                      ...base,
-                      color: '#cbd5e1',
-                    }),
-                    menuPortal: (base) => ({
-                      ...base,
-                      zIndex: 20,
-                    }),
-                    control: (base, state) => ({
-                      ...base,
+              <div className="flex items-center col-span-5 gap-2">
+                <h2 className="col-span-1">{dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}</h2>
+                <div className="col-span-4">
+                  <SelectComponent
+                    type="form"
+                    options={taxOptions}
+                    onChange={_HandleChangeInput.bind(this, 'tax')}
+                    value={tax}
+                    formatOptionLabel={(option) => (
+                      <div className="flex items-center justify-start gap-1 ">
+                        <h2>{option?.label}</h2>
+                        <h2>{`(${option?.tax_rate})`}</h2>
+                      </div>
+                    )}
+                    placeholder={dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
+                    hideSelectedOptions={false}
+                    className={` "border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                    isSearchable={true}
+                    noOptionsMessage={() => 'Không có dữ liệu'}
+                    dangerouslySetInnerHTML={{
+                      __html: option.label,
+                    }}
+                    menuPortalTarget={document.body}
+                    closeMenuOnSelect={true}
+                    style={{
+                      border: 'none',
                       boxShadow: 'none',
-                      padding: '2.7px',
-                      ...(state.isFocused && {
-                        border: '0 0 0 1px #92BFF7',
+                      outline: 'none',
+                    }}
+                    theme={(theme) => ({
+                      ...theme,
+                      colors: {
+                        ...theme.colors,
+                        primary25: '#EBF5FF',
+                        primary50: '#92BFF7',
+                        primary: '#0F4F9E',
+                      },
+                    })}
+                    styles={{
+                      placeholder: (base) => ({
+                        ...base,
+                        color: '#cbd5e1',
                       }),
-                    }),
-                  }}
-                />
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 20,
+                      }),
+                      control: (base, state) => ({
+                        ...base,
+                        boxShadow: 'none',
+                        padding: '2.7px',
+                        ...(state.isFocused && {
+                          border: '0 0 0 1px #92BFF7',
+                        }),
+                      }),
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </>
+          <h2 className="font-normal bg-[#ECF0F4] p-2  ">
+            {dataLang?.purchase_order_purchase_item_information || 'purchase_order_purchase_item_information'}
+          </h2>
+
           <h2 className="font-normal bg-[white]  p-2 border-b border-b-[#a9b5c5]  border-t border-t-[#a9b5c5]">
             {dataLang?.purchase_order_table_total_outside || 'purchase_order_table_total_outside'}{' '}
           </h2>
