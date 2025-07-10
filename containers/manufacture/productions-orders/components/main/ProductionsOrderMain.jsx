@@ -186,6 +186,7 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
   const [isOpenSearch, setIsOpenSearch] = useState(false)
 
   const { isOpen: isOpenSheet, openSheet, closeSheet, sheetData } = useSheet()
+  const { isOpen: isOpenSheetDetail, openSheetDetail, closeSheetDetail, sheetDetailData } = useSheet()
   const { isOpen, handleQueryId, isIdChild, isId } = useToggle()
 
   const { isStateProvider, queryStateProvider } = useContext(StateContext)
@@ -464,6 +465,45 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
       })
     }
   }, [isStateProvider?.productionsOrders?.idDetailProductionOrder, dataProductionOrderDetail])
+
+  // Tự động chọn lệnh đầu tiên khi filter hoặc search thay đổi danh sách lệnh
+  useEffect(() => {
+    if (isInitialRun.current || !flagProductionOrders?.length) return
+    
+    if (router.pathname === '/manufacture/productions-orders' && !router.query?.poi_id) {
+      const currentId = isStateProvider?.productionsOrders?.idDetailProductionOrder
+      
+      const currentItemExists = flagProductionOrders.some(item => item.id === currentId)
+      
+      if (!currentId || !currentItemExists) {
+        const firstItem = flagProductionOrders[0]
+        
+        queryStateProvider({
+          productionsOrders: {
+            ...isStateProvider?.productionsOrders,
+            idDetailProductionOrder: firstItem?.id,
+          },
+        })
+        
+        CookieCore.set('lsx_active', JSON.stringify(firstItem), {
+          expires: new Date(Date.now() + 86400 * 1000),
+          sameSite: true,
+        })
+        
+        closeSheet('manufacture-productions-orders')
+        
+        queryStateProvider((prev) => ({
+          productionsOrders: {
+            ...prev.productionsOrders,
+            selectedImages: [],
+            uploadProgress: {},
+            inputCommentText: '',
+            taggedUsers: [],
+          },
+        }))
+      }
+    }
+  }, [flagProductionOrders, router.pathname, router.query])
 
   // onchange search combobox new
   const handleSearchProductionOrders = debounce((value) => {
@@ -1263,9 +1303,10 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
                 })
               }}
               isClearable
+              dateFormat="dd/MM/yyyy"
               placeholderText={'dd/mm/yyyy - dd/mm/yyyy' || `${dataLang?.productions_orders_select_day}`}
               className="pl-8 pr-2 3xl:h-10 h-9 text-base-default w-[290px] outline-none cursor-pointer focus:outline-none border-[#D0D5DD] focus:border-[#3276FA] focus:bg-[#EBF5FF] placeholder:text-[#3A3E4C] border rounded-md"
-              onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
+              // onKeyDown={(e) => e.preventDefault()} // 👈 chặn gõ bàn phím
             />
 
             {!isStateProvider?.productionsOrders.date.dateStart && (

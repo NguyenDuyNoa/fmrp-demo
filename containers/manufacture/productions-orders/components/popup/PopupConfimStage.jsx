@@ -128,7 +128,10 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       refetchMainTable()
 
       if (r?.data?.status_manufacture == '2') {
-        setIsOrderCompleted(true)
+        // Đóng popup khi đã hoàn thành công đoạn cuối (status_manufacture == '2')
+        isToast('success', 'Lệnh sản xuất đã được hoàn thành')
+        queryState({ open: false })
+        setIsOrderCompleted(false)
       } else {
         queryState({
           open: true,
@@ -389,7 +392,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
   useEffect(() => {
     if (isState.open) {
       if (data?.po?.status_manufacture === '2') {
-        setIsOrderCompleted(true)
+        // Không mở popup khi status_manufacture == '2'
+        queryState({ open: false })
+        isToast('info', 'Lệnh SX đã được hoàn thành')
       } else {
         setIsOrderCompleted(false)
         const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || [])
