@@ -579,13 +579,46 @@ const ProductionsOrderMain = ({ dataLang, typeScreen }) => {
     try {
       const res = await apiProductionsOrders.apiDeleteProductionOrders(isId)
       if (res?.isSuccess == 1) {
-        fetchState('delete')
         isShow('success', `${dataLang[res?.message] || res?.message}`)
+        handleQueryId({ status: false })
+        await refreshData()
+
+        // Sau khi refresh, chọn lệnh đầu tiên trong danh sách mới
+        if (flagProductionOrders?.length > 0) {
+          const currentIndex = flagProductionOrders.findIndex(item => item.id === isId)
+          
+          if (flagProductionOrders.length > 0) {
+            let nextItem
+            if (currentIndex === flagProductionOrders.length - 1) {
+              nextItem = flagProductionOrders[currentIndex - 1]
+            } else {
+              nextItem = flagProductionOrders[currentIndex + 1]
+            }
+
+            if (nextItem) {
+              queryStateProvider({
+                productionsOrders: {
+                  ...isStateProvider?.productionsOrders,
+                  idDetailProductionOrder: nextItem.id,
+                },
+              })
+
+              // Lưu vào cookie
+              CookieCore.set('lsx_active', JSON.stringify(nextItem), {
+                expires: new Date(Date.now() + 86400 * 1000),
+                sameSite: true,
+              })
+            }
+          }
+        }
       } else {
         isShow('error', `${dataLang[res?.message] || res?.message}`)
       }
+    } catch (error) {
+      isShow('error', `${dataLang?.update_failed || 'Cập nhật dữ liệu thất bại'}`)
+    } finally {
       handleQueryId({ status: false })
-    } catch (error) {}
+    }
   }
 
   // Hàm mở accordion trong danh sách công đoạn
