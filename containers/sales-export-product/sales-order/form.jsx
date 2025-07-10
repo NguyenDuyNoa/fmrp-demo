@@ -83,8 +83,14 @@ const SalesOrderForm = (props) => {
 
   // Gán chi nhánh đầu tiên vào state selectedBranch khi render
   useEffect(() => {
-    if (dataBranch.length > 0 && dataBranch[0]?.value) setSelectedBranch(dataBranch[0].value)
-  }, [dataBranch])
+    if (dataBranch.length > 0 && dataBranch[0]?.value) {
+      if (authState.branch?.length > 0 && !selectedBranch) {
+        const firstBranch = authState.branch[0].id
+        setSelectedBranch(firstBranch)
+        setBranch({ label: authState.branch[0].name, value: firstBranch })
+      }
+    }
+  }, [dataBranch, authState.branch])
 
   // Gán nhân viên theo staff_id từ authState lọc từ mảng dataStaffs
   useEffect(() => {

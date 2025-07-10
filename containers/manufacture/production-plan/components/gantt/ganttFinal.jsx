@@ -1186,7 +1186,7 @@ const GanttChart = ({
                                                 <label
                                                     key={pIndex}
                                                     htmlFor={product?.id}
-                                                    className="flex items-center w-full gap-2 px-1 text-sm cursor-pointer"
+                                                    className="flex items-center w-full gap-2 px-1 py-0.5 text-sm cursor-pointer"
                                                     style={{
                                                         minHeight: `${product?.processArr?.length * ROW_HEIGHT
                                                             }px`,

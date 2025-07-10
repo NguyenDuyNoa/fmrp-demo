@@ -171,10 +171,14 @@ const DeliveryReceiptForm = (props) => {
 
   // Gắn chi nhánh đầu tiên vào state idBranch
   useEffect(() => {
-    if (dataBranch.length > 0) {
-      sIdBranch(dataBranch[0])
+    if (dataBranch.length > 0 && authState.branch?.length > 0 && !idBranch) {
+      const firstBranch = {
+        value: authState.branch[0].id,
+        label: authState.branch[0].name
+      }
+      sIdBranch(firstBranch)
     }
-  }, [dataBranch, router.query])
+  }, [dataBranch, authState.branch, router.query])
 
   // Gắn người dùng đầu tiên vào state idStaff
   useEffect(() => {
