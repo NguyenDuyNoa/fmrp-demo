@@ -1,4 +1,3 @@
-import apiContact from '@/Api/apiClients/contact/apiContact'
 import apiComons from '@/Api/apiComon/apiComon'
 import { optionsQuery } from '@/configs/optionsQuery'
 import { useQuery } from '@tanstack/react-query'
@@ -58,12 +57,12 @@ export const useClientComboboxByFilterBranch = (id, params) => {
 }
 
 // danh sách khách hàng đổ theo chi nhánh có id mới chạy sử dụng báo giá, trả lại hàng
-export const useClientByBranch = (value) => {
+export const useClientByBranch = (value, search) => {
   return useQuery({
-    queryKey: ['api_client_by_branch', value],
+    queryKey: ['api_client_by_branch', value, search],
     queryFn: async () => {
       const { rResult } = await apiComons.apiClientContact({
-        params: { 'filter[branch_id]': value != null ? value?.value : null },
+        params: { 'filter[branch_id]': value != null ? value?.value : null, search },
       })
 
       return rResult?.map((e) => ({ label: e?.name, value: e?.id })) || []

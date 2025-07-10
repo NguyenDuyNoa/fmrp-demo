@@ -27,7 +27,6 @@ const SelectWithRadio = ({
   disabled,
   isError = false,
   isShowAddNew = false,
-  onSearch,
   dataBranch,
   dataLang,
   icon,
@@ -80,7 +79,7 @@ const SelectWithRadio = ({
           onClear={onClear}
           disabled={disabled}
           filterOption={
-            onSearch ? false : (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            sSearchClient ? false : (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
           notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
           popupRender={(menu) => (

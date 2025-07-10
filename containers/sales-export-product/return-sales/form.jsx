@@ -106,6 +106,8 @@ const ReturnSalesForm = (props) => {
     totalAmount: 0,
   })
 
+  const [searchClient, sSearchClient] = useState(null)
+
   const { data: dataTasxes = [] } = useTaxList()
 
   const { data: listBranch = [] } = useBranchList()
@@ -120,7 +122,7 @@ const ReturnSalesForm = (props) => {
     idChange?.idClient?.value != null && idChange?.idBranch?.value != null
   )
 
-  const { data: dataClient } = useClientByBranch(idChange?.idBranch)
+  const { data: dataClient } = useClientByBranch(idChange?.idBranch, searchClient)
 
   const { data: dataWarehouse } = useWarehouseComboboxlocation({
     'filter[branch_id]': idChange?.idBranch ? idChange?.idBranch?.value : null,
@@ -950,45 +952,6 @@ const ReturnSalesForm = (props) => {
                             </div>
                             {/* Số lượng */}
                             <div className="flex items-center justify-center">
-                              {/* <QuantitySelector
-                                ce={ce}
-                                clsxErrorBorder={`${
-                                  errors.errQuantity &&
-                                  (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
-                                    ? 'border-red-500'
-                                    : errors.errSurvive
-                                    ? 'border-red-500'
-                                    : 'border-border-gray-2'
-                                } ${
-                                  (ce?.quantity == 0 && 'border-red-500') || (ce?.quantity == '' && 'border-red-500')
-                                }`}
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
-                                isAllowedNumber={({ floatValue }) => {
-                                  if (floatValue == 0) {
-                                    return true
-                                  }
-                                  if (+floatValue > +ce?.quantityLeft) {
-                                    isShow(
-                                      'error',
-                                      `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                        +ce?.quantityLeft
-                                      )} số lượng còn lại`
-                                    )
-                                    return false
-                                  } else {
-                                    return true
-                                  }
-                                }}
-                                disabledMinus={
-                                  ce?.quantity === 1 ||
-                                  ce?.quantity === '' ||
-                                  ce?.quantity === null ||
-                                  ce?.quantity === 0
-                                }
-                                onDecrease={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
-                                onIncrease={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
-                                isPopop={true}
-                              /> */}
                               <div
                                 className={`relative flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
                                   errors.errQuantity &&
@@ -1017,6 +980,7 @@ const ReturnSalesForm = (props) => {
                                   onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
                                   value={ce?.quantity || null}
                                   className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                  allowNegative={false}
                                   isAllowed={({ floatValue }) => {
                                     if (floatValue == 0) {
                                       return true
@@ -1095,6 +1059,7 @@ const ReturnSalesForm = (props) => {
                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                 value={ce?.discount}
                                 isAllowed={isAllowedDiscount}
+                                allowNegative={false}
                               />
                               <span className="pl-[2px] 2xl:pl-1">%</span>
                             </div>
@@ -1214,6 +1179,7 @@ const ReturnSalesForm = (props) => {
                   _HandleChangeInput('idClient', newValue)
                 }}
                 isError={errors.errClient}
+                sSearchClient={sSearchClient}
                 dataLang={dataLang}
                 icon={<LuBriefcase />}
               />

@@ -37,6 +37,7 @@ const QuantitySelector = ({
           value={ce?.quantity || null}
           className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
           isAllowed={isAllowedNumber}
+          allowNegative={false}
         />
         <button
           className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"

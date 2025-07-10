@@ -35,7 +35,6 @@ import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Add, ArrowDown2, ArrowUp2, Minus, TableDocument } from 'iconsax-react'
-import { debounce } from 'lodash'
 import moment from 'moment/moment'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -1018,10 +1017,6 @@ const DeliveryReceiptForm = (props) => {
     onSending && _ServerSending()
   }, [onSending])
 
-  const handleSearchClient = debounce(async (value) => {
-    sSearchClient(value)
-  }, 500)
-
   const breadcrumbItems = [
     {
       label: `${dataLang?.returnSales_title || 'returnSales_title'}`,
@@ -1238,7 +1233,7 @@ const DeliveryReceiptForm = (props) => {
                                             ? 'border-red-500'
                                             : errSurvive
                                             ? ' border-red-500'
-                                            : 'border-border-gray-2'
+                                            : 'border-neutral-N400'
                                         }  ${
                                           (ce?.quantity == 0 && 'border-red-500') ||
                                           (ce?.quantity == '' && 'border-red-500')
@@ -1260,6 +1255,7 @@ const DeliveryReceiptForm = (props) => {
                                           onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
                                           value={ce?.quantity || null}
                                           className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                          allowNegative={false}
                                           isAllowed={(values) => {
                                             const { value } = values
                                             const newValue = +value
