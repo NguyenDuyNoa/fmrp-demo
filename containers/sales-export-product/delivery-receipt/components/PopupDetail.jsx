@@ -37,7 +37,6 @@ const PopupDetail = (props) => {
   }
 
   const { data, isFetching } = useDeliveryReceipDetail(open, props?.id)
-  console.log('data?.person_contact_name', data?.person_contact_name)
 
   return (
     <>

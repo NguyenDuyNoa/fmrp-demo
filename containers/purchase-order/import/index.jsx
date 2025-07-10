@@ -115,7 +115,6 @@ const PurchaseImport = (props) => {
     const { data: listBranch = [] } = useBranchList()
 
     const { data, isFetching, refetch } = useImportList(params);
-    console.log("🚀 ~ PurchaseImport ~ data:", data)
 
     const { data: listCode = [] } = useImportCombobox(isState.keySearchCode)
 

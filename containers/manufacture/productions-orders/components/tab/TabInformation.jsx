@@ -671,8 +671,6 @@ const TabInformation = ({ scrollRef }) => {
     }
   }, [socket, isStateProvider?.productionsOrders?.poiId])
 
-  console.log('socket', socket)
-
   return (
     <div className="space-y-4">
       <div className="flex items-start xl:gap-4 gap-2 border-b border-[#D0D5DD]">

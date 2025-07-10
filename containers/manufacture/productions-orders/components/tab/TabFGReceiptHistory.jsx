@@ -64,7 +64,6 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
   }
 
   const onChangeSearch = (e) => {
-    console.log('check e: ', e)
 
     queryStateProvider({
       productionsOrders: {
@@ -208,8 +207,6 @@ const TabFGReceiptHistory = ({ dataLang, ...props }) => {
       ]),
     },
   ]
-
-  console.log('flagFGReceiptHistory: ', flagFGReceiptHistory)
 
   return (
     <div className="flex flex-col 3xl:gap-6 gap-4">

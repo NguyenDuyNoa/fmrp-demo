@@ -1334,14 +1334,12 @@ const Popup_dspc = (props) => {
                                     <InPutMoneyFormat
                                         value={price}
                                         onChange={(e) => {
-                                            console.log("Raw input value:", e.target.value);
                                             _HandleChangeInput("price", e);
                                         }}
                                         placeholder={((object == null || listObject == null) && (props.dataLang?.payment_errObList || "payment_errObList")) || (object != null && props.dataLang?.payment_amountOfMoney) || "payment_amountOfMoney"}
                                         isAllowed={(values) => {
                                             if (!values.value) return true;
                                             const { floatValue, formattedValue } = values;
-                                            console.log("Kiểm tra giá trị nhập:", floatValue, "giá trị hiện tại:", price);
                                             
                                             // Vẫn kiểm tra không cho nhập giá trị lớn hơn tổng số tiền ban đầu
                                             if (object?.value && listTypeOfDocument?.length > 0 && object?.value != "other") {
@@ -1353,7 +1351,6 @@ const Popup_dspc = (props) => {
                                             }
                                             
                                             // Chỉ cập nhật floatValue khi giá trị hợp lệ
-                                            console.log("Giá trị hợp lệ, cập nhật currentFloatValue =", floatValue);
                                             setCurrentFloatValue(floatValue);
                                             return true;
                                         }}
