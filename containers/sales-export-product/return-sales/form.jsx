@@ -44,6 +44,7 @@ import Popup from 'reactjs-popup'
 import { routerReturnSales } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import { useReturnSalesItems } from './hooks/useReturnSalesItems'
+import { useSelector } from 'react-redux'
 
 const initsFetching = {
   onFetchingCondition: false,
@@ -106,6 +107,8 @@ const ReturnSalesForm = (props) => {
     totalAmount: 0,
   })
 
+  const authState = useSelector((state) => state.auth)
+
   const { data: dataTasxes = [] } = useTaxList()
 
   const { data: listBranch = [] } = useBranchList()
@@ -126,12 +129,16 @@ const ReturnSalesForm = (props) => {
     'filter[branch_id]': idChange?.idBranch ? idChange?.idBranch?.value : null,
   })
 
-  // Gắn chi nhánh đầu tiên vào state idBranch
+  // Tự động chọn chi nhánh đầu tiên từ authState khi component mount
   useEffect(() => {
-    if (listBranch.length > 0) {
-      sIdChange((list) => ({ ...list, idBranch: listBranch[0] }))
+    if (authState.branch?.length > 0 && !idChange.idBranch) {
+      const firstBranch = {
+        label: authState.branch[0].name,
+        value: authState.branch[0].id,
+      }
+      sIdChange((list) => ({ ...list, idBranch: firstBranch }))
     }
-  }, [listBranch, router.query])
+  }, [])
 
   const resetAllStates = () => {
     sIdChange(initsValue)
