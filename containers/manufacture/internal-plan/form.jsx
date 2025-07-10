@@ -93,6 +93,13 @@ const InternalPlanForm = (props) => {
     return formatNumberConfig(+number, dataSeting)
   }
 
+  // Gắn chi nhánh đầu tiên vào state idBranch
+  //   useEffect(() => {
+  //     if (dataBranch.length > 0) {
+  //       sIdChange((list) => ({ ...list, idBranch: dataBranch[0] }))
+  //     }
+  //   }, [dataBranch, router.query])
+
   const resetAllStates = () => {
     sIdChange(initsValue)
     sErrors(initsErors)

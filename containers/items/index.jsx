@@ -1,7 +1,7 @@
 import { BtnAction } from "@/components/UI/BtnAction";
+import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
 import OnResetData from "@/components/UI/btnResetData/btnReset";
 import ContainerPagination from "@/components/UI/common/ContainerPagination/ContainerPagination";
-import TitlePagination from "@/components/UI/common/ContainerPagination/TitlePagination";
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import {
@@ -16,9 +16,7 @@ import {
 } from "@/components/UI/common/TablePopup";
 import TagBranch from "@/components/UI/common/Tag/TagBranch";
 import {
-  Container,
-  ContainerBody,
-  LayOutTableDynamic,
+  LayOutTableDynamic
 } from "@/components/UI/common/layout";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
 import ExcelFileComponent from "@/components/UI/filterComponents/excelFilecomponet";
@@ -60,7 +58,7 @@ import Popup_NVL from "./components/items/popupNvl";
 import { useItemCategoryOptions } from "./hooks/items/useItemCategoryOptions";
 import { useItemDetail } from "./hooks/items/useItemDetail";
 import { useItemList } from "./hooks/items/useItemList";
-import Breadcrumb from "@/components/UI/breadcrumb/BreadcrumbCustom";
+
 const Items = (props) => {
   const dataLang = props.dataLang;
 
@@ -411,14 +409,17 @@ const Items = (props) => {
             <Customscrollbar className="h-full overflow-y-auto ">
               <div className="w-full">
                 <HeaderTable gridCols={13}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"}>
+                    STT
+                  </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
                     {dataLang?.image || "image"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"left"}>
+                  <ColumnTable colSpan={1.5} textAlign={"left"}>
                     {dataLang?.category_material_group_name ||
                       "category_material_group_name"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"left"}>
+                  <ColumnTable colSpan={2} textAlign={"left"}>
                     {dataLang?.category_material_list_code ||
                       "category_material_list_code"}
                   </ColumnTable>
@@ -426,7 +427,7 @@ const Items = (props) => {
                     {dataLang?.category_material_list_name ||
                       "category_material_list_name"}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={"center"}>
+                  <ColumnTable colSpan={0.5} textAlign={"center"} className={'whitespace-nowrap'}>
                     {dataLang?.unit || "unit"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -439,7 +440,7 @@ const Items = (props) => {
                     {dataLang?.category_material_list_variant ||
                       "category_material_list_variant"}
                   </ColumnTable>
-                  <ColumnTable colSpan={2} textAlign={"left"}>
+                  <ColumnTable colSpan={1.5} textAlign={"left"}>
                     {dataLang?.client_list_brand || "client_list_brand"}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={"center"}>
@@ -453,11 +454,14 @@ const Items = (props) => {
                   <React.Fragment>
                     {dataItems?.rResult?.length == 0 && <NoData />}
                     <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px] ">
-                      {dataItems?.rResult?.map((e) => (
+                      {dataItems?.rResult?.map((e, index) => (
                         <RowTable
                           gridCols={13}
                           key={e?.id ? e?.id.toString() : ""}
                         >
+                          <RowItemTable colSpan={0.5} textAlign={"center"}>
+                            {index + 1}
+                          </RowItemTable>
                           <RowItemTable
                             colSpan={1}
                             className="flex justify-center select-none"
@@ -480,10 +484,10 @@ const Items = (props) => {
                               )}
                             </div>
                           </RowItemTable>
-                          <RowItemTable colSpan={2} textAlign={"left"}>
+                          <RowItemTable colSpan={1.5} textAlign={"left"} className={`truncate`}>
                             {e?.category_name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={"left"}>
+                          <RowItemTable colSpan={2} textAlign={"left"}>
                             <Popup_Detail
                               dataMaterialExpiry={dataMaterialExpiry}
                               id={e?.id}
@@ -494,10 +498,10 @@ const Items = (props) => {
                               </button>
                             </Popup_Detail>
                           </RowItemTable>
-                          <RowItemTable colSpan={2} textAlign={"left"}>
+                          <RowItemTable colSpan={2} textAlign={"left"} className={`truncate`}>
                             {e?.name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={"center"}>
+                          <RowItemTable colSpan={0.5} textAlign={"center"}>
                             {e?.unit}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={"center"}>
@@ -512,7 +516,7 @@ const Items = (props) => {
                               : e?.variation_count - 1}
                           </RowItemTable>
                           <RowItemTable
-                            colSpan={2}
+                            colSpan={1.5}
                             className="flex flex-col justify-start"
                           >
                             {e.branch?.map((i, index) => (

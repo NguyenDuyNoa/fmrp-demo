@@ -18,6 +18,7 @@ const DropdownDiscount = ({ value, onChange, dataLang }) => {
               onValueChange={onChange}
               className="cursor-text appearance-none text-end w-full border-none focus:outline-none"
               isAllowed={isAllowedDiscount}
+              allowNegative={false}
             />
             <span className="pl-1">%</span>
           </div>
