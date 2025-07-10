@@ -329,7 +329,7 @@ const SalesOrderForm = (props) => {
     }
   }
 
-  // tổng thay đổi
+  // Set hàng loại % Thuế
   useEffect(() => {
     if (totalTax == null) return
     setOption((prevOption) => {
@@ -358,6 +358,7 @@ const SalesOrderForm = (props) => {
     })
   }, [deliveryDate])
 
+  // Set hàng loạt % Chiết khẩu
   useEffect(() => {
     if (totalDiscount == null) return
     setOption((prevOption) => {
@@ -368,7 +369,7 @@ const SalesOrderForm = (props) => {
       newOption.forEach((item) => {
         const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100)
         const thanhTien = dongiasauchietkhau * (1 + thueValue / 100) * item.quantity
-        item.tax = totalTax
+        // item.tax = totalTax
         item.discount = Number(totalDiscount)
         item.price_after_discount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau
         item.total_amount = isNaN(thanhTien) ? 0 : thanhTien
@@ -902,15 +903,6 @@ const SalesOrderForm = (props) => {
   useEffect(() => {
     onSending && handleSubmit()
   }, [onSending])
-
-  const taxRateLabel = (option) => {
-    return (
-      <div className="flex items-center justify-start">
-        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{option?.label}</h2>
-        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[8px] text-[8px] ">{`(${option?.tax_rate})`}</h2>
-      </div>
-    )
-  }
 
   const sortedArr = id ? option.sort((a, b) => a.id - b.id) : option.sort((a, b) => b.id - a.id)
 
