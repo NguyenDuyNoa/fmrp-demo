@@ -39,6 +39,11 @@ import { BsCalendarEvent } from 'react-icons/bs'
 import { MdClear } from 'react-icons/md'
 import { useOrderByPurchase } from './hooks/useOrderByPurchase'
 import LayoutForm from '@/components/layout/LayoutForm'
+import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
+import IconStar from '@/components/icons/common/IconStar'
+import { PiCaretDownBold, PiMapPinLight } from 'react-icons/pi'
+import { useChangeValue } from '@/hooks/useChangeValue'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 
 const OrderForm = (props) => {
   const router = useRouter()
@@ -52,6 +57,8 @@ const OrderForm = (props) => {
   const statusExprired = useStatusExprired()
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
+
+  const { isValue, sIsValue, onChangeValue } = useChangeValue({ idBrach: null })
 
   const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false)
 
@@ -1051,6 +1058,8 @@ const OrderForm = (props) => {
         heading={'Thông tin đơn hàng mua (PO)'}
         dataLang={dataLang}
         statusExprired={statusExprired}
+        onSave={_HandleSubmit.bind(this)}
+        onExit={() => router.push(routerOrder.home)}
         leftContent={
           <>
             <div className="pr-2">
@@ -1599,9 +1608,293 @@ const OrderForm = (props) => {
             </div>
           </>
         }
+        info={
+          <OrderFormTabs
+            info={
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3">
+                  <label className="text-typo-gray-4 font-normal responsive-text-base flex items-center gap-1">
+                    {dataLang?.purchase_order_table_code || 'purchase_order_table_code'}{' '}
+                  </label>
+                  <input
+                    value={code}
+                    onChange={_HandleChangeInput.bind(this, 'code')}
+                    name="fname"
+                    type="text"
+                    placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
+                    className="border border-border-gray-1 py-[7px] px-3 rounded-lg placeholder:text-typo-gray-2 placeholder:responsive-text-base text-neutral-05 w-full"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <label className="responsive-text-base text-typo-gray-4 font-normal flex items-center gap-1">
+                    <IconStar />
+                    {dataLang?.purchase_order_table_branch || 'purchase_order_table_branch'}{' '}
+                  </label>
+                  <SelectComponent
+                    type="form"
+                    options={dataBranch}
+                    onChange={_HandleChangeInput.bind(this, 'branch')}
+                    value={idBranch}
+                    isClearable={true}
+                    closeMenuOnSelect={true}
+                    hideSelectedOptions={false}
+                    menuPortalTarget={document.body}
+                    placeholder={dataLang?.purchase_order_branch || 'purchase_order_branch'}
+                    className="w-full rounded-lg cursor-pointer placeholder:responsive-text-base responsive-text-base"
+                    isSearchable={true}
+                    components={{ MultiValue }}
+                    icon={<PiMapPinLight color="#9295A4" className="size-4" />}
+                    dropdownIcon={<PiCaretDownBold color="#9295A4" className="size-4" />}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused
+                          ? '#0F4F9E'
+                          : isValue.idBrach == null
+                          ? '#ef4444'
+                          : baseStyles.borderColor,
+                        borderRadius: '8px',
+                        '&:hover': {
+                          borderColor: state.isFocused
+                            ? '#0F4F9E'
+                            : isValue.idBrach == null
+                            ? '#ef4444'
+                            : baseStyles.borderColor,
+                        },
+                        boxShadow: state.isFocused ? '0 0 0 1px #0F4F9E' : 'none',
+                      }),
+                    }}
+                  />
+                  {errBranch && (
+                    <label className="text-sm text-red-500">
+                      {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+                    </label>
+                  )}
+                </div>
+                <div className="flex flex-col gap-3">
+                  <label className="responsive-text-base text-typo-gray-4 font-normal flex items-center gap-1">
+                    <IconStar />
+                    {dataLang?.purchase_order_table_supplier}
+                  </label>
+                  <SelectComponent
+                    type="form"
+                    options={dataSupplier}
+                    onChange={_HandleChangeInput.bind(this, 'supplier')}
+                    value={idSupplier}
+                    placeholder={dataLang?.purchase_order_supplier || 'purchase_order_supplier'}
+                    hideSelectedOptions={false}
+                    isClearable={true}
+                    className={`${
+                      errSupplier ? 'border-red-500' : 'border-transparent'
+                    } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    isSearchable={true}
+                    icon={<PiMapPinLight color="#9295A4" className="size-4" />}
+                    dropdownIcon={<PiCaretDownBold color="#9295A4" className="size-4" />}
+                    noOptionsMessage={() => 'Không có dữ liệu'}
+                    // components={{ MultiValue }}
+                    menuPortalTarget={document.body}
+                    closeMenuOnSelect={true}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused
+                          ? '#0F4F9E'
+                          : isValue.idBrach == null
+                          ? '#ef4444'
+                          : baseStyles.borderColor,
+                        borderRadius: '8px',
+                        '&:hover': {
+                          borderColor: state.isFocused
+                            ? '#0F4F9E'
+                            : isValue.idBrach == null
+                            ? '#ef4444'
+                            : baseStyles.borderColor,
+                        },
+                        boxShadow: state.isFocused ? '0 0 0 1px #0F4F9E' : 'none',
+                      }),
+                    }}
+                  />
+                  {errSupplier && (
+                    <label className="text-sm text-red-500">
+                      {dataLang?.purchase_order_errSupplier || 'purchase_order_errSupplier'}
+                    </label>
+                  )}
+                </div>
+                <div className="flex flex-col gap-3">
+                  <label className="responsive-text-base text-typo-gray-4 font-normal flex items-center gap-1">
+                    <IconStar />
+                    {dataLang?.purchase_order_staff || 'purchase_order_staff'}
+                  </label>
+                  <SelectComponent
+                    type="form"
+                    options={dataStaff}
+                    onChange={_HandleChangeInput.bind(this, 'staff')}
+                    value={idStaff}
+                    placeholder={dataLang?.purchase_order_staff || 'purchase_order_staff'}
+                    hideSelectedOptions={false}
+                    isClearable={true}
+                    className={`${
+                      errStaff ? 'border-red-500' : 'border-transparent'
+                    } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
+                    isSearchable={true}
+                    icon={<PiMapPinLight color="#9295A4" className="size-4" />}
+                    dropdownIcon={<PiCaretDownBold color="#9295A4" className="size-4" />}
+                    noOptionsMessage={() => 'Không có dữ liệu'}
+                    menuPortalTarget={document.body}
+                    closeMenuOnSelect={true}
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderColor: state.isFocused
+                          ? '#0F4F9E'
+                          : isValue.idBrach == null
+                          ? '#ef4444'
+                          : baseStyles.borderColor,
+                        borderRadius: '8px',
+                        '&:hover': {
+                          borderColor: state.isFocused
+                            ? '#0F4F9E'
+                            : isValue.idBrach == null
+                            ? '#ef4444'
+                            : baseStyles.borderColor,
+                        },
+                        boxShadow: state.isFocused ? '0 0 0 1px #0F4F9E' : 'none',
+                      }),
+                    }}
+                  />
+                  {errStaff && (
+                    <label className="text-sm text-red-500">
+                      {dataLang?.purchase_order_errStaff || 'purchase_order_errStaff'}
+                    </label>
+                  )}
+                </div>
+                <div className="relative flex flex-col gap-3">
+                  <label className="responsive-text-base text-typo-gray-4 font-normal flex items-center gap-1">
+                    <IconStar />
+                    {dataLang?.purchase_order_detail_day_vouchers || 'purchase_order_detail_day_vouchers'}
+                  </label>
+                  <div className="relative flex flex-row custom-date-picker">
+                    <DatePicker
+                      blur
+                      fixedHeight
+                      showTimeSelect
+                      selected={startDate}
+                      onSelect={(date) => sStartDate(date)}
+                      onChange={(e) => handleTimeChange(e)}
+                      placeholderText="DD/MM/YYYY HH:mm:ss"
+                      dateFormat="dd/MM/yyyy h:mm:ss aa"
+                      timeInputLabel={'Time: '}
+                      placeholder={dataLang?.price_quote_system_default || 'price_quote_system_default'}
+                      className={`border ${
+                        errDate ? 'border-red-500' : 'focus:border-[#92BFF7] border-[#d0d5dd]'
+                      } py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280] w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-1 border rounded-lg z-[999] `}
+                    />
+                    {startDate && (
+                      <>
+                        <MdClear
+                          className="absolute right-2 translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                          onClick={() => handleClearDate('startDate')}
+                        />
+                      </>
+                    )}
+                    <CalendarBlankIcon className="size-4 absolute left-3 -translate-y-1/2 top-1/2 opacity-60" />
+                  </div>
+                </div>
+                <div className="relative flex flex-col gap-3">
+                  <label className="responsive-text-base text-typo-gray-4 font-normal flex items-center gap-1">
+                    <IconStar />
+                    {dataLang?.purchase_order_detail_delivery_date || 'purchase_order_detail_delivery_date'}
+                  </label>
+                  <div className="relative flex flex-row custom-date-picker">
+                    <DatePicker
+                      selected={delivery_dateNew}
+                      blur
+                      placeholderText="DD/MM/YYYY"
+                      dateFormat="dd/MM/yyyy"
+                      onSelect={(date) => _HandleChangeInput('delivery_dateNew', date)}
+                      placeholder={dataLang?.price_quote_system_default || 'price_quote_system_default'}
+                      className={`${'focus:border-[#92BFF7] border-[#d0d5dd] '} py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280] w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-1 border rounded-lg z-[999]`}
+                    />
+                    {delivery_dateNew && (
+                      <>
+                        <MdClear
+                          className="absolute right-2 translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
+                          onClick={() => handleClearDateNew('delivery_dateNew')}
+                        />
+                      </>
+                    )}
+                    <CalendarBlankIcon className="size-4 absolute left-3 -translate-y-1/2 top-1/2 opacity-60" />
+                  </div>
+                </div>
+              </div>
+            }
+            note={
+              <div className="flex flex-col gap-6">
+                <div className="text-typo-gray-4 font-normal responsive-text-base">
+                  {dataLang?.purchase_order_note || 'purchase_order_note'}
+                </div>
+                <textarea
+                  value={note}
+                  placeholder={dataLang?.purchase_order_note || 'purchase_order_note'}
+                  onChange={_HandleChangeInput.bind(this, 'note')}
+                  name="fname"
+                  type="text"
+                  className="responsive-text-base placeholder:responsive-text-base focus:border-[#92BFF7] border-[#919EAB3D] placeholder:text-slate-300 w-full min-h-[220px] bg-[#ffffff] rounded-[5.5px] font-normal p-2 border outline-none text-[#919EAB]"
+                />
+              </div>
+            }
+          />
+        }
+        total={
+          <div className="flex flex-col gap-3 justify-between text-right ">
+            <div className="flex justify-between ">
+              <div className="font-normal">
+                <h3>{dataLang?.purchase_order_table_total || 'purchase_order_table_total'}</h3>
+              </div>
+              <div className="font-normal">
+                <h3 className="text-blue-600">{formatMoney(totalMoney.total)}</h3>
+              </div>
+            </div>
+            <div className="flex justify-between ">
+              <div className="font-normal">
+                <h3>{dataLang?.purchase_order_detail_discounty || 'purchase_order_detail_discounty'}</h3>
+              </div>
+              <div className="font-normal">
+                <h3 className="text-blue-600">{formatMoney(totalMoney.totalDiscount)}</h3>
+              </div>
+            </div>
+            <div className="flex justify-between ">
+              <div className="font-normal">
+                <h3>
+                  {dataLang?.purchase_order_detail_money_after_discount || 'purchase_order_detail_money_after_discount'}
+                </h3>
+              </div>
+              <div className="font-normal">
+                <h3 className="text-blue-600">{formatMoney(totalMoney.totalAfftertDiscount)}</h3>
+              </div>
+            </div>
+            <div className="flex justify-between ">
+              <div className="font-normal">
+                <h3>{dataLang?.purchase_order_detail_tax_money || 'purchase_order_detail_tax_money'}</h3>
+              </div>
+              <div className="font-normal">
+                <h3 className="text-blue-600">{formatMoney(totalMoney.totalTax)}</h3>
+              </div>
+            </div>
+            <div className="flex justify-between ">
+              <div className="font-normal">
+                <h3>{dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}</h3>
+              </div>
+              <div className="font-normal">
+                <h3 className="text-blue-600">{formatMoney(totalMoney.totalMoney)}</h3>
+              </div>
+            </div>
+          </div>
+        }
       />
 
-      <Container className="!h-auto">
+      {/* <Container className="!h-auto">
         {statusExprired ? (
           <EmptyExprired />
         ) : (
@@ -1680,7 +1973,6 @@ const OrderForm = (props) => {
                     } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
                     isSearchable={true}
                     noOptionsMessage={() => 'Không có dữ liệu'}
-                    // components={{ MultiValue }}
                     menuPortalTarget={document.body}
                     closeMenuOnSelect={true}
                   />
@@ -1860,8 +2152,6 @@ const OrderForm = (props) => {
                           onChange={(e) => {
                             changeItem(e)
                           }}
-                          // isMulti
-                          // maxShowMuti={0}
                           value={null}
                           formatOptionLabel={(option) => (
                             <div className="flex items-center justify-between py-2">
@@ -2013,7 +2303,6 @@ const OrderForm = (props) => {
                       </div>
                       <div className="flex items-center justify-end col-span-1 text-right">
                         <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
-                        {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
                       </div>
                       <div className="flex items-center justify-center col-span-1">
                         <input
@@ -2222,7 +2511,6 @@ const OrderForm = (props) => {
                           <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
                             {formatNumber(e?.total)}
                           </h3>
-                          {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
                         </div>
                         <div className="flex items-center justify-center col-span-1">
                           <input
@@ -2395,7 +2683,7 @@ const OrderForm = (props) => {
             </div>
           </div>
         </div>
-      </Container>
+      </Container> */}
       <PopupConfim
         dataLang={dataLang}
         type="warning"

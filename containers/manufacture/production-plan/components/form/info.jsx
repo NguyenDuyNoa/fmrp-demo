@@ -125,8 +125,7 @@ const InFo = ({ dataLang, data, listBranch, handleRemoveBtn, isValue, onChangeVa
               isValue.dateRange.startDate == null || isValue.dateRange.endDate == null
                 ? 'border-red-500'
                 : 'border-border-gray-1'
-            } py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280]  w-full outline-none focus:outline-none 
-             focus:border-[#0F4F9E] focus:border-1 border  rounded-lg z-[999] `}
+            } py-[8px] pl-9 px-3 placeholder:responsive-text-base responsive-text-base placeholder:text-[#6b7280] w-full outline-none focus:outline-none focus:border-[#0F4F9E] focus:border-1 border rounded-lg z-[999] `}
           />
           <CalendarBlankIcon className="size-4 absolute left-3 -translate-y-1/2 top-1/2 opacity-60" />
         </div>
