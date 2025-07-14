@@ -33,7 +33,7 @@ const SelectWithRadio = ({
   dataBranch,
   dataLang,
   icon,
-  sSearchClient,
+  sSearch,
 }) => {
   const router = useRouter()
 
@@ -63,8 +63,8 @@ const SelectWithRadio = ({
   //  danh sách khách hàng
   const { refetch } = useClientList(params)
 
-  const handleSearchClient = debounce(async (value) => {
-    sSearchClient(value)
+  const handleSearch = debounce(async (value) => {
+    sSearch(value)
   }, 500)
 
   return (
@@ -77,7 +77,7 @@ const SelectWithRadio = ({
           <Select
             className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer select-with-radio w-full"
             showSearch
-            onSearch={handleSearchClient}
+            onSearch={handleSearch}
             placeholder={placeholderText}
             allowClear
             value={value}
@@ -85,9 +85,7 @@ const SelectWithRadio = ({
             onClear={onClear}
             disabled={disabled}
             filterOption={
-              sSearchClient
-                ? false
-                : (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              sSearch ? false : (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
             notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
             popupRender={(menu) => (

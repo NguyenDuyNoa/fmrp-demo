@@ -28,7 +28,7 @@ const DropdownDiscount = ({ value, onChange, dataLang }) => {
       placement="bottomCenter"
       arrow
     >
-      <div className="inline-flex items-center justify-between cursor-pointer w-[90%] group">
+      <div className="inline-flex items-center justify-between cursor-pointer group">
         <TableHeader className="text-start group-hover:text-neutral-05">% CK</TableHeader>
         <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
       </div>
