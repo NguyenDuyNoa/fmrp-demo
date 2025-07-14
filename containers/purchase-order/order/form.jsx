@@ -1,18 +1,23 @@
 import apiOrder from '@/Api/apiPurchaseOrder/apiOrder'
+import InputCustom from '@/components/common/input/InputCustom'
+import ButtonDelete from '@/components/common/orderManagement/ButtonDelete'
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
+import MenuList from '@/components/common/orderManagement/MenuList'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
-import SelectBySearch from '@/components/common/select/SelectBySearch'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearchBar from '@/components/common/orderManagement/SelectSearchBar'
 import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 import IconStar from '@/components/icons/common/IconStar'
 import LayoutForm from '@/components/layout/LayoutForm'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
+import EmptyData from '@/components/UI/emptyData'
 import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import SelectItemComponent, { MenuListClickAll } from '@/components/UI/filterComponents/selectItemComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
-import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
-import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
 import { optionsQuery } from '@/configs/optionsQuery'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
@@ -25,14 +30,14 @@ import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { routerOrder } from '@/routers/buyImportGoods'
-import { isAllowedDiscount, isAllowedNumber } from '@/utils/helpers/common'
+import { isAllowedDiscount } from '@/utils/helpers/common'
 import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Add, Trash as IconDelete, Minus } from 'iconsax-react'
 import { debounce } from 'lodash'
 import moment from 'moment/moment'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
@@ -76,7 +81,7 @@ const OrderForm = (props) => {
       purchases_order_item_id: '',
     },
   ])
-
+  console.log(option)
   const [sortedArr, setSortedArr] = useState([])
 
   const [hidden, sHidden] = useState(false)
@@ -408,14 +413,32 @@ const OrderForm = (props) => {
     } else if (type == 'discount') {
       sDiscount(typeof value === 'object' ? value?.value : value)
     } else if (type == 'itemAll') {
-      sItemAll(value)
       if (value?.length == 0) {
         setSortedArr([])
+        sItemAll([])
       } else {
-        setSortedArr([
-          ...sortedArr,
-          ...value.map((item) => {
-            // const money = Number(item?.e.affterDiscount) * (1 + Number(item?.e?.tax?.e?.tax_rate) / 100) * Number(item?.e?.quantity);
+        // Tìm các item bị xóa từ lần selection trước
+        const previousItemValues = new Set(itemAll.map((item) => item.value))
+        const currentItemValues = new Set(value.map((item) => item.value))
+
+        // Kiểm tra xem có item nào bị xóa không
+        const hasRemovedItems = itemAll.some((item) => !currentItemValues.has(item.value))
+
+        // Nếu có item bị xóa, cập nhật lại sortedArr
+        if (hasRemovedItems) {
+          // Lọc ra các mặt hàng cần giữ lại trong sortedArr
+          const newSortedArr = sortedArr.filter((item) => item?.items?.value && currentItemValues.has(item.items.value))
+          setSortedArr(newSortedArr)
+        }
+
+        // Chỉ thêm các mặt hàng chưa tồn tại trong sortedArr
+        const existingItemIds = new Set(sortedArr.map((item) => item?.items?.value))
+
+        // Lọc những mặt hàng chưa tồn tại
+        const newItems = value.filter((item) => !existingItemIds.has(item.value))
+
+        if (newItems.length > 0) {
+          const newItemsFormatted = newItems.map((item) => {
             let money = 0
             if (item.e?.tax?.tax_rate == undefined) {
               money = Number(1) * (1 + Number(0) / 100) * Number(item?.e?.quantity_left)
@@ -425,11 +448,11 @@ const OrderForm = (props) => {
             }
 
             return {
-              id: Date.now(),
+              id: Date.now() + Math.random(),
               items: item,
               unit: item?.e?.unit_name,
               quantity: idPurchases?.length ? Number(item?.e?.quantity_left) : 1,
-              price: item?.price,
+              price: item?.e?.price || 1,
               discount: discount ? discount : 0,
               affterDiscount: 1,
               tax: tax ? tax : 0,
@@ -437,8 +460,13 @@ const OrderForm = (props) => {
               total: Number(money.toFixed(2)),
               note: '',
             }
-          }),
-        ])
+          })
+
+          setSortedArr([...sortedArr, ...newItemsFormatted])
+        }
+
+        // Cập nhật itemAll sau khi đã cập nhật sortedArr
+        sItemAll(value)
       }
     }
   }
@@ -829,8 +857,18 @@ const OrderForm = (props) => {
     }
   }
   const _HandleDelete = (id) => {
+    // Tìm item cần xóa để lấy value của nó
+    const itemToDelete = sortedArr.find((x) => x.id === id)
+
+    // Lọc ra các mặt hàng còn lại trong sortedArr
     const newOption = sortedArr.filter((x) => x.id !== id)
     setSortedArr(newOption)
+
+    if (itemToDelete) {
+      // Cập nhật itemAll để đồng bộ với sortedArr
+      const newItemAll = itemAll.filter((item) => item.value !== itemToDelete.items.value)
+      sItemAll(newItemAll)
+    }
   }
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
@@ -960,6 +998,9 @@ const OrderForm = (props) => {
   }, [onSending])
 
   const _HandleSelectAll = () => {
+    // Lấy danh sách ID của các mặt hàng đã tồn tại
+    const existingItemIds = new Set(sortedArr.map((item) => item?.items?.value))
+
     const newData = dataItems.map((item, index) => {
       let money = 0
       if (item.tax?.tax_rate == undefined) {
@@ -977,7 +1018,7 @@ const OrderForm = (props) => {
         },
         unit: item?.unit_name,
         quantity: idPurchases?.length ? Number(item?.quantity_left) : 1,
-        price: 1,
+        price: item?.price || 1,
         discount: discount ? discount : 0,
         affterDiscount: 1,
         tax: tax ? tax : 0,
@@ -986,27 +1027,24 @@ const OrderForm = (props) => {
         note: '',
       }
     })
-    sItemAll(newData)
-    setSortedArr(newData)
+
+    // Lọc bỏ các mặt hàng đã có trong sortedArr
+    const uniqueNewData = newData.filter((item) => !existingItemIds.has(item.items.value))
+
+    sItemAll([...sortedArr, ...uniqueNewData])
+    setSortedArr([...sortedArr, ...uniqueNewData])
   }
 
   const changeItem = (e) => {
-    // const price = Number(e?.e?.price);
-    // sortedArr[index].affterDiscount = +price * (1 - (discount ? discount : 0) / 100);
-    // sortedArr[index].affterDiscount = +(Math.round(sortedArr[index].affterDiscount + "e+2") + "e-2");
-    // if (sortedArr[index].tax?.tax_rate == undefined) {
-    //     const money = Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity);
-    //     sortedArr[index].total = Number(money.toFixed(2));
-    // } else {
-    //     const money =
-    //         Number(sortedArr[index].affterDiscount) *
-    //         (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
-    //         Number(sortedArr[index].quantity);
-    //     sortedArr[index].total = Number(money.toFixed(2));
-    // }
-    // const money = Number(e?.e?.affterDiscount) * (1 + Number(0) / 100) * Number(e?.e?.quantity_left);
-    // // Number(money.toFixed(2))
-    // console.log("money", money);
+    // Kiểm tra xem mặt hàng đã tồn tại chưa
+    const existingItemIndex = sortedArr.findIndex((item) => item?.items?.value === e?.value)
+
+    // Nếu đã tồn tại, không thêm nữa và thông báo
+    if (existingItemIndex !== -1) {
+      isShow('warning', 'Mặt hàng này đã được thêm vào danh sách')
+      return
+    }
+
     let moneyClient = 0
     if (e.e?.tax?.tax_rate == undefined) {
       moneyClient = Number(1) * (1 + Number(0) / 100) * Number(e?.e?.quantity_left)
@@ -1018,11 +1056,11 @@ const OrderForm = (props) => {
       ...sortedArr,
       {
         ...e?.e,
-        id: Date.now(),
+        id: Date.now() + Math.random(),
         items: e,
         unit: e?.e?.unit_name,
         quantity: idPurchases?.length ? Number(e?.e?.quantity_left) : 1,
-        price: e?.e?.price,
+        price: e?.e?.price || 1,
         discount: discount ? discount : 0,
         affterDiscount: 1,
         tax: tax ? tax : 0,
@@ -1045,7 +1083,7 @@ const OrderForm = (props) => {
       label: `${'Thông tin đơn hàng mua (PO)'}`,
     },
   ]
-
+  console.log(sortedArr)
   return (
     <React.Fragment>
       <LayoutForm
@@ -1064,102 +1102,58 @@ const OrderForm = (props) => {
           <>
             <div className="flex items-center justify-between">
               <h2 className="responsive-text-xl font-medium text-brand-color w-full">Thông tin mặt hàng</h2>
-              <SelectBySearch
-                placeholderText={dataLang?.purchase_items || 'purchase_items'}
-                selectedOptions={itemAll}
+              <SelectSearchBar
+                options={[...options]}
                 onChange={(value) => {
                   _HandleChangeInput('itemAll', value)
                 }}
-                options={options}
-                handleIncrease={handleIncrease}
-              >
-                {options?.map((opt) => {
-                  const e = opt.e
-                  return (
-                    <Option key={opt.value} value={opt.value} label={e.name} option={opt}>
-                      <div className="flex items-center justify-between py-2">
-                        <div className="flex items-center gap-2">
-                          <div>
-                            {e?.images != null ? (
-                              <img
-                                src={e?.images}
-                                alt="Product Image"
-                                style={{
-                                  width: '40px',
-                                  height: '50px',
-                                }}
-                                className="object-cover rounded"
-                              />
-                            ) : (
-                              <div className="w-[50px] h-[60px] object-cover flex items-center justify-center rounded">
-                                <img
-                                  src="/icon/noimagelogo.png"
-                                  alt="Product Image"
-                                  style={{
-                                    width: '40px',
-                                    height: '40px',
-                                  }}
-                                  className="object-cover rounded"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.name}</h3>
-                            <div className="flex gap-2">
-                              <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                {e?.code}
-                              </h5>
-                              <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                {e?.product_variation}
-                              </h5>
-                            </div>
-                            <h5
-                              className={`${
-                                optionType == '1' ? '' : 'flex items-center gap-1'
-                              } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                            >
-                              {dataLang[e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
-                              {optionType == '1' ? e?.purchases_code : ''}{' '}
-                              {optionType != '1' && (
-                                <>
-                                  <h5>-</h5>
-                                  <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                    {dataLang?.purchase_survive || 'purchase_survive'}:
-                                  </h5>
-                                  <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                    {e?.qty_warehouse ? formatNumber(e?.qty_warehouse) : '0'}
-                                  </h5>
-                                </>
-                              )}
-                            </h5>
-                            {optionType == '1' && (
-                              <div className="flex items-center gap-2 text-gray-400">
-                                <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                  Số lượng:
-                                </h5>
-                                <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                  {formatNumber(e?.quantity_left)}
-                                </h5>
-                                {'-'}
-                                <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                  {dataLang?.purchase_survive || 'purchase_survive'}:
-                                </h5>
-                                <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                  {e?.qty_warehouse ? formatNumber(e?.qty_warehouse) : '0'}
-                                </h5>
-                              </div>
-                            )}
-                          </div>
+                value={itemAll}
+                menuIsOpen={true}
+                MenuList={(props) => (
+                  <MenuList
+                    dataItems={itemAll}
+                    handleSelectAll={_HandleSelectAll.bind(this)}
+                    handleDeleteAll={() => {
+                      setSortedArr([])
+                      sItemAll([])
+                    }}
+                    {...props}
+                  />
+                )}
+                formatOptionLabel={(option) => (
+                  <div className="flex items-start p-2 cursor-pointer font-deca">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={option.e?.images ?? '/icon/noimagelogo.png'}
+                        alt={option?.e?.name}
+                        className="size-16 object-cover rounded-md"
+                      />
+                      <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
+                        <h3 className="font-semibold responsive-text-sm truncate text-black">{option.e?.name}</h3>
+
+                        <h5 className="text-blue-color truncate">
+                          {option.e?.code}: {option?.e?.product_variation}
+                        </h5>
+
+                        <div className="flex flex-wrap items-center gap-2 text-neutral-03">
+                          ĐVT: {option.e?.unit_name} - {dataLang[option.e?.text_type]} -{' '}
+                          {dataLang?.purchase_survive || 'purchase_survive'}:{' '}
+                          {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+                          {optionType == '1' && (
+                            <span className="flex items-center gap-1">
+                              - Số lượng: {formatNumber(option.e?.quantity_left)}
+                            </span>
+                          )}
                         </div>
                       </div>
-                    </Option>
-                  )
-                })}
-              </SelectBySearch>
+                    </div>
+                  </div>
+                )}
+                placeholder={dataLang?.N_search_product || 'Tìm kiếm mặt hàng'}
+              />
             </div>
-            <div className="grid grid-cols-25 items-center z-10">
-              <h4 className="col-span-5 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+            <div className="grid grid-cols-26 items-center z-10">
+              <h4 className="col-span-6 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_purchase_from_item || 'purchase_order_purchase_from_item'}
                 {idPurchases?.length > 0 && (
                   <SelectItemComponent
@@ -1196,16 +1190,12 @@ const OrderForm = (props) => {
                   />
                 )}
               </h4>
-              {/* <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02">
-                {dataLang?.purchase_order_purchase_from_unit || 'purchase_order_purchase_from_unit'}
-              </h4> */}
-              <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+              <h4 className="col-span-4 text-center responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_quantity || 'purchase_quantity'}
               </h4>
-              <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+              <h4 className="col-span-3 text-center responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_detail_unit_price || 'purchase_order_detail_unit_price'}
               </h4>
-              {/* Chọn hàng loạt % chiết khấu */}
               <div className="col-span-3 px-3">
                 <DropdownDiscount
                   value={discount}
@@ -1213,11 +1203,9 @@ const OrderForm = (props) => {
                   dataLang={dataLang}
                 />
               </div>
-
               <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_detail_after_discount || 'purchase_order_detail_after_discount'}
               </h4>
-              {/* Chọn hàng loại % Thuế */}
               <div className="col-span-3 px-3">
                 <DropdownTax
                   value={tax}
@@ -1228,199 +1216,93 @@ const OrderForm = (props) => {
                 />
               </div>
 
-              <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+              <h4 className="col-span-3 text-right responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_detail_into_money || 'purchase_order_detail_into_money'}
               </h4>
-              {/* <h4 className="2xl:text-[12px] xl:text-[13px] text-[12.5px] px-2  text-[#667085] uppercase  col-span-1    text-left    truncate font-[400]">
-                  {dataLang?.purchase_order_note || 'purchase_order_note'}
-                </h4> */}
-              <h4 className="col-span-2 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
-                {dataLang?.purchase_order_table_operations || 'purchase_order_table_operations'}
-              </h4>
+              <h4 className="col-span-1 responsive-text-sm font-semibold text-neutral-02 py-2 px-3"></h4>
             </div>
             <Customscrollbar className="overflow-auto">
               <div className="w-full h-full">
                 <React.Fragment>
-                  <div className="divide-y divide-slate-200 min:h-[400px] h-[100%] max:h-[800px]">
-                    {/* <div className="grid grid-cols-12 gap-1 py-1 ">
-                      <div className="col-span-3 my-auto">
-                        <SelectItemComponent
-                          onInputChange={(event) => {
-                            _HandleSeachApi(event)
-                          }}
-                          options={options}
-                          onChange={(e) => {
-                            changeItem(e)
-                          }}
-                          value={null}
-                          formatOptionLabel={(option) => (
-                            <div className="flex items-center justify-between py-2">
-                              <div className="flex items-center gap-2">
-                                <div>
-                                  {option.e?.images != null ? (
-                                    <img
-                                      src={option.e?.images}
-                                      alt="Product Image"
-                                      style={{
-                                        width: '40px',
-                                        height: '50px',
-                                      }}
-                                      className="object-cover rounded"
-                                    />
-                                  ) : (
-                                    <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                      <img
-                                        src="/icon/noimagelogo.png"
-                                        alt="Product Image"
-                                        style={{
-                                          width: '40px',
-                                          height: '40px',
-                                        }}
-                                        className="object-cover rounded"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                    {option.e?.name}
-                                  </h3>
-                                  <div className="flex gap-2">
-                                    <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {option.e?.code}
-                                    </h5>
-                                    <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {option.e?.product_variation}
-                                    </h5>
-                                  </div>
-                                  <h5
-                                    className={`${
-                                      optionType == '1' ? '' : 'flex items-center gap-1'
-                                    } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                                  >
-                                    {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
-                                    {optionType == '1' ? option.e?.purchases_code : ''}{' '}
-                                    {optionType != '1' && (
-                                      <>
-                                        <h5>-</h5>
-                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          {dataLang?.purchase_survive || 'purchase_survive'}:
-                                        </h5>
-                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
-                                        </h5>
-                                      </>
-                                    )}
+                  <div className="divide-y divide-slate-200">
+                    {sortedArr.length === 0 ? (
+                      <EmptyData />
+                    ) : (
+                      sortedArr.map((e, index) => (
+                        <div className="grid grid-cols-26" key={e?.id}>
+                          <div className="col-span-6 py-2 2xl:px-4 px-2 flex flex-col gap-2 2xl:gap-3">
+                            <div className="flex items-center gap-2">
+                              <div className="size-16 flex-shrink-0">
+                                <img
+                                  src={e?.items?.e?.images || '/icon/noimagelogo.png'}
+                                  alt="Product Image"
+                                  className="object-cover rounded size-full"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <h3 className="responsive-text-sm font-semibold text-new-blue">{e?.items?.e?.name}</h3>
+                                <div className="flex gap-1">
+                                  <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                    {e?.items?.e?.code}
                                   </h5>
-                                  {optionType == '1' && (
-                                    <div className="flex items-center gap-2 text-gray-400">
-                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        Số lượng:
-                                      </h5>
-                                      <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {formatNumber(option.e?.quantity_left)}
-                                      </h5>
-                                      {'-'}
-                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                                  <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                    {e?.items?.e?.product_variation}
+                                  </h5>
+                                </div>
+                                <h5
+                                  className={`${
+                                    optionType == '1' ? '' : 'flex items-center gap-1'
+                                  } responsive-text-xxs text-neutral-03 font-normal`}
+                                >
+                                  {dataLang[e?.items?.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
+                                  {optionType == '1' ? e?.items?.e?.purchases_code : ''}{' '}
+                                  {optionType != '1' && (
+                                    <>
+                                      <h5>-</h5>
+                                      <h5 className="responsive-text-xxs text-neutral-03 font-normal">
                                         {dataLang?.purchase_survive || 'purchase_survive'}:
                                       </h5>
-                                      <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
+                                      <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                        {e?.items?.e?.qty_warehouse ? e?.items?.e?.qty_warehouse : '0'}
                                       </h5>
-                                    </div>
+                                    </>
                                   )}
-                                </div>
+                                </h5>
+                                {optionType == '1' && (
+                                  <div className="flex items-center gap-2 text-gray-400">
+                                    <h5 className="responsive-text-xxs text-neutral-03 font-normal">Số lượng:</h5>
+                                    <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                      {formatNumber(e?.items?.e?.quantity_left)}
+                                    </h5>
+                                    {'-'}
+                                    <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                      {dataLang?.purchase_survive || 'purchase_survive'}:
+                                    </h5>
+                                    <h5 className="responsive-text-xxs text-neutral-03 font-normal">
+                                      {e?.items?.e?.qty_warehouse ? formatNumber(e?.items?.e?.qty_warehouse) : '0'}
+                                    </h5>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                          )}
-                          placeholder={dataLang?.purchase_items || 'purchase_items'}
-                          hideSelectedOptions={false}
-                          className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
-                          isSearchable={true}
-                          noOptionsMessage={() => 'Không có dữ liệu'}
-                          styles={{
-                            menu: {
-                              width: '100%',
-                            },
-                          }}
-                        />
-                      </div>
-                      <div className="flex items-center justify-center col-span-1 text-center">
-                        <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">Cái</h3>
-                      </div>
-                      <div className="flex items-center justify-center col-span-1">
-                        <div className="flex items-center justify-center">
-                          <button
-                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            onClick={() => {}}
-                            disabled
-                          >
-                            <Minus size="16" />
-                          </button>
-                          <InPutNumericFormat
-                            disabled
-                            value={1}
-                            isAllowed={isAllowedNumber}
-                            className={`  appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                          />
-                          <button
-                            className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                            onClick={() => {}}
-                            disabled
-                          >
-                            <Add size="16" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-center col-span-1 text-center">
-                        <InPutMoneyFormat
-                          value={1}
-                          disabled
-                          className={` appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                        />
-                      </div>
-                      <div className="flex items-center justify-center col-span-1 text-center">
-                        <InPutNumericFormat
-                          value={1}
-                          disabled
-                          className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
-                          isAllowed={isAllowedDiscount}
-                        />
-                      </div>
-                      <div className="flex items-center justify-end col-span-1 text-right">
-                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
-                      </div>
-                      <div className="flex items-center justify-center col-span-1">
-                        <SelectItemComponent
-                          options={[]}
-                          disabled
-                          placeholder={'% Thuế'}
-                          hideSelectedOptions={false}
-                          className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                          isSearchable={true}
-                          noOptionsMessage={() => 'Không có dữ liệu'}
-                        />
-                      </div>
-                      <div className="flex items-center justify-end col-span-1 text-right">
-                        <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">1</h3>
-                      </div>
-                      <div className="flex items-center justify-center col-span-1">
-                        <button
-                          type="button"
-                          title="Xóa"
-                          onClick={() => {
-                            isShow('error', `${'Mặc định hệ thống, không xóa'}`)
-                          }}
-                          className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
-                        >
-                          <IconDelete />
-                        </button>
-                      </div>
-                    </div> */}
-                    {sortedArr.map((e, index) => (
-                      <div className="grid grid-cols-25 py-1 " key={e?.id}>
-                        <div className="col-span-5 my-auto">
-                          <SelectItemComponent
+                            <div className="flex items-center justify-center">
+                              <Image
+                                src={'/icon/pen.svg'}
+                                alt="icon pen"
+                                width={16}
+                                height={16}
+                                className="size-3 object-cover"
+                              />
+                              <input
+                                value={e?.note}
+                                onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
+                                name="optionEmail"
+                                placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
+                                type="text"
+                                className="responsive-text-xs placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 w-full text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
+                              />
+                            </div>
+                            {/* <SelectItemComponent
                             onInputChange={(event) => {
                               _HandleSeachApi(event)
                             }}
@@ -1517,94 +1399,90 @@ const OrderForm = (props) => {
                                 width: '100%',
                               },
                             }}
-                          />
-                        </div>
-                        {/* <div className="flex items-center justify-center col-span-1 text-center">
+                          /> */}
+                          </div>
+                          {/* <div className="flex items-center justify-center col-span-1 text-center">
                           <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.unit}</h3>
                         </div> */}
-                        <div className="col-span-3 flex items-center justify-center">
-                          <div className="flex items-center justify-center">
-                            <button
-                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                              onClick={() => handleDecrease(e?.id)}
-                            >
-                              <Minus size="16" />
-                            </button>
-                            <InPutNumericFormat
-                              onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'quantity', e)}
-                              value={e?.quantity}
-                              readOnly={false}
-                              isAllowed={isAllowedNumber}
-                              className={`
-                                                        ${
-                                                          (e?.quantity == 0 && 'border-red-500') ||
-                                                          (e?.quantity == '' && 'border-red-500')
-                                                        } 
-                                                        appearance-none text-center 2xl:text-[12px] xl:text-[13px] text-[12.5px] py-2 px-0.5 font-normal 2xl:w-24 xl:w-[90px] w-[63px]  focus:outline-none border-b-2 border-gray-200`}
-                            />
-                            <button
-                              className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-slate-200 rounded-full"
-                              onClick={() => handleIncrease(e.id)}
-                            >
-                              <Add size="16" />
-                            </button>
+                          <div className="col-span-4 p-1 flex items-center justify-center">
+                            <div className="flex items-center justify-center">
+                              <InputCustom
+                                state={e?.quantity}
+                                setState={(value) => _HandleChangeInputOption(e?.id, 'quantity', e, { value })}
+                                min={1}
+                                step={1}
+                                className="p-1"
+                                classNameInput={`${
+                                  (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
+                                } text-center !responsive-text-sm w-full`}
+                                classNameButton="size-7"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-span-3 flex items-center justify-center">
-                          <InPutMoneyFormat
-                            value={e?.price}
-                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
-                            readOnly={false}
-                            className={`${(e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')} 
-                                                appearance-none 2xl:text-[12px] xl:text-[13px] text-[12.5px] text-center py-1 px-2 font-normal w-[80%] focus:outline-none border-b-2 border-gray-200`}
-                          />
-                        </div>
-                        <div className="col-span-3 flex items-center justify-center">
-                          <InPutNumericFormat
-                            value={e?.discount}
-                            onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
-                            className="appearance-none text-center py-1 px-2 font-normal w-[80%]  focus:outline-none border-b-2 2xl:text-[12px] xl:text-[13px] text-[12.5px] border-gray-200"
-                            isAllowed={isAllowedDiscount}
-                          />
-                        </div>
-                        <div className="col-span-3 flex items-center justify-end">
-                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
+                          <div className="col-span-3 flex items-center justify-center p-1">
+                            <div className="relative w-full">
+                              <InPutMoneyFormat
+                                value={e?.price}
+                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
+                                readOnly={false}
+                                className={`${
+                                  (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
+                                } rounded-lg appearance-none text-center py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400`}
+                              />
+                              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold underline">
+                                đ
+                              </span>
+                            </div>
+                          </div>
+                          <div className="col-span-3 flex items-center justify-center p-1">
+                            <div className="relative w-full">
+                              <InPutNumericFormat
+                                value={e?.discount}
+                                onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
+                                className="rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400"
+                                isAllowed={isAllowedDiscount}
+                              />
+                              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold">
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <h3 className="col-span-3 flex items-center justify-center px-2 responsive-text-sm font-semibold text-neutral-07">
                             {formatNumber(e?.affterDiscount || 1)}
                           </h3>
-                        </div>
-                        <div className="col-span-3 flex items-center justify-center">
-                          <SelectItemComponent
-                            options={taxOptions}
-                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'tax', index)}
-                            value={
-                              e?.tax
-                                ? {
-                                    label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
-                                    value: e?.tax?.value,
-                                    tax_rate: e?.tax?.tax_rate,
-                                  }
-                                : null
-                            }
-                            placeholder={'% Thuế'}
-                            hideSelectedOptions={false}
-                            formatOptionLabel={(option) => (
-                              <div className="flex items-center justify-start gap-1 ">
-                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{option?.label}</h2>
-                                <h2 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{`(${option?.tax_rate})`}</h2>
-                              </div>
-                            )}
-                            className={` "border-transparent placeholder:text-slate-300 w-full 2xl:text-[12px] xl:text-[13px] text-[12.5px] z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                          />
-                        </div>
-                        <div className="col-span-3 flex items-center justify-end">
-                          <h3 className="px-2 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                            {formatNumber(e?.total)}
-                          </h3>
-                          {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
-                        </div>
-                        {/* <div className="flex items-center justify-center col-span-1">
+                          <div className="col-span-3 p-1 flex items-center justify-center">
+                            <SelectCustomLabel
+                              placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                              options={taxOptions}
+                              value={e?.tax}
+                              onChange={(value) => _HandleChangeInputOption(e?.id, 'tax', index, value)}
+                              renderOption={(option, isLabel) => (
+                                <div
+                                  className={`flex items-center justify-start gap-1 text-[#1C252E] ${
+                                    isLabel ? 'py-1 2xl:py-2' : ''
+                                  }`}
+                                >
+                                  <h2 className="responsive-text-sm leading-normal whitespace-nowrap">
+                                    {option?.label}
+                                  </h2>
+                                  {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                    <h2 className="responsive-text-sm leading-normal">
+                                      {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
+                                    </h2>
+                                  )}
+                                </div>
+                              )}
+                              isVisibleLotDate={false}
+                              isKeepOpen={true}
+                            />
+                          </div>
+                          <div className="col-span-3 flex items-center justify-end">
+                            <h3 className="px-4 responsive-text-sm font-semibold text-neutral-07">
+                              {formatNumber(e?.total)} <span className="text-neutral-07 underline">đ</span>
+                            </h3>
+                            {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
+                          </div>
+                          {/* <div className="flex items-center justify-center col-span-1">
                           <input
                             value={e?.note}
                             onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
@@ -1614,18 +1492,12 @@ const OrderForm = (props) => {
                             className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
                           />
                         </div> */}
-                        <div className="col-span-2 flex items-center justify-center">
-                          <button
-                            onClick={_HandleDelete.bind(this, e?.id)}
-                            type="button"
-                            title="Xóa"
-                            className="transition  w-full bg-slate-100 h-10 rounded-[5.5px] text-red-500 flex flex-col justify-center items-center mb-2"
-                          >
-                            <IconDelete />
-                          </button>
+                          <div className="col-span-1 flex items-center justify-center">
+                            <ButtonDelete onDelete={_HandleDelete.bind(this, e?.id)} />
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </React.Fragment>
               </div>

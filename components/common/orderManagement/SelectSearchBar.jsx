@@ -16,6 +16,7 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         closeMenuOnSelect={false}
         onChange={onChange}
         value={value}
+        menuIsOpen={menuIsOpen}
         isMulti
         maxShowMuti={0}
         components={{ MenuList, MultiValue }}
@@ -61,6 +62,10 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
           menu: (provided, state) => ({
             ...provided,
             width: '100%',
+          }),
+          menuList: (provided) => ({
+            ...provided,
+            padding: '4px',
           }),
         }}
       />

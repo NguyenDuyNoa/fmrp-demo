@@ -270,7 +270,7 @@ const InputCustom = ({
         onBlur={handleBlur}
         onMouseDown={(e) => e.stopPropagation()}
         className={twMerge(
-          'w-20 text-center outline-none text-lg font-normal text-secondary-09 bg-transparent',
+          'w-20 text-center outline-none responsive-text-lg font-normal text-secondary-09 bg-transparent',
           isError && inputValue > 0 ? 'text-red-500' : '',
           classNameInput
         )}
