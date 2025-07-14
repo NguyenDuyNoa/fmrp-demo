@@ -9,7 +9,7 @@ import { Button } from 'antd'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-const LayoutSalesPurchaseOrder = ({
+const LayoutOrderManagement = ({
   dataLang,
   titleHead,
   breadcrumbItems,
@@ -142,4 +142,4 @@ const LayoutSalesPurchaseOrder = ({
   )
 }
 
-export default LayoutSalesPurchaseOrder
+export default LayoutOrderManagement

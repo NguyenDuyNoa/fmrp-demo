@@ -1,6 +1,12 @@
 import apiDeliveryReceipt from '@/Api/apiSalesExportProduct/deliveryReceipt/apiDeliveryReceipt'
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
+import { DocumentNumber } from '@/components/common/orderManagement/GeneralInfo'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
+import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import EmptyData from '@/components/UI/emptyData'
@@ -9,11 +15,6 @@ import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericF
 import Loading from '@/components/UI/loading/loading'
 import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
-import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
-import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
-import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
-import SelectCustomLabel from '@/components/UI/salesPurchase/SelectCustomLabel'
-import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
@@ -174,7 +175,7 @@ const DeliveryReceiptForm = (props) => {
     if (dataBranch.length > 0 && authState.branch?.length > 0 && !idBranch) {
       const firstBranch = {
         value: authState.branch[0].id,
-        label: authState.branch[0].name
+        label: authState.branch[0].name,
       }
       sIdBranch(firstBranch)
     }
@@ -1039,7 +1040,7 @@ const DeliveryReceiptForm = (props) => {
   ]
 
   return (
-    <LayoutSalesPurchaseOrder
+    <LayoutOrderManagement
       dataLang={dataLang}
       titleHead={
         id
@@ -1412,20 +1413,7 @@ const DeliveryReceiptForm = (props) => {
       info={
         <div className="flex flex-col gap-4 relative">
           {/* Mã chứng từ */}
-          <div className="flex flex-col flex-wrap items-center gap-y-3">
-            <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
-            <div className="w-full relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
-              <input
-                value={code}
-                onChange={_HandleChangeInput.bind(this, 'code')}
-                name="fname"
-                type="text"
-                placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
-                className={`xl1439:text-[15px] xl1439:leading-6 text-[13px] leading-[20px] text-gray-600 font-normal placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
-              />
-            </div>
-          </div>
+          <DocumentNumber dataLang={dataLang} value={code} onChange={_HandleChangeInput.bind(this, 'code')} />
           {/* Ngày chứng từ */}
           <div className="flex flex-col flex-wrap items-center gap-y-3">
             <InfoFormLabel isRequired={true} label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
@@ -1459,68 +1447,47 @@ const DeliveryReceiptForm = (props) => {
           </div>
 
           {/* Khách hàng */}
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel isRequired={true} label="Khách hàng" />
-              <div className="w-full flex">
-                <SelectWithRadio
-                  title="Khách hàng"
-                  placeholderText="Chọn khách hàng"
-                  options={dataClient}
-                  value={idClient}
-                  onChange={(value) => {
-                    const newValue = dataClient.find((item) => item.value === value)
-                    _HandleChangeInput('idClient', newValue)
-                  }}
-                  isError={errClient}
-                  sSearchClient={sSearchClient}
-                  dataLang={dataLang}
-                  icon={<LuBriefcase />}
-                />
-              </div>
-            </div>
-            {errClient && (
-              <label className="text-sm text-red-500">
-                {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
-              </label>
-            )}
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label="Khách hàng"
+            placeholderText="Chọn khách hàng"
+            options={dataClient}
+            value={idClient}
+            onChange={(value) => {
+              const newValue = dataClient.find((item) => item.value === value)
+              _HandleChangeInput('idClient', newValue)
+            }}
+            isError={errClient}
+            sSearchClient={sSearchClient}
+            dataLang={dataLang}
+            icon={<LuBriefcase />}
+            errMess={dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
+          />
+
           {/* Đơn hàng bán */}
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel
-                isRequired={true}
-                label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-              />
-              <div className="w-full flex">
-                <SelectWithRadio
-                  title={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
-                  placeholderText="Chọn đơn hàng bán"
-                  options={dataProductOrder}
-                  value={idProductOrder}
-                  onChange={(value) => {
-                    const newValue = dataProductOrder.find((item) => item.value === value)
-                    _HandleChangeInput('idProductOrder', newValue)
-                  }}
-                  isError={errProductOrder}
-                  icon={<TbNotes />}
-                />
-              </div>
-            </div>
-            {errProductOrder && (
-              <label className="text-sm text-red-500">
-                {dataLang?.delivery_receipt_err_select_product_order || 'delivery_receipt_err_select_product_order'}
-              </label>
-            )}
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.delivery_receipt_product_order || 'delivery_receipt_product_order'}
+            placeholderText="Chọn đơn hàng bán"
+            options={dataProductOrder}
+            value={idProductOrder}
+            onChange={(value) => {
+              const newValue = dataProductOrder.find((item) => item.value === value)
+              _HandleChangeInput('idProductOrder', newValue)
+            }}
+            isError={errProductOrder}
+            icon={<TbNotes />}
+            errMess={dataLang?.delivery_receipt_err_select_product_order || 'delivery_receipt_err_select_product_order'}
+          />
+
           {/* Địa chỉ giao hàng */}
           <div className="flex flex-col gap-y-2">
             <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel isRequired={true} label={dataLang?.address || 'address'} />
               <div className="w-full flex">
                 <div className="relative flex flex-col select-with-radio">
                   <SelectWithRadio
-                    title={dataLang?.select_address || 'select_address'}
+                    isRequired={true}
+                    label={dataLang?.address || 'address'}
                     placeholderText="Chọn địa chỉ giao hàng"
                     options={dataAddress}
                     value={idAddress}
@@ -1565,58 +1532,36 @@ const DeliveryReceiptForm = (props) => {
               >
                 <div className="flex flex-col gap-y-3">
                   {/* Chi nhánh */}
-                  <div className="flex flex-col gap-y-2">
-                    <div className="flex flex-col flex-wrap items-center gap-y-3">
-                      <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
-                      <div className="w-full flex">
-                        <SelectWithRadio
-                          title={dataLang?.import_branch || 'import_branch'}
-                          placeholderText="Chọn chi nhánh"
-                          options={dataBranch}
-                          value={idBranch}
-                          onChange={(value) => {
-                            const newValue = dataBranch.find((item) => item.value === value)
-                            _HandleChangeInput('branch', newValue)
-                          }}
-                          isError={errBranch}
-                          icon={<PiMapPinLight />}
-                        />
-                      </div>
-                    </div>
-                    {errBranch && (
-                      <label className="text-sm text-red-500">
-                        {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                      </label>
-                    )}
-                  </div>
+                  <SelectWithRadio
+                    isRequired={true}
+                    label={dataLang?.import_branch || 'import_branch'}
+                    placeholderText="Chọn chi nhánh"
+                    options={dataBranch}
+                    value={idBranch}
+                    onChange={(value) => {
+                      const newValue = dataBranch.find((item) => item.value === value)
+                      _HandleChangeInput('branch', newValue)
+                    }}
+                    isError={errBranch}
+                    icon={<PiMapPinLight />}
+                    errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+                  />
+
                   {/* Người dùng */}
-                  <div className="flex flex-col gap-y-2">
-                    <div className="flex flex-col flex-wrap items-center gap-y-3">
-                      <InfoFormLabel
-                        isRequired
-                        label={dataLang?.delivery_receipt_edit_User || 'delivery_receipt_edit_User'}
-                      />
-                      <div className="w-full flex">
-                        <SelectWithRadio
-                          title={dataLang?.import_branch || 'import_branch'}
-                          placeholderText="Chọn người dùng"
-                          options={dataStaff}
-                          value={idStaff}
-                          onChange={(value) => {
-                            const newValue = dataStaff.find((item) => item.value === value)
-                            _HandleChangeInput('idStaff', newValue)
-                          }}
-                          isError={errStaff}
-                          icon={<PiUser />}
-                        />
-                      </div>
-                    </div>
-                    {errStaff && (
-                      <label className="text-sm text-red-500">
-                        {dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
-                      </label>
-                    )}
-                  </div>
+                  <SelectWithRadio
+                    isRequired={true}
+                    label={dataLang?.import_branch || 'import_branch'}
+                    placeholderText="Chọn người dùng"
+                    options={dataStaff}
+                    value={idStaff}
+                    onChange={(value) => {
+                      const newValue = dataStaff.find((item) => item.value === value)
+                      _HandleChangeInput('idStaff', newValue)
+                    }}
+                    isError={errStaff}
+                    icon={<PiUser />}
+                    errMess={dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
+                  />
                 </div>
               </motion.div>
             )}
