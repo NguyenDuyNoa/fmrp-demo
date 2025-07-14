@@ -2,7 +2,7 @@ import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { isAllowedDiscount } from '@/utils/helpers/common'
 import { Dropdown } from 'antd'
 import { ArrowDown2 } from 'iconsax-react'
-import InPutNumericFormat from '../inputNumericFormat/inputNumericFormat'
+import InPutNumericFormat from '../../UI/inputNumericFormat/inputNumericFormat'
 
 const DropdownDiscount = ({ value, onChange, dataLang }) => {
   return (

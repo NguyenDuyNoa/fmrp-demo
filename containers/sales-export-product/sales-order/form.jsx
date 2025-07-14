@@ -31,17 +31,17 @@ import { PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
+import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import SelectBySearch from '@/components/common/select/SelectBySearch'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
 import EmptyData from '@/components/UI/emptyData'
-import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
-import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
-import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
-import SelectCustomLabel from '@/components/UI/salesPurchase/SelectCustomLabel'
-import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
 import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
@@ -939,7 +939,7 @@ const SalesOrderForm = (props) => {
   })
 
   return (
-    <LayoutSalesPurchaseOrder
+    <LayoutOrderManagement
       dataLang={dataLang}
       titleHead={
         id
@@ -1158,9 +1158,9 @@ const SalesOrderForm = (props) => {
         </>
       }
       info={
-        <div className="relative">
+        <div className="flex flex-col gap-4 relative">
           {/* Số đơn hàng */}
-          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+          <div className="flex flex-col flex-wrap items-center gap-y-3">
             <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
             <div className="w-full relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
@@ -1175,7 +1175,7 @@ const SalesOrderForm = (props) => {
             </div>
           </div>
           {/* Ngày tạo đơn */}
-          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+          <div className="flex flex-col flex-wrap items-center gap-y-3 relative">
             <InfoFormLabel isRequired label={'Ngày tạo đơn' || dataLang?.sales_product_date} />
             <div className="w-full">
               <div className="relative w-full flex flex-row custom-date-picker date-form">
@@ -1211,7 +1211,7 @@ const SalesOrderForm = (props) => {
             )}
           </div>
           {/* Ngày cần hàng */}
-          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3 relative">
+          <div className="flex flex-col flex-wrap items-center gap-y-3 relative">
             <InfoFormLabel isRequired label={dataLang?.sales_product_item_date || 'sales_product_item_date'} />
             <div className="w-full">
               <div className="relative flex flex-row custom-date-picker date-form">
@@ -1245,30 +1245,22 @@ const SalesOrderForm = (props) => {
             </div>
           </div>
           {/* Khách hàng */}
-          <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-            <InfoFormLabel isRequired label={'Khách hàng' || dataLang?.selectedCustomer} />
-            <div className="w-full">
-              <SelectWithRadio
-                title="Khách hàng"
-                placeholderText="Chọn khách hàng"
-                options={!!flagStateChange ? [] : dataCustomer}
-                value={selectedCustomer}
-                onChange={(value) => setSelectedCustomer(value)}
-                isError={errCustomer}
-                isShowAddNew={true}
-                sSearchClient={sSearchClient}
-                dataBranch={dataBranch}
-                dataLang={dataLang}
-                icon={<LuBriefcase />}
-              />
-
-              {errCustomer && (
-                <label className="text-sm text-red-500">
-                  {dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
-                </label>
-              )}
-            </div>
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.selectedCustomer || 'Khách hàng'}
+            title="Khách hàng"
+            placeholderText="Chọn khách hàng"
+            options={!!flagStateChange ? [] : dataCustomer}
+            value={selectedCustomer}
+            onChange={(value) => setSelectedCustomer(value)}
+            isError={errCustomer}
+            messErr={dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
+            isShowAddNew={true}
+            sSearchClient={sSearchClient}
+            dataBranch={dataBranch}
+            dataLang={dataLang}
+            icon={<LuBriefcase />}
+          />
           {/* Xem thêm thông tin */}
           <AnimatePresence initial={false}>
             {showMoreInfo && (

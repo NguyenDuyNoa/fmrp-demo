@@ -2,11 +2,11 @@ import apiInternalPlan from '@/Api/apiManufacture/manufacture/internalPlan/apiIn
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import Loading from '@/components/UI/loading/loading'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
-import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
 import ButtonDelete from '@/components/common/orderManagement/ButtonDelete'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import QuantitySelector from '@/components/common/orderManagement/QuantitySelector'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import LayoutForm from '@/components/layout/LayoutForm'
 import { optionsQuery } from '@/configs/optionsQuery'
@@ -34,9 +34,9 @@ import { useEffect, useState } from 'react'
 import { BsCalendarEvent, BsClipboardCheck } from 'react-icons/bs'
 import { CiSearch } from 'react-icons/ci'
 import { PiMapPinLight } from 'react-icons/pi'
+import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 import { useInternalPlanItems } from './hooks/useInternalPlanItems'
-import { useSelector } from 'react-redux'
 
 const initsFetching = {
   onLoading: false,
