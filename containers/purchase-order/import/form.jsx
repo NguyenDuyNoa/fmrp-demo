@@ -13,7 +13,6 @@ import TableHeader from '@/components/common/orderManagement/TableHeader'
 import TextareaNote from '@/components/common/orderManagement/TextareaNote'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import { TagColorProduct } from '@/components/UI/common/Tag/TagStatus'
-import SelectItemComponent from '@/components/UI/filterComponents/selectItemComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
@@ -896,7 +895,11 @@ const PurchaseImportForm = (props) => {
 
   const selectItemsLabel = (option, isOnTable = false) => (
     <div className="flex items-start py-2 cursor-pointer font-deca">
-      <div className={`flex ${isOnTable && 'xl:flex-row flex-col'} items-center gap-3`}>
+      <div
+        className={`flex ${isOnTable && 'xl:flex-row flex-col'} ${
+          isOnTable ? 'xl:items-center items-start' : 'items-center'
+        } gap-3`}
+      >
         <img
           src={option.e?.images ?? '/icon/noimagelogo.png'}
           alt={option?.e.name}
@@ -977,30 +980,13 @@ const PurchaseImportForm = (props) => {
                       <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
                         Chọn nhanh kho - Vị trí
                       </p>
-                      <SelectItemComponent
-                        onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
-                        value={warehouseAll}
-                        formatOptionLabel={(option) => (
-                          <div className="z-20">
-                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                              {dataLang?.import_Warehouse || 'import_Warehouse'} : {option?.warehouse_name}
-                            </h2>
-                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                              {dataLang?.import_Warehouse_location || 'import_Warehouse_ocation'}: {option?.label}
-                            </h2>
-                          </div>
-                        )}
-                        options={dataWarehouse}
-                        isClearable
+                      <SelectCustomLabel
+                        dataLang={dataLang}
                         placeholder={'Chọn nhanh kho - Vị trí'}
-                        // placeholder={dataLang?.import_from_ware_loca || "import_from_ware_loca"}
-                        styles={{
-                          menu: {
-                            width: '100%',
-                          },
-                        }}
-                        hideSelectedOptions={false}
-                        className={` border-transparent placeholder:text-slate-300 2xl:!text-[10px] xl:!text-[10px] !text-[10px]  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                        options={dataWarehouse}
+                        value={warehouseAll}
+                        onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
+                        isVisibleLotDate={false}
                       />
                     </div>
                   }
