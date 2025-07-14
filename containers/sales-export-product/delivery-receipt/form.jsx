@@ -866,7 +866,7 @@ const DeliveryReceiptForm = (props) => {
           <img
             src={option.e?.images ?? '/icon/noimagelogo.png'}
             alt={option?.e.name}
-            className="size-16 object-cover rounded-md"
+            className="xl:size-16 size-12 object-cover rounded-md"
           />
           <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
             <div className="font-semibold responsive-text-sm truncate text-black">{option.e.name}</div>
@@ -1087,10 +1087,10 @@ const DeliveryReceiptForm = (props) => {
               }),
               menuPortal: (base) => ({
                 ...base,
-                // zIndex: 9999,
               }),
               control: (base, state) => ({
                 ...base,
+                cursor: 'pointer',
                 borderRadius: '8px',
                 borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
                 boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
@@ -1124,9 +1124,7 @@ const DeliveryReceiptForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-center">
-                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                </TableHeader>
+                <TableHeader className="text-center">Đơn giá SCK</TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={generalTax}
@@ -1146,13 +1144,17 @@ const DeliveryReceiptForm = (props) => {
                     <Loading className="w-full h-10" color="#0f4f9e" />
                   ) : (
                     <>
-                      {listData?.map((e) => {
+                      {listData?.map((e, index) => {
                         const option = e?.matHang
                         const firstChild = e?.child[0]
+                        const isLast = index === listData.length - 1
+
                         return (
                           <div
                             key={e?.id?.toString()}
-                            className="grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-4 2xl:gap-5 my-1 py-4 border-b border-[#F3F3F4]"
+                            className={`grid items-center grid-cols-[minmax(0,2fr)_minmax(0,7fr)] gap-4 2xl:gap-5 my-1 py-4 ${
+                              isLast ? '' : 'border-b border-[#F3F3F4]'
+                            }`}
                           >
                             {/* Mặt hàng */}
                             <div className="h-full p-2">
@@ -1162,7 +1164,7 @@ const DeliveryReceiptForm = (props) => {
                                     <img
                                       src={option.e?.images ?? '/icon/noimagelogo.png'}
                                       alt={option?.e.name}
-                                      className="size-16 object-cover rounded-md"
+                                      className="size-12 object-cover rounded-md"
                                     />
                                     <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] overflow-hidden w-full text-neutral-03 font-normal">
                                       <h4 className="font-semibold responsive-text-sm text-brand-color">
@@ -1458,7 +1460,7 @@ const DeliveryReceiptForm = (props) => {
               _HandleChangeInput('idClient', newValue)
             }}
             isError={errClient}
-            sSearchClient={sSearchClient}
+            sSearch={sSearchClient}
             dataLang={dataLang}
             icon={<LuBriefcase />}
             errMess={dataLang?.sales_product_err_customer || 'sales_product_err_customer'}

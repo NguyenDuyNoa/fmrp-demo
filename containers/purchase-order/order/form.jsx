@@ -1108,7 +1108,7 @@ const OrderForm = (props) => {
                   _HandleChangeInput('itemAll', value)
                 }}
                 value={itemAll}
-                menuIsOpen={true}
+                // menuIsOpen={true}
                 MenuList={(props) => (
                   <MenuList
                     dataItems={itemAll}

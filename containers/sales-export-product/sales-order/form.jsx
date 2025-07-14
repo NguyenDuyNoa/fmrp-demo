@@ -994,9 +994,7 @@ const SalesOrderForm = (props) => {
                   onChange={handleOnChangeInput.bind(this, 'totaldiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-center">
-                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                </TableHeader>
+                <TableHeader className="text-center">Đơn giá SCK</TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={totalTax}
@@ -1016,40 +1014,39 @@ const SalesOrderForm = (props) => {
                     key={e?.id}
                   >
                     {/* Mặt hàng */}
-                    <div className="">
-                      <div className="flex">
-                        <div className="w-16 h-16 flex items-center justify-center">
-                          <img
-                            src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
-                            alt={e?.item?.e?.name}
-                            className="w-10 h-10 rounded-lg"
+                    <div className="flex gap-1">
+                      <div className="w-16 h-16 flex items-center justify-center">
+                        <img
+                          src={e?.item?.e?.images ?? '/icon/noimagelogo.png'}
+                          alt={e?.item?.e?.name}
+                          className="size-12 rounded-lg"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h2 className="responsive-text-sm font-semibold text-brand-color mb-1 line-clamp-1">
+                          {e?.item?.e?.name}
+                        </h2>
+                        <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal mb-1">
+                          Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
+                          <span>{e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}</span>
+                        </p>
+                        <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
+                          ĐVT: <span>{e?.unit}</span> - Tồn: <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
+                        </p>
+                        <div className="flex items-center justify-center col-span-1">
+                          <FaPencilAlt size={10} />
+                          <input
+                            value={e?.note}
+                            onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
+                            name="optionEmail"
+                            placeholder="Ghi chú"
+                            type="text"
+                            className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
                           />
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="responsive-text-sm font-semibold text-brand-color mb-1 line-clamp-1">
-                            {e?.item?.e?.name}
-                          </h2>
-                          <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal mb-1">
-                            Màu sắc: <span>{e?.item?.e?.product_variation}</span> - Size:{' '}
-                            <span>{e?.item?.e?.product_variation_1 ? e?.item?.e?.product_variation_1 : 'None'}</span>
-                          </p>
-                          <p className="text-typo-gray-2 3xl:text-[10px] text-[9px] font-normal">
-                            ĐVT: <span>{e?.unit}</span> - Tồn: <span>{formatNumber(e?.item?.e?.qty_warehouse)}</span>
-                          </p>
-                          <div className="flex items-center justify-center col-span-1">
-                            <FaPencilAlt size={10} />
-                            <input
-                              value={e?.note}
-                              onChange={(value) => handleOnChangeInputOption(e?.id, 'note', value)}
-                              name="optionEmail"
-                              placeholder="Ghi chú"
-                              type="text"
-                              className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 mt-1 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#52575E] font-normal outline-none"
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>
+
                     {/* Số lượng */}
                     <div className="flex items-center justify-center">
                       <div className="flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border border-border-gray-2 rounded-3xl">
@@ -1256,7 +1253,7 @@ const SalesOrderForm = (props) => {
             isError={errCustomer}
             messErr={dataLang?.sales_product_err_customer || 'sales_product_err_customer'}
             isShowAddNew={true}
-            sSearchClient={sSearchClient}
+            sSearch={sSearchClient}
             dataBranch={dataBranch}
             dataLang={dataLang}
             icon={<LuBriefcase />}

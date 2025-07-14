@@ -49,7 +49,7 @@ const LayoutOrderManagement = ({
         </h2>
         <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-20 relative">
           {/* Cột trái */}
-          <div className="w-3/4 xl:w-4/5">
+          <div className="w-4/5">
             <div className="min-h-full max-h-[1132px] flex flex-col gap-6 bg-white border border-[#919EAB3D] rounded-2xl p-4">
               {/* Thông tin mặt hàng */}
               <div className="flex justify-between items-center">
@@ -64,7 +64,7 @@ const LayoutOrderManagement = ({
           </div>
 
           {/* Cột phải */}
-          <div className="w-1/4 xl:w-1/5">
+          <div className="w-1/5">
             <div className="flex flex-col gap-y-6">
               {/* Cột thông tin chung */}
               <div className="w-full mx-auto px-4 bg-white border border-gray-200 rounded-2xl py-6">
