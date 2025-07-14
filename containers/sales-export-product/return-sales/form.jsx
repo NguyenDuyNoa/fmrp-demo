@@ -1,16 +1,17 @@
 import apiReturnSales from '@/Api/apiSalesExportProduct/returnSales/apiReturnSales'
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
+import { DocumentNumber } from '@/components/common/orderManagement/GeneralInfo'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
+import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
-import DropdownDiscount from '@/components/UI/salesPurchase/DropdownDiscount'
-import DropdownTax from '@/components/UI/salesPurchase/DropdownTax'
-import LayoutSalesPurchaseOrder from '@/components/UI/salesPurchase/LayoutSalesPurchaseOrder'
-import SelectCustomLabel from '@/components/UI/salesPurchase/SelectCustomLabel'
-import SelectWithRadio from '@/components/UI/salesPurchase/SelectWithRadio'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { useBranchList } from '@/hooks/common/useBranch'
@@ -746,7 +747,7 @@ const ReturnSalesForm = (props) => {
   ]
 
   return (
-    <LayoutSalesPurchaseOrder
+    <LayoutOrderManagement
       dataLang={dataLang}
       titleHead={id ? dataLang?.returnSales_edit || 'returnSales_edit' : dataLang?.returnSales_add || 'returnSales_add'}
       breadcrumbItems={breadcrumbItems}
@@ -1127,21 +1128,9 @@ const ReturnSalesForm = (props) => {
       info={
         <div className="flex flex-col gap-4 relative">
           {/* Mã chứng từ */}
-          <div className="flex flex-col flex-wrap items-center gap-y-3">
-            <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
-            <div className="w-full relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
-              <input
-                value={idChange.code}
-                onChange={_HandleChangeInput.bind(this, 'code')}
-                name="fname"
-                type="text"
-                placeholder={dataLang?.purchase_order_system_default || 'purchase_order_system_default'}
-                className={`xl1439:text-[15px] xl1439:leading-6 text-[13px] leading-[20px] font-normal text-gray-600 placeholder:text-sm z-10 pl-8 hover:border-[#0F4F9E] focus:border-[#0F4F9E] w-full border border-[#d0d5dd] p-2 rounded-lg outline-none cursor-text`}
-              />
-            </div>
-          </div>
+          <DocumentNumber dataLang={dataLang} value={idChange.code} onChange={_HandleChangeInput.bind(this, 'code')} />
           {/* Ngày chứng từ */}
+
           <div className="flex flex-col flex-wrap items-center gap-y-3">
             <InfoFormLabel label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
 
@@ -1173,77 +1162,55 @@ const ReturnSalesForm = (props) => {
             </div>
           </div>
           {/* Khách hàng */}
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel label={dataLang?.returnSales_client || 'returnSales_client'} isRequired />
-              <SelectWithRadio
-                title={dataLang?.returnSales_client || 'returnSales_client'}
-                placeholderText="Chọn khách hàng"
-                options={dataClient}
-                value={idChange.idClient}
-                onChange={(value) => {
-                  const newValue = dataClient.find((item) => item.value === value)
-                  _HandleChangeInput('idClient', newValue)
-                }}
-                isError={errors.errClient}
-                sSearchClient={sSearchClient}
-                dataLang={dataLang}
-                icon={<LuBriefcase />}
-              />
-            </div>
-            {errors.errClient && (
-              <label className="text-sm text-red-500">
-                {dataLang?.returnSales_errClient || 'returnSales_errClient'}
-              </label>
-            )}
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.returnSales_client || 'returnSales_client'}
+            placeholderText="Chọn khách hàng"
+            options={dataClient}
+            value={idChange.idClient}
+            onChange={(value) => {
+              const newValue = dataClient.find((item) => item.value === value)
+              _HandleChangeInput('idClient', newValue)
+            }}
+            isError={errors.errClient}
+            sSearchClient={sSearchClient}
+            dataLang={dataLang}
+            icon={<LuBriefcase />}
+            errMess={dataLang?.returnSales_errClient || 'returnSales_errClient'}
+          />
+
           {/* Phương thức xử lí */}
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel isRequired label={dataLang?.returns_treatment_methods || 'returns_treatment_methods'} />
-              <SelectWithRadio
-                title={dataLang?.returns_treatment_methods || 'returns_treatment_methods'}
-                placeholderText="Chọn phương thức xử lý"
-                options={dataSolution}
-                value={idChange.idTreatment}
-                onChange={(value) => {
-                  const newValue = dataSolution.find((item) => item.value === value)
-                  _HandleChangeInput('treatment', newValue)
-                }}
-                isError={errors.errTreatment}
-                dataLang={dataLang}
-                icon={<LuRefreshCcw />}
-              />
-            </div>
-            {errors.errTreatment && (
-              <label className="text-sm text-red-500">
-                {dataLang?.returns_treatment_methods_err || 'returns_treatment_methods_err'}
-              </label>
-            )}
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.returns_treatment_methods || 'returns_treatment_methods'}
+            placeholderText="Chọn phương thức xử lý"
+            options={dataSolution}
+            value={idChange.idTreatment}
+            onChange={(value) => {
+              const newValue = dataSolution.find((item) => item.value === value)
+              _HandleChangeInput('treatment', newValue)
+            }}
+            isError={errors.errTreatment}
+            dataLang={dataLang}
+            icon={<LuRefreshCcw />}
+            errMess={dataLang?.returns_treatment_methods_err || 'returns_treatment_methods_err'}
+          />
+
           {/* Chi nhánh */}
-          <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <InfoFormLabel isRequired label={dataLang?.import_branch || 'import_branch'} />
-              <SelectWithRadio
-                title={dataLang?.import_branch || 'import_branch'}
-                placeholderText="Chọn chi nhánh"
-                options={listBranch}
-                value={idChange.idBranch}
-                onChange={(value) => {
-                  const newValue = listBranch.find((item) => item.value === value)
-                  _HandleChangeInput('branch', newValue)
-                }}
-                isError={errors.errBranch}
-                icon={<PiMapPinLight />}
-              />
-            </div>
-            {errors.errBranch && (
-              <label className="text-sm text-red-500">
-                {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-              </label>
-            )}
-          </div>
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.import_branch || 'import_branch'}
+            placeholderText="Chọn chi nhánh"
+            options={listBranch}
+            value={idChange.idBranch}
+            onChange={(value) => {
+              const newValue = listBranch.find((item) => item.value === value)
+              _HandleChangeInput('branch', newValue)
+            }}
+            isError={errors.errBranch}
+            icon={<PiMapPinLight />}
+            errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+          />
         </div>
       }
       note={

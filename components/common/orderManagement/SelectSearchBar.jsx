@@ -1,0 +1,71 @@
+import MultiValue from '@/components/UI/mutiValue/multiValue'
+import { Empty } from 'antd'
+import { CiSearch } from 'react-icons/ci'
+import Select from 'react-select'
+
+const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder, menuIsOpen }) => {
+  return (
+    <div className="relative w-full">
+      <Select
+        options={options}
+        closeMenuOnSelect={false}
+        onChange={onChange}
+        value={value}
+        menuIsOpen={menuIsOpen}
+        isMulti
+        maxShowMuti={0}
+        components={{ MenuList, MultiValue }}
+        formatOptionLabel={formatOptionLabel}
+        placeholder={placeholder}
+        hideSelectedOptions={false}
+        className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
+        isSearchable={true}
+        noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
+        menuPortalTarget={document.body}
+        style={{
+          border: 'none',
+          boxShadow: 'none',
+          outline: 'none',
+        }}
+        theme={(theme) => ({
+          ...theme,
+          colors: {
+            ...theme.colors,
+            primary25: '#0000000A',
+            primary50: 'transparent',
+            primary: '#C7DFFB',
+          },
+        })}
+        styles={{
+          placeholder: (base) => ({
+            ...base,
+            color: '#cbd5e1',
+          }),
+          menuPortal: (base) => ({
+            ...base,
+            // zIndex: 9999,
+          }),
+          control: (base, state) => ({
+            ...base,
+            borderRadius: '8px',
+            borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
+            boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
+          }),
+          menu: (provided, state) => ({
+            ...provided,
+            width: '100%',
+          }),
+          menuList: (provided) => ({
+            ...provided,
+            padding: '4px',
+          }),
+        }}
+      />
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
+        <CiSearch className="text-white responsive-text-lg" />
+      </div>
+    </div>
+  )
+}
+
+export default SelectSearchBar
