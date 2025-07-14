@@ -582,7 +582,7 @@ const ReturnSalesForm = (props) => {
           <img
             src={option.e?.images ?? '/icon/noimagelogo.png'}
             alt={option.e?.name}
-            className="w-10 h-10 object-cover rounded-md"
+            className="xl:size-16 size-12 object-cover rounded-md"
           />
 
           <div className="font-normal 3xl:text-[10px] text-[9px] text-neutral-03 overflow-hidden">
@@ -753,7 +753,7 @@ const ReturnSalesForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={dataLang?.returnSales_titleLits || 'returnSales_titleLits'}
       searchBar={
-        <div className="relative w-full">
+        <div className="relative w-full cursor-pointer">
           <Select
             options={options}
             value={null}
@@ -788,6 +788,7 @@ const ReturnSalesForm = (props) => {
               }),
               control: (base, state) => ({
                 ...base,
+                cursor: 'pointer',
                 borderRadius: '8px',
                 borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
                 boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
@@ -824,9 +825,7 @@ const ReturnSalesForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-left">
-                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                </TableHeader>
+                <TableHeader className="text-left">Đơn giá SCK</TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={generalTax}
@@ -845,14 +844,17 @@ const ReturnSalesForm = (props) => {
                 <Loading className="w-full h-10" color="#0f4f9e" />
               ) : (
                 <> */}
-              {listData?.map((e) => {
+              {listData?.map((e, index) => {
                 const option = e?.matHang
                 const firstChild = e.child[0]
+                const isLast = index === listData.length - 1
 
                 return (
                   <div
                     key={e?.id?.toString()}
-                    className="grid items-center grid-cols-12 gap-3 2xl:gap-4 py-2 border-b border-[#F3F3F4]"
+                    className={`grid items-center grid-cols-12 gap-3 2xl:gap-4 py-2 ${
+                      isLast ? '' : 'border-b border-[#F3F3F4]'
+                    }`}
                   >
                     {/* Mặt hàng */}
                     <div className="h-full col-span-3 p-2">
@@ -862,7 +864,7 @@ const ReturnSalesForm = (props) => {
                             <img
                               src={option?.e?.images ?? '/icon/noimagelogo.png'}
                               alt={option?.e?.name}
-                              className="size-16 object-cover rounded-md"
+                              className="size-12 object-cover rounded-md"
                             />
                             <div className="flex flex-col gap-[2px] responsive-text-xxs overflow-hidden text-neutral-03 font-normal">
                               <h3 className="font-semibold responsive-text-sm text-brand-color">{option.e?.name}</h3>
@@ -935,7 +937,7 @@ const ReturnSalesForm = (props) => {
                       )}
                     </div>
                     <div className="items-center col-span-9">
-                      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] items-center gap-3 2xl:gap-4 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
+                      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] items-center gap-3 2xl:gap-4 py-1">
                         {/* {fetChingData.load ? (
                           <Loading className="h-2 col-span-8" color="#0f4f9e" />
                         ) : ( */}
@@ -967,7 +969,7 @@ const ReturnSalesForm = (props) => {
                                     ? 'border-red-500'
                                     : errors.errSurvive
                                     ? 'border-red-500'
-                                    : 'border-border-gray-2'
+                                    : 'border-neutral-N400'
                                 } ${
                                   (ce?.quantity == 0 && 'border-red-500') || (ce?.quantity == '' && 'border-red-500')
                                 }  `}
@@ -1130,7 +1132,6 @@ const ReturnSalesForm = (props) => {
           {/* Mã chứng từ */}
           <DocumentNumber dataLang={dataLang} value={idChange.code} onChange={_HandleChangeInput.bind(this, 'code')} />
           {/* Ngày chứng từ */}
-
           <div className="flex flex-col flex-wrap items-center gap-y-3">
             <InfoFormLabel label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
 
@@ -1173,7 +1174,7 @@ const ReturnSalesForm = (props) => {
               _HandleChangeInput('idClient', newValue)
             }}
             isError={errors.errClient}
-            sSearchClient={sSearchClient}
+            sSearch={sSearchClient}
             dataLang={dataLang}
             icon={<LuBriefcase />}
             errMess={dataLang?.returnSales_errClient || 'returnSales_errClient'}

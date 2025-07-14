@@ -1,14 +1,18 @@
 import apiImport from '@/Api/apiPurchaseOrder/apiImport'
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
 import { DocumentDate, DocumentNumber } from '@/components/common/orderManagement/GeneralInfo'
+import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import MenuList from '@/components/common/orderManagement/MenuList'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
 import SelectSearchBar from '@/components/common/orderManagement/SelectSearchBar'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import TextareaNote from '@/components/common/orderManagement/TextareaNote'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import { TagColorProduct } from '@/components/UI/common/Tag/TagStatus'
-import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import SelectItemComponent from '@/components/UI/filterComponents/selectItemComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
@@ -22,7 +26,6 @@ import { useTaxList } from '@/hooks/common/useTaxs'
 import { useWarehouseComboboxlocation } from '@/hooks/common/useWarehouses'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
-import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { routerImport } from '@/routers/buyImportGoods'
@@ -31,16 +34,17 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { ConfigProvider, DatePicker as DatePickerAntd, Dropdown } from 'antd'
+import viVN from 'antd/lib/locale/vi_VN'
+import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Add, Minus } from 'iconsax-react'
-import { debounce } from 'lodash'
+import { Add, ArrowDown2, Minus } from 'iconsax-react'
 import moment from 'moment/moment'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
-import { BsCalendarEvent } from 'react-icons/bs'
-import { MdClear } from 'react-icons/md'
+import { PiClipboardTextLight, PiMapPinLight, PiUsersLight } from 'react-icons/pi'
+import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 import { useImportBySupplier } from './hooks/useImportBySupplier'
 import { useImportItemByOrder } from './hooks/useImportItemByOrder'
@@ -57,8 +61,6 @@ const PurchaseImportForm = (props) => {
   const isShow = useToast()
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
-
-  const statusExprired = useStatusExprired()
 
   const [onSending, sOnSending] = useState(false)
 
@@ -96,8 +98,6 @@ const PurchaseImportForm = (props) => {
 
   const [errDateList, sErrDateList] = useState(false)
 
-  const [errTheOrder, sErrTheOrder] = useState(false)
-
   const [errBranch, sErrBranch] = useState(false)
 
   const [errWarehouse, sErrWarehouse] = useState(false)
@@ -120,6 +120,8 @@ const PurchaseImportForm = (props) => {
 
   const [inputValue, setInputValue] = useState('')
 
+  const authState = useSelector((state) => state.auth)
+
   const { data: dataBranch = [] } = useBranchList()
 
   const { data: dataTasxes = [] } = useTaxList()
@@ -136,10 +138,20 @@ const PurchaseImportForm = (props) => {
 
   const dataSupplier = idBranch ? dataSupplierList?.rResult?.map((e) => ({ label: e?.name, value: e?.id })) : []
 
+  // Tự động chọn chi nhánh đầu tiên từ authState khi component mount
+  useEffect(() => {
+    if (authState.branch?.length > 0 && !idBranch) {
+      const firstBranch = {
+        label: authState.branch[0].name,
+        value: authState.branch[0].id,
+      }
+      sIdBranch(firstBranch)
+    }
+  }, [])
+
   useEffect(() => {
     router.query && sErrDate(false)
     router.query && sErrSupplier(false)
-    // router.query && sErrTheOrder(false);
     router.query && sErrBranch(false)
     router.query && sErrSerial(false)
     router.query && sErrLot(false)
@@ -427,10 +439,6 @@ const PurchaseImportForm = (props) => {
     sErrBranch(false)
   }, [idBranch != null])
 
-  // useEffect(() => {
-  //     sErrTheOrder(false);
-  // }, [idTheOrder != null]);
-
   const options = dataItems?.map((e) => ({
     label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
     value: e.id,
@@ -552,14 +560,6 @@ const PurchaseImportForm = (props) => {
     setTotal(totalMoney)
   }, [listData])
 
-  const handleClearDate = (type) => {
-    if (type === 'effectiveDate') {
-      sEffectiveDate(null)
-    }
-    if (type === 'startDate') {
-      sStartDate(new Date())
-    }
-  }
   const handleTimeChange = (date) => {
     sStartDate(date)
   }
@@ -881,14 +881,6 @@ const PurchaseImportForm = (props) => {
     }
   }
 
-  const _HandleSeachApi = debounce(async (inputValue) => {
-    sSearchOrder(inputValue)
-  }, 500)
-
-  const _HandleSeachApiProductItems = debounce(async (e) => {
-    setInputValue(e)
-  }, 500)
-
   const breadcrumbItems = [
     {
       label: `${dataLang?.import_title || 'import_title'}`,
@@ -903,12 +895,12 @@ const PurchaseImportForm = (props) => {
   ]
 
   const selectItemsLabel = (option, isOnTable = false) => (
-    <div className="flex items-start p-2 cursor-pointer font-deca">
-      <div className="flex items-center gap-3">
+    <div className="flex items-start py-2 cursor-pointer font-deca">
+      <div className={`flex ${isOnTable && 'xl:flex-row flex-col'} items-center gap-3`}>
         <img
           src={option.e?.images ?? '/icon/noimagelogo.png'}
           alt={option?.e.name}
-          className="size-16 object-cover rounded-md"
+          className={`${isOnTable ? 'size-12' : 'xl:size-16 size-12'} object-cover rounded-md`}
         />
         <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
           <h3 className={`font-semibold responsive-text-sm truncate ${isOnTable ? 'text-brand-color' : 'text-black'}`}>
@@ -920,7 +912,7 @@ const PurchaseImportForm = (props) => {
           </h5>
 
           <div className="flex flex-wrap items-center gap-2 text-neutral-03">
-            {isOnTable && `ĐVT: ${option.e?.unit_name}`} - {dataLang[option.e?.text_type]} -{' '}
+            {isOnTable && `ĐVT: ${option.e?.unit_name} - `} {dataLang[option.e?.text_type]} -{' '}
             {dataLang?.purchase_survive || 'purchase_survive'}:{' '}
             {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
           </div>
@@ -953,16 +945,17 @@ const PurchaseImportForm = (props) => {
           )}
           formatOptionLabel={(option) => selectItemsLabel(option)}
           placeholder={dataLang?.import_click_items || 'import_click_items'}
+          setSearch={setInputValue}
         />
       }
       tableLeft={
-        <>
-          <div className="grid grid-cols-15 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
+        <div>
+          <div className="grid grid-cols-13 items-center gap-3 sticky top-0 z-10 py-2 border-b border-gray-100">
             <TableHeader className="col-span-2 text-left">
               {dataLang?.import_from_items || 'import_from_items'}
             </TableHeader>
 
-            <div className="col-span-13">
+            <div className="col-span-11">
               <div
                 className={`${
                   dataProductSerial?.is_enable == '1'
@@ -972,52 +965,67 @@ const PurchaseImportForm = (props) => {
                       ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
                       : 'grid-cols-9'
                     : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                    ? 'grid-cols-10'
+                    ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.3fr)]'
                     : dataMaterialExpiry?.is_enable == '1'
                     ? 'grid-cols-10'
                     : 'grid-cols-8'
-                } grid items-center `}
+                } grid items-center gap-3`}
               >
-                <h4 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]  text-[#667085] px-px   col-span-2   text-center  truncate font-[400]">
-                  {dataLang?.import_from_ware_loca || 'import_from_ware_loca'}
-                  <SelectItemComponent
-                    onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
-                    value={warehouseAll}
-                    formatOptionLabel={(option) => (
-                      <div className="z-20">
-                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                          {dataLang?.import_Warehouse || 'import_Warehouse'} : {option?.warehouse_name}
-                        </h2>
-                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                          {dataLang?.import_Warehouse_location || 'import_Warehouse_ocation'}: {option?.label}
-                        </h2>
-                      </div>
-                    )}
-                    options={dataWarehouse}
-                    isClearable
-                    placeholder={'Chọn nhanh kho - Vị trí'}
-                    // placeholder={dataLang?.import_from_ware_loca || "import_from_ware_loca"}
-                    styles={{
-                      menu: {
-                        width: '100%',
-                      },
-                    }}
-                    hideSelectedOptions={false}
-                    className={` border-transparent placeholder:text-slate-300 2xl:!text-[10px] xl:!text-[10px] !text-[10px]  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                  />
-                </h4>
+                <Dropdown
+                  overlay={
+                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                      <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
+                        Chọn nhanh kho - Vị trí
+                      </p>
+                      <SelectItemComponent
+                        onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
+                        value={warehouseAll}
+                        formatOptionLabel={(option) => (
+                          <div className="z-20">
+                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                              {dataLang?.import_Warehouse || 'import_Warehouse'} : {option?.warehouse_name}
+                            </h2>
+                            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
+                              {dataLang?.import_Warehouse_location || 'import_Warehouse_ocation'}: {option?.label}
+                            </h2>
+                          </div>
+                        )}
+                        options={dataWarehouse}
+                        isClearable
+                        placeholder={'Chọn nhanh kho - Vị trí'}
+                        // placeholder={dataLang?.import_from_ware_loca || "import_from_ware_loca"}
+                        styles={{
+                          menu: {
+                            width: '100%',
+                          },
+                        }}
+                        hideSelectedOptions={false}
+                        className={` border-transparent placeholder:text-slate-300 2xl:!text-[10px] xl:!text-[10px] !text-[10px]  z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
+                      />
+                    </div>
+                  }
+                  trigger={['click']}
+                  placement="bottomCenter"
+                  arrow
+                >
+                  <div className="inline-flex items-center justify-between cursor-pointer group">
+                    <TableHeader className="text-start group-hover:text-neutral-05">
+                      {dataLang?.PDF_house || 'PDF_house'}
+                    </TableHeader>
+                    <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
+                  </div>
+                </Dropdown>
+
                 {dataProductSerial?.is_enable === '1' && (
                   <TableHeader className="col-span-1 text-center">{'Serial'}</TableHeader>
                 )}
-                {dataMaterialExpiry?.is_enable === '1' || dataProductExpiry?.is_enable === '1' ? (
+                {(dataMaterialExpiry?.is_enable === '1' || dataProductExpiry?.is_enable === '1') && (
                   <>
                     <TableHeader className="col-span-1 text-center">{'Lot'}</TableHeader>
                     <TableHeader className="col-span-1 text-center">
                       {props.dataLang?.warehouses_detail_date || 'Date'}
                     </TableHeader>
                   </>
-                ) : (
-                  ''
                 )}
                 <TableHeader className="col-span-1 text-center">
                   {dataLang?.import_from_quantity || 'import_from_quantity'}
@@ -1026,39 +1034,17 @@ const PurchaseImportForm = (props) => {
                   {dataLang?.import_from_unit_price || 'import_from_unit_price'}
                 </TableHeader>
 
-                <div className="flex flex-col items-center col-span-1 gap-2">
-                  <h2>{dataLang?.purchase_order_detail_discount || 'purchase_order_detail_discount'}</h2>
-                  <div className="flex items-center justify-center col-span-1 text-center">
-                    <InPutNumericFormat
-                      value={discount}
-                      isAllowed={isAllowedDiscount}
-                      onValueChange={_HandleChangeInput.bind(this, 'discount')}
-                      className="w-20 px-2 py-1 font-medium text-center bg-transparent border-b-2 border-gray-300 focus:outline-none"
-                    />
-                  </div>
-                </div>
-                <TableHeader className="col-span-1 text-center">
-                  {dataLang?.sales_product_after_discount || 'sales_product_after_discount'}
-                </TableHeader>
+                <DropdownDiscount value={discount} onChange={_HandleChangeInput.bind(this, 'discount')} />
 
-                <div className="flex flex-col items-center col-span-1 gap-2">
-                  <h2>{dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}</h2>
-                  <SelectItemComponent
-                    options={taxOptions}
-                    onChange={_HandleChangeInput.bind(this, 'tax')}
-                    value={tax}
-                    formatOptionLabel={(option) => (
-                      <div className="flex items-center justify-start gap-1 ">
-                        <h2>{option?.label}</h2>
-                        <h2>{`(${option?.tax_rate})`}</h2>
-                      </div>
-                    )}
-                    placeholder={dataLang?.purchase_order_detail_tax || 'purchase_order_detail_tax'}
-                    className={` "border-transparent placeholder:text-slate-300 w-[70%] bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                    isSearchable={true}
-                    noOptionsMessage={() => 'Không có dữ liệu'}
-                  />
-                </div>
+                <TableHeader className="col-span-1 text-center">Đơn giá SCK</TableHeader>
+
+                <DropdownTax
+                  taxOptions={taxOptions}
+                  totalTax={tax}
+                  onChange={_HandleChangeInput.bind(this, 'tax')}
+                  dataLang={dataLang}
+                />
+
                 <TableHeader className="col-span-1 text-center">
                   {dataLang?.import_into_money || 'import_into_money'}
                 </TableHeader>
@@ -1066,19 +1052,34 @@ const PurchaseImportForm = (props) => {
             </div>
           </div>
 
-          <Customscrollbar className="max-h-[780px] overflow-auto pb-2">
+          <Customscrollbar className="max-h-[840px] overflow-auto pb-2">
             <div className="h-full">
               {isFetching ? (
-                <Loading className="h-60" color="#0f4f9e" />
+                <Loading className="h-[840px]" color="#0f4f9e" />
               ) : (
                 <>
-                  {listData?.map((e) => {
+                  {listData?.map((e, index) => {
                     const firstChild = e?.child?.[0]
+                    const isLast = index === listData.length - 1
+
                     return (
-                      <div key={e?.id?.toString()} className="grid items-start gap-1 my-1 grid-cols-15">
+                      <div
+                        key={e?.id?.toString()}
+                        className={`grid items-start gap-3 py-2 grid-cols-13 ${
+                          isLast ? '' : 'border-b border-[#F3F3F4]'
+                        }`}
+                      >
                         {/* Mặt hàng */}
-                        <div className="col-span-2 p-2 h-full">
-                          {selectItemsLabel(e?.item, true)}
+                        <div className="col-span-2 h-full">
+                          <div className="flex items-center justify-between gap-1 xl:gap-2">
+                            {selectItemsLabel(e?.item, true)}
+                            <button
+                              onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
+                              className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
+                            >
+                              <Add />
+                            </button>
+                          </div>
                           {/* Ghi chú */}
                           <div className="flex items-center justify-center mt-2">
                             <Image
@@ -1098,7 +1099,7 @@ const PurchaseImportForm = (props) => {
                             />
                           </div>
                         </div>
-                        <div className="items-center col-span-13">
+                        <div className="h-full col-span-11">
                           <div
                             className={`${
                               dataProductSerial?.is_enable == '1'
@@ -1108,61 +1109,42 @@ const PurchaseImportForm = (props) => {
                                   ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
                                   : 'grid-cols-9'
                                 : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                ? 'grid-cols-10'
+                                ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.3fr)]'
                                 : dataMaterialExpiry?.is_enable == '1'
                                 ? 'grid-cols-10'
                                 : 'grid-cols-8'
-                            } grid  3xl:text-[12px] 2xl:text-[11px] xl:text-[10px] text-[9px]`}
+                            } grid items-center justify-center gap-3 h-full py-1`}
                           >
                             {e?.child?.map((ce) => (
                               <React.Fragment key={ce?.id?.toString()}>
-                                <div className={`flex flex-col items-center justify-center h-full col-span-2 p-1`}>
+                                {/* Kho - Vị trí */}
+                                <div className={`flex flex-col items-center justify-center`}>
                                   {ce?.id_plan > 0 && ce?.reference_no_plan ? (
                                     <TagColorProduct
                                       lang={false}
                                       dataKey={6}
                                       name={`Vị trí theo ${ce?.reference_no_plan}`}
-                                      className="3xl:!text-[13px] 2xl:!text-[9px] xl:!text-[8px] !text-[8px]"
+                                      className="3xl:!text-[13px] xl:!text-[10px] !text-[9px]"
                                     />
                                   ) : (
-                                    <SelectItemComponent
+                                    <SelectCustomLabel
+                                      dataLang={dataLang}
+                                      placeholder={dataLang?.PDF_house || 'PDF_house'}
                                       options={dataWarehouse}
                                       value={ce?.warehouse}
                                       onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'warehouse')}
-                                      className={`${
+                                      isError={
                                         (errWarehouse && ce?.warehouse == null) ||
                                         (errWarehouse &&
                                           (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
-                                          ? 'border-red-500 border'
-                                          : ''
-                                      }  3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] placeholder:text-slate-300 w-full  rounded text-[#52575E] font-normal `}
-                                      placeholder={'Kho - vị trí'}
-                                      formatOptionLabel={(option) => {
-                                        return (
-                                          (option?.warehouse_name || option?.label) && (
-                                            <div className="z-[999]">
-                                              <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                {dataLang?.import_Warehouse || 'import_Warehouse'} :{' '}
-                                                {option?.warehouse_name}
-                                              </h2>
-                                              <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] z-[999]">
-                                                {option?.label}
-                                              </h2>
-                                            </div>
-                                          )
-                                        )
-                                      }}
-                                      styles={{
-                                        menu: {
-                                          width: '100%',
-                                        },
-                                      }}
+                                      }
+                                      isVisibleLotDate={false}
                                     />
                                   )}
                                 </div>
                                 {dataProductSerial.is_enable === '1' ? (
                                   <div className="col-span-1 ">
-                                    <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                    <div className="flex justify-center flex-col items-center">
                                       <input
                                         value={ce?.serial}
                                         disabled={e?.item?.e?.text_type != 'products'}
@@ -1182,8 +1164,9 @@ const PurchaseImportForm = (props) => {
                                 )}
                                 {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
                                   <>
-                                    <div className="col-span-1 ">
-                                      <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                    {/* Lot */}
+                                    <div>
+                                      <div className="flex justify-center items-center">
                                         <input
                                           value={ce?.lot}
                                           disabled={ce?.disabledDate}
@@ -1192,8 +1175,8 @@ const PurchaseImportForm = (props) => {
                                               ? 'bg-gray-50'
                                               : errLot && (ce?.lot == '' || ce?.lot == null)
                                               ? 'border-red-500'
-                                              : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                                          } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                              : ' focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                          } placeholder:text-secondary-color-text-disabled w-full rounded-lg font-normal p-2 outline-none cursor-text responsive-text-sm`}
                                           onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'lot')}
                                           placeholder={
                                             dataLang?.purchase_order_system_default || 'purchase_order_system_default'
@@ -1201,49 +1184,41 @@ const PurchaseImportForm = (props) => {
                                         />
                                       </div>
                                     </div>
-                                    <div className="col-span-1 ">
-                                      <div className="custom-date-picker flex justify-center h-full p-0.5 flex-col items-center w-full">
-                                        <div className="relative col-span-4">
-                                          <div className="flex flex-row custom-date-picker">
-                                            <DatePicker
-                                              selected={ce?.date}
-                                              blur
-                                              disabled={ce?.disabledDate}
-                                              placeholderText="DD/MM/YYYY"
-                                              dateFormat="dd/MM/yyyy"
-                                              onSelect={(date) => _HandleChangeChild(e?.id, ce?.id, 'date', date)}
-                                              placeholder={
-                                                dataLang?.purchase_order_system_default ||
-                                                'purchase_order_system_default'
+                                    {/* Date */}
+                                    <div>
+                                      <div className="flex justify-center items-center">
+                                        <ConfigProvider locale={viVN}>
+                                          <DatePickerAntd
+                                            className="p-[6.7px]"
+                                            isError={errDateList && ce?.date == null}
+                                            allowClear={false}
+                                            placeholder={'DD/MM/YYYY'}
+                                            disabled={ce?.disabledDate}
+                                            format="DD/MM/YYYY"
+                                            suffixIcon={null}
+                                            value={ce?.date ? dayjs(ce?.date) : null}
+                                            onChange={(date) => {
+                                              if (date) {
+                                                const dateString = date.toDate().toString()
+                                                _HandleChangeChild(e?.id, ce?.id, 'date', dateString)
                                               }
-                                              className={`border ${
-                                                ce?.disabledDate
-                                                  ? 'bg-gray-50'
-                                                  : errDateList && ce?.date == null
-                                                  ? 'border-red-500'
-                                                  : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                                              } placeholder:text-slate-300 placeholder:text-[9px] text-[10px] w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
-                                            />
-                                            {effectiveDate && (
-                                              <>
-                                                <MdClear
-                                                  className="absolute right-0 -translate-x-[320%] translate-y-[1%] h-10 text-[#CCCCCC] hover:text-[#999999] scale-110 cursor-pointer"
-                                                  onClick={() => handleClearDate('effectiveDate')}
-                                                />
-                                              </>
-                                            )}
-                                            <BsCalendarEvent className="absolute right-0 -translate-x-[55%] top-[50%] -translate-y-[50%] text-[#CCCCCC] scale-110 cursor-pointer" />
-                                          </div>
-                                        </div>
+                                            }}
+                                          />
+                                        </ConfigProvider>
                                       </div>
                                     </div>
                                   </>
                                 ) : (
                                   ''
                                 )}
-                                <div className="flex items-center justify-center  h-full p-0.5">
+                                {/* Số lượng */}
+                                <div
+                                  className={`flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                    ce?.amount == 0 || ce?.amount == '' ? 'border-red-500' : 'border-neutral-N400'
+                                  }`}
+                                >
                                   <button
-                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                    className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
                                     onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                   >
                                     <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
@@ -1252,57 +1227,70 @@ const PurchaseImportForm = (props) => {
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'amount')}
                                     value={ce?.amount}
                                     isAllowed={isAllowedNumber}
-                                    className={`${
-                                      (ce?.amount == 0 && 'border-red-500') || (ce?.amount == '' && 'border-red-500')
-                                    } appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 3xl:px-1 2xl:px-0.5 xl:px-0.5 p-0 font-normal w-full focus:outline-none border-b border-gray-200`}
+                                    className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
                                   />
                                   <button
-                                    className=" text-gray-400 hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center 3xl:p-0 2xl:p-0 xl:p-0 p-0 bg-slate-200 rounded-full"
+                                    className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
                                     onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                   >
                                     <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
                                   </button>
                                 </div>
-                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                {/* Đơn giá */}
+                                <div
+                                  className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
+                                    ce?.price == 0 || ce?.price == ''
+                                      ? 'border-red-500'
+                                      : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                  }`}
+                                >
                                   <InPutMoneyFormat
-                                    className={`${
-                                      (ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')
-                                    } 
-                                                                    appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px] focus:outline-none border-b border-gray-200 h-fit`}
+                                    className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
                                     value={ce?.price}
+                                    isSuffix=" đ"
                                   />
                                 </div>
-                                <div className="flex justify-center  h-full p-0.5 flex-col items-center">
+                                {/* % CK */}
+                                <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border focus:border-brand-color hover:border-brand-color border-neutral-N400 responsive-text-sm font-semibold">
                                   <InPutNumericFormat
-                                    className="appearance-none text-center 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] py-2 2xl:px-2 xl:px-1 p-0 font-normal 2xl:w-24 xl:w-[70px] w-[60px]  focus:outline-none border-b border-gray-200"
+                                    className="appearance-none w-full focus:outline-none text-right"
                                     onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                     value={ce?.discount}
                                     isAllowed={isAllowedDiscount}
                                   />
                                 </div>
-                                <div className="col-span-1  text-right flex items-center justify-end  h-full p-0.5">
-                                  <h3 className="px-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                                    {formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}
-                                  </h3>
+                                {/* Đơn giá sau CK */}
+                                <div className="flex items-center justify-center text-center responsive-text-sm font-semibold">
+                                  <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
+                                  <span className="pl-1 underline">đ</span>
                                 </div>
-                                <div className=" flex flex-col items-center p-0.5 h-full justify-center">
-                                  <SelectItemComponent
+                                {/* Thuế */}
+                                <div className="flex items-center">
+                                  <SelectCustomLabel
+                                    placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                                     options={taxOptions}
                                     value={ce?.tax}
-                                    onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'tax')}
-                                    placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                    className={`  3xl:text-[12px] 2xl:text-[10px] p-1 xl:text-[9.5px] text-[9px] border-transparent placeholder:text-slate-300 w-full z-19 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none `}
-                                    formatOptionLabel={(option) => (
-                                      <div className="flex items-center justify-start gap-1 flex-nowrap">
-                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] whitespace-nowrap">
-                                          {option?.label}
-                                        </h2>
-                                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">{`(${option?.tax_rate})`}</h2>
+                                    onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
+                                    renderOption={(option, isLabel) => (
+                                      <div
+                                        className={`flex items-center justify-start gap-1 responsive-text-sm ${
+                                          isLabel ? 'py-1 2xl:py-2' : ''
+                                        }`}
+                                      >
+                                        <h2 className="">{option?.label}</h2>
+                                        {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                          <h2>
+                                            {option?.tax_rate === '20'
+                                              ? `(${option?.tax_rate}%)`
+                                              : `${option?.tax_rate}%`}
+                                          </h2>
+                                        )}
                                       </div>
                                     )}
                                   />
                                 </div>
+                                {/* Thành tiền và nút xóa */}
                                 <ItemTotalAndDelete
                                   total={formatMoney(
                                     ce?.price *
@@ -1323,7 +1311,7 @@ const PurchaseImportForm = (props) => {
               )}
             </div>
           </Customscrollbar>
-        </>
+        </div>
       }
       info={
         <div className="flex flex-col gap-4">
@@ -1338,76 +1326,52 @@ const PurchaseImportForm = (props) => {
               handleTimeChange(date)
             }}
           />
-          <div className="col-span-2">
-            <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.import_branch || 'import_branch'} <span className="text-red-500">*</span>
-            </label>
-            <SelectComponent
-              options={dataBranch}
-              onChange={_HandleChangeInput.bind(this, 'branch')}
-              value={idBranch}
-              isClearable={true}
-              closeMenuOnSelect={true}
-              hideSelectedOptions={false}
-              type="form"
-              placeholder={dataLang?.import_branch || 'import_branch'}
-              className={`${
-                errBranch ? 'border-red-500' : 'border-transparent'
-              } placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-              isSearchable={true}
-            />
-            {errBranch && (
-              <label className="text-sm text-red-500">
-                {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-              </label>
-            )}
-          </div>
-          <div className="col-span-2">
-            <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.import_supplier || 'import_supplier'} <span className="text-red-500">*</span>
-            </label>
-            <SelectComponent
-              options={dataSupplier}
-              onChange={_HandleChangeInput.bind(this, 'supplier')}
-              value={idSupplier}
-              placeholder={dataLang?.import_supplier || 'import_supplier'}
-              hideSelectedOptions={false}
-              isClearable={true}
-              className={`${
-                errSupplier ? 'border-red-500' : 'border-transparent'
-              } placeholder:text-slate-300 w-full  bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-              isSearchable={true}
-              noOptionsMessage={() => 'Không có dữ liệu'}
-              type="form"
-            />
-            {errSupplier && (
-              <label className="text-sm text-red-500">
-                {dataLang?.purchase_order_errSupplier || 'purchase_order_errSupplier'}
-              </label>
-            )}
-          </div>
-          <div className="col-span-2 ">
-            <label className="text-[#344054] font-normal text-sm mb-1 ">
-              {dataLang?.import_the_orders || 'import_the_orders'}{' '}
-            </label>
-            <SelectComponent
-              onInputChange={(event) => {
-                _HandleSeachApi(event)
-              }}
-              options={dataTheOrder}
-              onChange={_HandleChangeInput.bind(this, 'theorder')}
-              value={idTheOrder}
-              isClearable={true}
-              noOptionsMessage={() => 'Không có dữ liệu'}
-              closeMenuOnSelect={true}
-              hideSelectedOptions={false}
-              placeholder={dataLang?.import_the_orders || 'import_the_orders'}
-              className={`border-transparent placeholder:text-slate-300 w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border `}
-              isSearchable={true}
-              type="form"
-            />
-          </div>
 
+          {/* Nhà cung cấp */}
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.import_supplier || 'import_supplier'}
+            placeholderText="Chọn nhà cung cấp"
+            options={dataSupplier}
+            value={idSupplier}
+            onChange={(value) => {
+              const newValue = dataSupplier.find((item) => item.value === value)
+              _HandleChangeInput('supplier', newValue)
+            }}
+            isError={errSupplier}
+            icon={<PiUsersLight />}
+            errMess={dataLang?.purchase_order_errSupplier || 'purchase_order_errSupplier'}
+          />
+          {/* Chi nhánh */}
+          <SelectWithRadio
+            isRequired={true}
+            label={dataLang?.import_branch || 'import_branch'}
+            placeholderText="Chọn chi nhánh"
+            options={dataBranch}
+            value={idBranch}
+            onChange={(value) => {
+              const newValue = dataBranch.find((item) => item.value === value)
+              _HandleChangeInput('branch', newValue)
+            }}
+            isError={errBranch}
+            icon={<PiMapPinLight />}
+            errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+          />
+          {/* Đơn đặt hàng (PO) */}
+          <SelectWithRadio
+            isRequired={false}
+            label={dataLang?.import_the_orders || 'import_the_orders'}
+            placeholderText="Chọn đơn đặt hàng"
+            options={dataTheOrder}
+            value={idTheOrder}
+            onChange={(value) => {
+              const newValue = dataTheOrder.find((item) => item.value === value)
+              _HandleChangeInput('theorder', newValue)
+            }}
+            sSearch={sSearchOrder}
+            icon={<PiClipboardTextLight />}
+          />
+          {/* Chọn kho nhập dư (nếu có) */}
           <AnimatePresence mode="wait">
             {idTheOrder && (
               <motion.div
@@ -1418,32 +1382,34 @@ const PurchaseImportForm = (props) => {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="col-span-2 origin-left"
               >
-                <div className="w-full">
-                  <label className="text-[#344054] font-normal text-sm mb-1">{'Chọn kho nhập dư (nếu có)'}</label>
-
-                  <SelectComponent
-                    onChange={_HandleChangeInput.bind(this, 'idSurplusWarehouse')}
-                    value={idSurplusWarehouse}
-                    formatOptionLabel={(option) => (
-                      <div className="z-20">
-                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                          {dataLang?.import_Warehouse || 'import_Warehouse'}: {option?.warehouse_name}
-                        </h2>
-                        <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                          {dataLang?.import_Warehouse_location || 'import_Warehouse_location'}: {option?.label}
-                        </h2>
-                      </div>
-                    )}
-                    options={dataWarehouse}
-                    hideSelectedOptions={false}
-                    isClearable
-                    placeholder={'Chọn kho nhập dư'}
-                    classNamePrefix="surplusWarehouse"
-                    className={`border-transparent placeholder:text-slate-300 textt-[8px] w-full z-20 bg-[#ffffff] rounded text-[#52575E] font-normal outline-none border`}
-                    isSearchable={true}
-                    noOptionsMessage={() => 'Không có dữ liệu'}
-                    type="form"
-                  />
+                <div className="w-full flex flex-col gap-y-2">
+                  <InfoFormLabel isRequired={false} label={'Chọn kho nhập dư (nếu có)'} />
+                  <div className="w-full flex">
+                    <div className="relative flex w-full">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-[#7a7a7a]">
+                        <PiMapPinLight />
+                      </span>
+                      <SelectCustomLabel
+                        className="select-with-radio w-full"
+                        dataLang={dataLang}
+                        placeholder={'Chọn kho nhập dư'}
+                        options={dataWarehouse}
+                        value={idSurplusWarehouse}
+                        onChange={_HandleChangeInput.bind(this, 'idSurplusWarehouse')}
+                        allowClear={true}
+                        renderOption={(option) => (
+                          <div className="z-20 font-deca xl1439:text-[15px] text-[13px] leading-5">
+                            <h2>
+                              {dataLang?.import_Warehouse || 'import_Warehouse'}: {option?.warehouse_name}
+                            </h2>
+                            <h2>
+                              {dataLang?.import_Warehouse_location || 'import_Warehouse_location'}: {option?.label}
+                            </h2>
+                          </div>
+                        )}
+                      />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}

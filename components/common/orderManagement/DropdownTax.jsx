@@ -17,6 +17,7 @@ const DropdownTax = ({ taxOptions, totalTax, onChange, dataLang }) => {
             Chọn hàng loạt % thuế
           </p>
           <SelectCustomLabel
+            allowClear={true}
             className="select-tax placeholder:text-xs"
             placeholder={dataLang?.sales_product_tax || 'sales_product_tax'}
             options={taxOptions}

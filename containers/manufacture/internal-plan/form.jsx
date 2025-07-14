@@ -336,7 +336,7 @@ const InternalPlanForm = (props) => {
         <img
           src={option.e?.images ?? '/icon/noimagelogo.png'}
           alt={option.e?.name}
-          className={`${isOnTable ? 'size-16' : 'size-10'} object-cover rounded-md`}
+          className={`xl:size-16 size-12 object-cover rounded-md`}
         />
         <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px]">
           <h3 className={`font-semibold responsive-text-sm truncate ${isOnTable ? 'text-brand-color' : 'text-black'}`}>
@@ -516,6 +516,7 @@ const InternalPlanForm = (props) => {
                     }),
                     control: (base, state) => ({
                       ...base,
+                      cursor: 'pointer',
                       borderRadius: '8px',
                       borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
                       boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
@@ -586,75 +587,81 @@ const InternalPlanForm = (props) => {
               </div>
             </div>
 
-            <Customscrollbar className="max-h-[495px] h-[495px] overflow-auto pb-2">
+            <Customscrollbar className="max-h-[780px] overflow-auto pb-2">
               <div className="h-[100%] w-full">
                 {isFetching ? (
                   <Loading className="w-full h-10" color="#0f4f9e" />
                 ) : (
                   <>
-                    {listData?.map((e) => (
-                      <div
-                        key={e?.id?.toString()}
-                        className="grid items-center grid-cols-12 gap-6 my-1 border-b border-gray-100"
-                      >
-                        {/* Mặt hàng */}
-                        <div className="h-full col-span-4">{selectItemsLabel(e.item, true)}</div>
-                        <div className="grid grid-cols-4 gap-6 items-center col-span-8">
-                          {/* Số lượng */}
-                          <div className="relative col-span-1 py-5">
-                            <QuantitySelector
-                              ce={e}
-                              clsxErrorBorder={`${
-                                errors.errQuantity && (e.quantity == null || e.quantity == '' || e.quantity <= 0)
-                                  ? 'border-red-500'
-                                  : 'border-gray-200'
-                              } ${
-                                e.quantity == null || e.quantity == '' || e.quantity <= 0
-                                  ? 'border-red-500'
-                                  : 'border-gray-200'
-                              }`}
-                              onValueChange={_HandleChangeChild.bind(this, e.id, 'quantity')}
-                              isAllowedNumber={isAllowedNumber}
-                              disabledMinus={e.quantity <= 1 || e.quantity === '' || e.quantity === null}
-                              onDecrease={_HandleChangeChild.bind(this, e?.id, 'decrease')}
-                              onIncrease={_HandleChangeChild.bind(this, e?.id, 'increase')}
-                            />
-                          </div>
-                          {/* Ngày cần hàng */}
-                          <div className="flex flex-col items-center justify-center col-span-1 py-3">
-                            <ConfigProvider locale={viVN}>
-                              <DatePickerAntd
-                                className="sales-product-date placeholder:text-secondary-color-text-disabled cursor-pointer"
-                                status={errors.errDate && (e.date == null || e.date == '') ? 'error' : ''}
-                                allowClear={false}
-                                placeholder={'Chọn ngày'}
-                                format="DD/MM/YYYY"
-                                suffixIcon={null}
-                                value={e.date ? dayjs(e.date) : null}
-                                onChange={(date) => {
-                                  const dateString = date?.toDate().toString()
-                                  _HandleChangeChild(e?.id, 'date', dateString)
-                                }}
+                    {listData?.map((e, index) => {
+                      const isLast = index === listData.length - 1
+
+                      return (
+                        <div
+                          key={e?.id?.toString()}
+                          className={`grid items-center grid-cols-12 gap-6 my-1 ${
+                            isLast ? '' : 'border-b border-gray-100'
+                          }`}
+                        >
+                          {/* Mặt hàng */}
+                          <div className="h-full col-span-4">{selectItemsLabel(e.item, true)}</div>
+                          <div className="grid grid-cols-4 gap-6 items-center col-span-8">
+                            {/* Số lượng */}
+                            <div className="relative col-span-1 py-5">
+                              <QuantitySelector
+                                ce={e}
+                                clsxErrorBorder={`${
+                                  errors.errQuantity && (e.quantity == null || e.quantity == '' || e.quantity <= 0)
+                                    ? 'border-red-500'
+                                    : 'border-gray-200'
+                                } ${
+                                  e.quantity == null || e.quantity == '' || e.quantity <= 0
+                                    ? 'border-red-500'
+                                    : 'border-gray-200'
+                                }`}
+                                onValueChange={_HandleChangeChild.bind(this, e.id, 'quantity')}
+                                isAllowedNumber={isAllowedNumber}
+                                disabledMinus={e.quantity <= 1 || e.quantity === '' || e.quantity === null}
+                                onDecrease={_HandleChangeChild.bind(this, e?.id, 'decrease')}
+                                onIncrease={_HandleChangeChild.bind(this, e?.id, 'increase')}
                               />
-                            </ConfigProvider>
-                          </div>
-                          {/* Ghi chú */}
-                          <div className="flex items-center justify-center col-span-1 h-8 2xl:h-10 3xl:p-2 p-[2px] border border-gray-200 rounded-lg">
-                            <input
-                              value={e.note}
-                              onChange={_HandleChangeChild.bind(this, e.id, 'note')}
-                              placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
-                              type="text"
-                              className="pl-2 placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] text-[#52575E] font-normal outline-none"
-                            />
-                          </div>
-                          {/* Thao tác */}
-                          <div className="flex items-center justify-center h-full col-span-1">
-                            <ButtonDelete onDelete={_HandleDeleteParent.bind(this, e.id)} />
+                            </div>
+                            {/* Ngày cần hàng */}
+                            <div className="flex flex-col items-center justify-center col-span-1 py-3">
+                              <ConfigProvider locale={viVN}>
+                                <DatePickerAntd
+                                  className="sales-product-date placeholder:text-secondary-color-text-disabled cursor-pointer"
+                                  status={errors.errDate && (e.date == null || e.date == '') ? 'error' : ''}
+                                  allowClear={false}
+                                  placeholder={'Chọn ngày'}
+                                  format="DD/MM/YYYY"
+                                  suffixIcon={null}
+                                  value={e.date ? dayjs(e.date) : null}
+                                  onChange={(date) => {
+                                    const dateString = date?.toDate().toString()
+                                    _HandleChangeChild(e?.id, 'date', dateString)
+                                  }}
+                                />
+                              </ConfigProvider>
+                            </div>
+                            {/* Ghi chú */}
+                            <div className="flex items-center justify-center col-span-1 h-8 2xl:h-10 3xl:p-2 p-[2px] border border-gray-200 rounded-lg">
+                              <input
+                                value={e.note}
+                                onChange={_HandleChangeChild.bind(this, e.id, 'note')}
+                                placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
+                                type="text"
+                                className="pl-2 placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] text-[#52575E] font-normal outline-none"
+                              />
+                            </div>
+                            {/* Thao tác */}
+                            <div className="flex items-center justify-center h-full col-span-1">
+                              <ButtonDelete onDelete={_HandleDeleteParent.bind(this, e.id)} />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </>
                 )}
               </div>
@@ -665,6 +672,7 @@ const InternalPlanForm = (props) => {
           <OrderFormTabs
             info={
               <div className="flex flex-col gap-3 mt-2">
+                {/* Mã chứng từ */}
                 <div className="flex flex-col flex-wrap items-center gap-y-3">
                   <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
                   <div className="w-full relative">
@@ -679,6 +687,7 @@ const InternalPlanForm = (props) => {
                     />
                   </div>
                 </div>
+                {/* Ngày chứng từ */}
                 <div className="flex flex-col flex-wrap items-center gap-y-3">
                   <InfoFormLabel isRequired={true} label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
                   <div className="relative w-full flex flex-row custom-date-picker date-form">
@@ -708,6 +717,7 @@ const InternalPlanForm = (props) => {
                     </ConfigProvider>
                   </div>
                 </div>
+                {/* Tên kế hoạch */}
                 <div className="flex flex-col gap-y-2">
                   <div className="flex flex-col flex-wrap items-center gap-y-3">
                     <InfoFormLabel isRequired={true} label={dataLang?.internal_plan_name || 'internal_plan_name'} />
@@ -736,28 +746,21 @@ const InternalPlanForm = (props) => {
                     </label>
                   )}
                 </div>
-                <div className="flex flex-col gap-y-2">
-                  <div className="flex flex-col flex-wrap items-center gap-y-3">
-                    <InfoFormLabel isRequired={true} label={dataLang?.import_branch || 'import_branch'} />
-                    <SelectWithRadio
-                      title={dataLang?.import_branch || 'import_branch'}
-                      placeholderText="Chọn chi nhánh"
-                      options={dataBranch}
-                      value={idChange.idBranch}
-                      onChange={(value) => {
-                        const newValue = dataBranch.find((item) => item.value === value)
-                        _HandleChangeInput('branch', newValue)
-                      }}
-                      isError={errors.errBranch}
-                      icon={<PiMapPinLight />}
-                    />
-                  </div>
-                  {errors.errBranch && (
-                    <label className="text-sm text-red-500">
-                      {dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                    </label>
-                  )}
-                </div>
+                {/* Chi nhánh */}
+                <SelectWithRadio
+                  isRequired={true}
+                  label={dataLang?.import_branch || 'import_branch'}
+                  placeholderText="Chọn chi nhánh"
+                  options={dataBranch}
+                  value={idChange.idBranch}
+                  onChange={(value) => {
+                    const newValue = dataBranch.find((item) => item.value === value)
+                    _HandleChangeInput('branch', newValue)
+                  }}
+                  isError={errors.errBranch}
+                  icon={<PiMapPinLight />}
+                  errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
+                />
               </div>
             }
             note={

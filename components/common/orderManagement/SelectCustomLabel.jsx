@@ -11,6 +11,7 @@ const SelectCustomLabel = ({
   options,
   value,
   onChange,
+  allowClear = false,
   onClear,
   disabled = false,
   isError = false,
@@ -32,7 +33,7 @@ const SelectCustomLabel = ({
               {opt?.warehouse_name}
             </h2>
             <div className="flex gap-1">
-              <h2 className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-semibold">
+              <h2 className="3xl:text-[11px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-medium">
                 Vị trí kho: {opt?.label}
               </h2>
             </div>
@@ -89,7 +90,7 @@ const SelectCustomLabel = ({
       <Select
         className={`placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer w-full ${className}`}
         placeholder={placeholder}
-        allowClear
+        allowClear={allowClear}
         value={valueCustom || null}
         onChange={handleChange}
         onClear={onClear}
