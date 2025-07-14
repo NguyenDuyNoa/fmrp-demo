@@ -3,7 +3,7 @@ import { Empty } from 'antd'
 import { CiSearch } from 'react-icons/ci'
 import Select from 'react-select'
 
-const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder }) => {
+const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder, menuIsOpen }) => {
   return (
     <div className="relative w-full">
       <Select
@@ -11,6 +11,7 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         closeMenuOnSelect={false}
         onChange={onChange}
         value={value}
+        menuIsOpen={menuIsOpen}
         isMulti
         maxShowMuti={0}
         components={{ MenuList, MultiValue }}
@@ -53,6 +54,10 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
           menu: (provided, state) => ({
             ...provided,
             width: '100%',
+          }),
+          menuList: (provided) => ({
+            ...provided,
+            padding: '4px',
           }),
         }}
       />

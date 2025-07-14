@@ -44,6 +44,7 @@ module.exports = {
       colors: {
         'gray-color': '#F4F6F8',
         'brand-color': '#003DA0',
+        'new-blue': '#003DA0',
         'black-color': '#141522',
         'blue-color': '#0375F3',
         'secondary-color-text': '#637381',
