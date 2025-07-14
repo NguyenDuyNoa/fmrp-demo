@@ -46,7 +46,7 @@ const SelectBySearch = ({
     setSelectedItems((prevItems) => {
       // Nếu đã tồn tại thì giữ nguyên
       if (prevItems.find((o) => o.value === newOption.value)) {
-        const updatedItem = options.find((o) => o.item.value === newOption.value)
+        const updatedItem = options.find((o) => o?.item?.value === newOption.value)
         if (updatedItem) {
           handleIncrease(updatedItem.id) // Gọi hàm tăng số lượng nếu có
         }
@@ -82,7 +82,7 @@ const SelectBySearch = ({
         {children}
       </Select>
 
-      <div className="absolute 3xl:right-3 right-2 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
+      <div className="absolute 3xl:right-2 right-2 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
         <CiSearch className="text-white responsive-text-lg" />
       </div>
     </div>

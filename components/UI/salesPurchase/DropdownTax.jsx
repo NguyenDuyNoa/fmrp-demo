@@ -14,7 +14,7 @@ const DropdownTax = ({ taxOptions, totalTax, onChange, dataLang }) => {
       overlay={
         <div className="px-4 py-5 shadow-lg bg-white rounded-lg">
           <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
-            Chọn hoàng loạt % thuế
+            Chọn hàng loạt % thuế
           </p>
           <SelectCustomLabel
             className="select-tax placeholder:text-xs"
@@ -43,11 +43,13 @@ const DropdownTax = ({ taxOptions, totalTax, onChange, dataLang }) => {
       arrow
     >
       <div
-        className="inline-flex items-center justify-between cursor-pointer"
+        className="inline-flex items-center justify-between cursor-pointer w-full group"
         onClick={() => sDropDownTax(!dropDownTax)}
       >
-        <TableHeader className="text-start">{dataLang?.sales_product_tax || 'sales_product_tax'}</TableHeader>
-        <ArrowDown2 size={16} className="text-neutral-02 font-medium" />
+        <TableHeader className="text-start group-hover:text-neutral-05">
+          {dataLang?.sales_product_tax || 'sales_product_tax'}
+        </TableHeader>
+        <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
       </div>
     </Dropdown>
   )
