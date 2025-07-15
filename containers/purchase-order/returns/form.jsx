@@ -11,6 +11,7 @@ import { DocumentDate, DocumentNumber } from '@/components/common/orderManagemen
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { optionsQuery } from '@/configs/optionsQuery'
@@ -30,7 +31,6 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
-import { SelectCore } from '@/utils/lib/Select'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Add, Minus, TableDocument } from 'iconsax-react'
 import moment from 'moment/moment'
@@ -829,7 +829,7 @@ const PurchaseReturnsForm = (props) => {
           : dataLang?.returns_title_child || 'returns_title_child'
       }
       searchBar={
-        <div className="w-full">
+        <div className="flex flex-col w-full">
           {/* <SelectSearchBar
             options={dataItems}
             onChange={_HandleAddParent.bind(this)}
@@ -837,7 +837,16 @@ const PurchaseReturnsForm = (props) => {
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={dataLang?.returns_items || 'returns_items'}
           /> */}
-          <SelectCore
+          <SelectSearch
+            options={dataItems}
+            onChange={(value) => {
+              _HandleAddParent(value[0])
+            }}
+            value={null}
+            formatOptionLabel={(option) => selectItemsLabel(option)}
+            placeholder={dataLang?.returns_items || 'returns_items'}
+          />
+          {/* <SelectCore
             options={dataItems}
             value={null}
             onChange={_HandleAddParent.bind(this)}
@@ -950,7 +959,7 @@ const PurchaseReturnsForm = (props) => {
                 width: '150%',
               }),
             }}
-          />
+          /> */}
         </div>
       }
       tableLeft={

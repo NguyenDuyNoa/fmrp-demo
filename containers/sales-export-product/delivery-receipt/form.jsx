@@ -6,6 +6,7 @@ import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
@@ -13,7 +14,6 @@ import EmptyData from '@/components/UI/emptyData'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
-import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
@@ -31,7 +31,7 @@ import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker, Empty } from 'antd'
+import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -42,12 +42,11 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsCalendarEvent } from 'react-icons/bs'
-import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight, PiUser } from 'react-icons/pi'
 import { TbNotes } from 'react-icons/tb'
 import { useSelector } from 'react-redux'
-import Select, { components } from 'react-select'
+import { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import PopupAddress from './components/PopupAddress'
@@ -1001,60 +1000,15 @@ const DeliveryReceiptForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
       searchBar={
-        <div className="relative w-full">
-          <Select
+        <div className="w-full">
+          <SelectSearch
             options={idProductOrder ? options : []}
-            closeMenuOnSelect={false}
             onChange={_HandleChangeInput.bind(this, 'itemAll')}
             value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
-            isMulti
-            maxShowMuti={0}
-            components={{ MenuList, MultiValue }}
+            MenuList={MenuList}
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={'Chọn nhanh mặt hàng'}
-            hideSelectedOptions={false}
-            className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
-            isSearchable={true}
-            noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-            menuPortalTarget={document.body}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              outline: 'none',
-            }}
-            theme={(theme) => ({
-              ...theme,
-              colors: {
-                ...theme.colors,
-                primary25: '#0000000A',
-                primary50: 'transparent',
-                primary: '#C7DFFB',
-              },
-            })}
-            styles={{
-              placeholder: (base) => ({
-                ...base,
-                color: '#cbd5e1',
-              }),
-              menuPortal: (base) => ({
-                ...base,
-              }),
-              control: (base, state) => ({
-                ...base,
-                cursor: 'pointer',
-                borderRadius: '8px',
-                borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
-                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
-              }),
-              menu: (provided, state) => ({
-                ...provided,
-                width: '100%',
-              }),
-            }}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
-            <CiSearch className="text-white responsive-text-lg" />
-          </div>
         </div>
       }
       tableLeft={

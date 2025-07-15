@@ -42,7 +42,6 @@ const SelectSearchBar = ({
         onInputChange={(event) => {
           setSearch && handleSeachApiProductItems(event)
         }}
-        {...props}
         style={{
           border: 'none',
           boxShadow: 'none',

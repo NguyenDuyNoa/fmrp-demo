@@ -6,6 +6,7 @@ import ButtonDelete from '@/components/common/orderManagement/ButtonDelete'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import QuantitySelector from '@/components/common/orderManagement/QuantitySelector'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import LayoutForm from '@/components/layout/LayoutForm'
@@ -21,9 +22,8 @@ import { routerInternalPlan } from '@/routers/manufacture'
 import { isAllowedNumber } from '@/utils/helpers/common'
 import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { SelectCore } from '@/utils/lib/Select'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker as DatePickerAntd, Dropdown, Empty } from 'antd'
+import { ConfigProvider, DatePicker as DatePickerAntd, Dropdown } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { ArrowDown2 } from 'iconsax-react'
@@ -479,7 +479,16 @@ const InternalPlanForm = (props) => {
                 {dataLang?.import_item_information || 'import_item_information'}
               </div>
               <div className="relative w-full">
-                <SelectCore
+                <SelectSearch
+                  options={dataItems}
+                  onChange={(value) => {
+                    _HandleAddParent(value[0])
+                  }}
+                  value={listData?.map((e) => e?.item)}
+                  formatOptionLabel={(option) => selectItemsLabel(option)}
+                  placeholder={dataLang?.returns_items || 'returns_items'}
+                />
+                {/* <SelectCore
                   options={dataItems}
                   value={null}
                   onInputChange={(event) => {
@@ -526,7 +535,7 @@ const InternalPlanForm = (props) => {
                       width: '100%',
                     }),
                   }}
-                />
+                /> */}
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
                   <CiSearch className="text-white responsive-text-lg" />
                 </div>

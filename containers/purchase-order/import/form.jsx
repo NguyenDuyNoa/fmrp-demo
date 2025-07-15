@@ -7,7 +7,7 @@ import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAnd
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import MenuList from '@/components/common/orderManagement/MenuList'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
-import SelectSearchBar from '@/components/common/orderManagement/SelectSearchBar'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import TextareaNote from '@/components/common/orderManagement/TextareaNote'
@@ -847,7 +847,7 @@ const PurchaseImportForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={dataLang?.import_title || 'import_title'}
       searchBar={
-        <SelectSearchBar
+        <SelectSearch
           options={options}
           onChange={_HandleChangeInput.bind(this, 'itemAll')}
           value={itemAll.value ? itemAll?.value : listData?.map((e) => e?.item)}

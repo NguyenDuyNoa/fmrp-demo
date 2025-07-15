@@ -6,6 +6,7 @@ import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
@@ -28,7 +29,7 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker, Empty } from 'antd'
+import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { Add, Minus, TableDocument } from 'iconsax-react'
@@ -37,11 +38,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { BsCalendarEvent } from 'react-icons/bs'
-import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase, LuRefreshCcw } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
-import Select from 'react-select'
 import Popup from 'reactjs-popup'
 import { routerReturnSales } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
@@ -753,8 +752,17 @@ const ReturnSalesForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={dataLang?.returnSales_titleLits || 'returnSales_titleLits'}
       searchBar={
-        <div className="relative w-full cursor-pointer">
-          <Select
+        <div className="w-full">
+          <SelectSearch
+            options={options}
+            onChange={(value) => {
+              _HandleAddParent(value[0])
+            }}
+            value={listData?.map((e) => e?.matHang)}
+            formatOptionLabel={(option) => selectItemsLabel(option)}
+            placeholder={dataLang?.returns_items || 'returns_items'}
+          />
+          {/* <Select
             options={options}
             value={null}
             onChange={_HandleAddParent.bind(this)}
@@ -801,7 +809,7 @@ const ReturnSalesForm = (props) => {
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
             <CiSearch className="text-white responsive-text-lg" />
-          </div>
+          </div> */}
         </div>
       }
       tableLeft={
