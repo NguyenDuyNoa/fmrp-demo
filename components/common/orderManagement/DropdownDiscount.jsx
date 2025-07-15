@@ -4,7 +4,7 @@ import { Dropdown } from 'antd'
 import { ArrowDown2 } from 'iconsax-react'
 import InPutNumericFormat from '../../UI/inputNumericFormat/inputNumericFormat'
 
-const DropdownDiscount = ({ value, onChange, dataLang }) => {
+const DropdownDiscount = ({ value, onChange, dataLang, className }) => {
   return (
     <Dropdown
       overlay={
@@ -28,7 +28,7 @@ const DropdownDiscount = ({ value, onChange, dataLang }) => {
       placement="bottomCenter"
       arrow
     >
-      <div className="inline-flex items-center justify-between cursor-pointer w-[90%] group">
+      <div className={`inline-flex items-center justify-between cursor-pointer group ${className}`}>
         <TableHeader className="text-start group-hover:text-neutral-05">% CK</TableHeader>
         <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
       </div>

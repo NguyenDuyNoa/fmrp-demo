@@ -2,7 +2,11 @@ const OptionSelectBySearch = ({ e, formatNumber }) => {
   return (
     <div className="flex p-2 hover:bg-gray-100 rounded-md cursor-pointer items-center justify-between font-deca">
       <div className="flex gap-3 items-start w-[calc(100%-80px)]">
-        <img src={e.images ?? '/icon/noimagelogo.png'} alt={e.name} className="w-10 h-10 object-cover rounded-md" />
+        <img
+          src={e.images ?? '/icon/noimagelogo.png'}
+          alt={e.name}
+          className="xl:size-16 size-12 object-cover rounded-md"
+        />
         <div className="flex flex-col 3xl:text-[10px] text-[9px] overflow-hidden w-full">
           <div className="font-semibold responsive-text-sm truncate text-black">{e.name}</div>
           {(e.product_variation || e.product_variation_1) && (
