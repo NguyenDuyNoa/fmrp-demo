@@ -6,6 +6,7 @@ import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
@@ -28,7 +29,7 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker, Empty } from 'antd'
+import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { Add, Minus, TableDocument } from 'iconsax-react'
@@ -37,11 +38,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { BsCalendarEvent } from 'react-icons/bs'
-import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase, LuRefreshCcw } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
-import Select from 'react-select'
 import Popup from 'reactjs-popup'
 import { routerReturnSales } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
@@ -753,8 +752,17 @@ const ReturnSalesForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={dataLang?.returnSales_titleLits || 'returnSales_titleLits'}
       searchBar={
-        <div className="relative w-full cursor-pointer">
-          <Select
+        <div className="w-full">
+          <SelectSearch
+            options={options}
+            onChange={(value) => {
+              _HandleAddParent(value[0])
+            }}
+            value={listData?.map((e) => e?.matHang)}
+            formatOptionLabel={(option) => selectItemsLabel(option)}
+            placeholder={dataLang?.returns_items || 'returns_items'}
+          />
+          {/* <Select
             options={options}
             value={null}
             onChange={_HandleAddParent.bind(this)}
@@ -801,7 +809,7 @@ const ReturnSalesForm = (props) => {
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
             <CiSearch className="text-white responsive-text-lg" />
-          </div>
+          </div> */}
         </div>
       }
       tableLeft={
@@ -811,7 +819,7 @@ const ReturnSalesForm = (props) => {
               {dataLang?.import_from_items || 'import_from_items'}
             </TableHeader>
             <div className="col-span-9">
-              <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] gap-3 2xl:gap-4">
+              <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-3 2xl:gap-4">
                 <TableHeader className="text-center">{dataLang?.PDF_house || 'PDF_house'}</TableHeader>
                 <TableHeader className="text-center">
                   {dataLang?.import_from_quantity || 'import_from_quantity'}
@@ -825,7 +833,7 @@ const ReturnSalesForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-left">Đơn giá SCK</TableHeader>
+                <TableHeader className="text-center">{dataLang?.returns_sck || 'returns_sck'}</TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={generalTax}
@@ -833,7 +841,7 @@ const ReturnSalesForm = (props) => {
                   dataLang={dataLang}
                   taxOptions={taxOptions}
                 />
-                <TableHeader className="text-center">{dataLang?.import_into_money || 'import_into_money'}</TableHeader>
+                <TableHeader className="text-right">{dataLang?.import_into_money || 'import_into_money'}</TableHeader>
               </div>
             </div>
           </div>
@@ -857,7 +865,7 @@ const ReturnSalesForm = (props) => {
                     }`}
                   >
                     {/* Mặt hàng */}
-                    <div className="h-full col-span-3 p-2">
+                    <div className="h-full col-span-3">
                       <div className="flex items-center justify-between gap-1 xl:gap-2">
                         <div className="flex items-start">
                           <div className="flex xl:flex-row flex-col items-start gap-3">
@@ -927,17 +935,14 @@ const ReturnSalesForm = (props) => {
                       {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
                         <button
                           onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
-                          className="w-full rounded mt-1.5 px-5 py-1 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white hover:ring-2 hover:ring-offset-2 hover:ring-rose-400 transition-all ease-out duration-300"
+                          className="text-xs text-center w-full rounded-lg mt-2 px-5 py-2 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white transition-all ease-out duration-300"
                         >
-                          <span className="absolute right-0 w-full h-full -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
-                          <span className="relative text-xs">
-                            Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
-                          </span>
+                          Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
                         </button>
                       )}
                     </div>
                     <div className="items-center col-span-9">
-                      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] items-center gap-3 2xl:gap-4 py-1">
+                      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] items-center gap-3 2xl:gap-4 py-1">
                         {/* {fetChingData.load ? (
                           <Loading className="h-2 col-span-8" color="#0f4f9e" />
                         ) : ( */}

@@ -50,7 +50,7 @@ const LayoutOrderManagement = ({
         <div className="flex w-full 3xl:gap-x-6 gap-x-4 items-stretch pb-20 relative">
           {/* Cột trái */}
           <div className="w-4/5">
-            <div className="min-h-full max-h-[1132px] flex flex-col gap-6 bg-white border border-[#919EAB3D] rounded-2xl p-4">
+            <div className="min-h-full max-h-[1132px] flex flex-col gap-y-6 bg-white border border-[#919EAB3D] rounded-2xl p-4">
               {/* Thông tin mặt hàng */}
               <div className="flex justify-between items-center">
                 {/* Heading */}
