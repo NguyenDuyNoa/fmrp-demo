@@ -4,19 +4,29 @@ import { debounce } from 'lodash'
 import { CiSearch } from 'react-icons/ci'
 import Select from 'react-select'
 
-const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder, setSearch, props }) => {
+const SelectSearchBar = ({
+  options,
+  onChange,
+  value,
+  MenuList,
+  formatOptionLabel,
+  placeholder,
+  setSearch,
+  menuIsOpen,
+}) => {
   const handleSeachApiProductItems = debounce(async (e) => {
     setSearch(e)
   }, 500)
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full bg-white">
       <Select
         options={options}
         closeMenuOnSelect={false}
         onChange={onChange}
         value={value}
-        // menuIsOpen={menuIsOpen}
+        defaultValue={value}
+        menuIsOpen={true}
         isMulti
         maxShowMuti={0}
         {...(MenuList && {
@@ -28,7 +38,7 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         className="rounded-md bg-white 3xl:text-[15px] text-[13px] cursor-pointer"
         isSearchable={true}
         noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-        menuPortalTarget={document.body}
+        // menuPortalTarget={document.body}
         onInputChange={(event) => {
           setSearch && handleSeachApiProductItems(event)
         }}
@@ -69,6 +79,24 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
           menuList: (provided) => ({
             ...provided,
             padding: '4px',
+          }),
+          multiValue: (base) => ({
+            ...base,
+            backgroundColor: '#E6F0FF',
+            borderRadius: '4px',
+          }),
+          multiValueLabel: (base) => ({
+            ...base,
+            color: '#1760B9',
+            fontWeight: 500,
+          }),
+          multiValueRemove: (base) => ({
+            ...base,
+            color: '#1760B9',
+            ':hover': {
+              backgroundColor: '#C7DFFB',
+              color: '#1760B9',
+            },
           }),
         }}
       />
