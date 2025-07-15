@@ -1126,7 +1126,7 @@ const OrderForm = (props) => {
               <h4 className="col-span-4 text-center responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_quantity || 'purchase_quantity'}
               </h4>
-              <h4 className="col-span-3 text-center responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+              <h4 className="col-span-3 text-right responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_detail_unit_price || 'purchase_order_detail_unit_price'}
               </h4>
               <div className="col-span-3 px-3">
@@ -1134,6 +1134,7 @@ const OrderForm = (props) => {
                   value={discount}
                   onChange={(val) => _HandleChangeInput('discount', val)}
                   dataLang={dataLang}
+                  className="w-full"
                 />
               </div>
               <h4 className="col-span-3 text-right responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
@@ -1259,7 +1260,7 @@ const OrderForm = (props) => {
                                 readOnly={false}
                                 className={`${
                                   (e?.price < 0 && 'border-red-500') || (e?.price === '' && 'border-red-500')
-                                } rounded-lg appearance-none text-center py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400`}
+                                } rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400`}
                               />
                               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold underline">
                                 đ
