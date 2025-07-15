@@ -43,7 +43,7 @@ const CheckboxDefault = ({
                     />
                 </svg>
             </div>
-            {label && <span className="text-sm text-gray-700">{label}</span>}
+            {label && <span className="responsive-text-base text-gray-700">{label}</span>}
         </label>
     );
 };

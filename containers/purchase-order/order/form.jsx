@@ -6,7 +6,7 @@ import DropdownTax from '@/components/common/orderManagement/DropdownTax'
 import MenuList from '@/components/common/orderManagement/MenuList'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
-import SelectSearchBar from '@/components/common/orderManagement/SelectSearchBar'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 import IconStar from '@/components/icons/common/IconStar'
 import LayoutForm from '@/components/layout/LayoutForm'
@@ -35,7 +35,6 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { debounce } from 'lodash'
 import moment from 'moment/moment'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -47,24 +46,37 @@ import { useSelector } from 'react-redux'
 import { useOrderByPurchase } from './hooks/useOrderByPurchase'
 
 const OrderForm = (props) => {
+  const isShow = useToast()
   const router = useRouter()
-
   const id = router.query?.id
-
   const dataLang = props?.dataLang
 
-  const isShow = useToast()
-
   const statusExprired = useStatusExprired()
+  const dataSeting = useSetingServer()
+  const authState = useSelector((state) => state.auth)
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
-
   const [onFetchingItemsAll, sOnFetchingItemsAll] = useState(false)
-
   const [onSending, sOnSending] = useState(false)
-
-  const dataSeting = useSetingServer()
-
+  const [sortedArr, setSortedArr] = useState([])
+  const [optionType, sOptionType] = useState('0')
+  const [dataItems, sDataItems] = useState([])
+  const [startDate, sStartDate] = useState(new Date())
+  const [delivery_dateNew, sDelivery_dateNew] = useState(new Date())
+  const [code, sCode] = useState('')
+  const [note, sNote] = useState('')
+  const [tax, sTax] = useState()
+  const [discount, sDiscount] = useState(0)
+  const [idSupplier, sIdSupplier] = useState(null)
+  const [idStaff, sIdStaff] = useState(null)
+  const [idPurchases, sIdPurchases] = useState([])
+  const [idBranch, sIdBranch] = useState(null)
+  const [errDate, sErrDate] = useState(false)
+  const [errSupplier, sErrSupplier] = useState(false)
+  const [errStaff, sErrStaff] = useState(false)
+  const [errPurchase, sErrPurchase] = useState(false)
+  const [errBranch, sErrBranch] = useState(false)
+  const [itemAll, sItemAll] = useState([])
   const [option, sOption] = useState([
     {
       id: Date.now(),
@@ -81,48 +93,6 @@ const OrderForm = (props) => {
       purchases_order_item_id: '',
     },
   ])
-  console.log(option)
-  const [sortedArr, setSortedArr] = useState([])
-
-  const [hidden, sHidden] = useState(false)
-
-  const [optionType, sOptionType] = useState('0')
-
-  const [dataItems, sDataItems] = useState([])
-
-  const [startDate, sStartDate] = useState(new Date())
-
-  const [delivery_dateNew, sDelivery_dateNew] = useState(new Date())
-
-  const [code, sCode] = useState('')
-
-  const [note, sNote] = useState('')
-
-  const [tax, sTax] = useState()
-
-  const [discount, sDiscount] = useState(0)
-
-  const [idSupplier, sIdSupplier] = useState(null)
-
-  const [idStaff, sIdStaff] = useState(null)
-
-  const [idPurchases, sIdPurchases] = useState([])
-
-  const [idBranch, sIdBranch] = useState(null)
-
-  const [errDate, sErrDate] = useState(false)
-
-  const [errSupplier, sErrSupplier] = useState(false)
-
-  const [errStaff, sErrStaff] = useState(false)
-
-  const [errPurchase, sErrPurchase] = useState(false)
-
-  const [errBranch, sErrBranch] = useState(false)
-
-  const [itemAll, sItemAll] = useState([])
-
-  const authState = useSelector((state) => state.auth)
 
   useEffect(() => {
     if (authState.branch?.length > 0 && !idBranch) {
@@ -136,46 +106,24 @@ const OrderForm = (props) => {
 
   useEffect(() => {
     if (option.length > 0) {
-      const slicedArr = option.slice(1) // Bỏ phần tử đầu tiên
-      const arr = slicedArr.sort((a, b) => b.id - a.id) // Sắp xếp giảm dần theo id
-      // arr.unshift(option[0]); // Đưa phần tử đầu tiên vào đầu danh sách
-      setSortedArr([
-        // {
-        // id: Date.now(),
-        // items: null,
-        // unit: 1,
-        // quantity: 1,
-        // price: 1,
-        // discount: 0,
-        // affterDiscount: 1,
-        // tax: 0,
-        // priceAffterTax: 1,
-        // total: 1,
-        // note: "",
-        // purchases_order_item_id: "",
-        // },
-      ]) // Cập nhật state
+      const slicedArr = option.slice(1)
+      const arr = slicedArr.sort((a, b) => b.id - a.id)
+      setSortedArr([])
     }
-  }, []) // Chạy lại khi options thay đổi
-
-  const readOnlyFirst = true
+  }, [])
 
   const { data: dataTasxes = [] } = useTaxList()
-
   const { data: dataBranch = [] } = useBranchList()
-
   const { data: listSuppiler } = useSupplierList({
+    'filter[branch_id]': idBranch != null ? idBranch.value : null,
+  })
+  const { data: listDataStaff = [] } = useStaffOptions({
     'filter[branch_id]': idBranch != null ? idBranch.value : null,
   })
 
   const dataSupplier = idBranch ? listSuppiler?.rResult?.map((e) => ({ label: e.name, value: e.id })) : []
 
-  const { data: listDataStaff = [] } = useStaffOptions({
-    idSupplier: idSupplier,
-    'filter[branch_id]': idBranch != null ? idBranch.value : null,
-  })
-
-  const dataStaff = idBranch && idSupplier ? listDataStaff : []
+  const dataStaff = idBranch ? listDataStaff : []
 
   const { data: dataPurchases = [] } = useOrderByPurchase(
     {
@@ -235,6 +183,14 @@ const OrderForm = (props) => {
       sOption(item)
       setSortedArr(itemsConver)
 
+      // Cập nhật itemAll để active các sản phẩm đã được chọn
+      const selectedItems = itemsConver.map((item) => ({
+        label: item.items.label,
+        value: item.items.value,
+        e: item.items.e,
+      }))
+      sItemAll(selectedItems)
+
       sCode(rResult?.code)
 
       sIdStaff({
@@ -269,8 +225,6 @@ const OrderForm = (props) => {
         }))
       )
 
-      // sHidden(rResult?.order_type === "1" ? true : false);
-
       sOnFetchingItemsAll(rResult?.order_type === '0' ? true : false)
 
       if (rResult?.order_type === '1') {
@@ -284,8 +238,6 @@ const OrderForm = (props) => {
   const resetValue = () => {
     if (isKeyState?.type === 'optionType') {
       sOptionType(isKeyState?.value.target.value)
-
-      // sHidden(isKeyState?.value.target.value === "1");
 
       sIdPurchases(isKeyState?.value.target.value === '0' ? [] : idPurchases)
 
@@ -385,11 +337,8 @@ const OrderForm = (props) => {
         handleQueryId({ status: true, initialKey: { type, value } })
       } else {
         sIdBranch(value)
-
         sIdPurchases([])
-
         sIdSupplier(null)
-
         sIdStaff(null)
         setSortedArr([])
         sOption([
@@ -417,47 +366,43 @@ const OrderForm = (props) => {
         setSortedArr([])
         sItemAll([])
       } else {
-        // Tìm các item bị xóa từ lần selection trước
         const previousItemValues = new Set(itemAll.map((item) => item.value))
         const currentItemValues = new Set(value.map((item) => item.value))
 
-        // Kiểm tra xem có item nào bị xóa không
         const hasRemovedItems = itemAll.some((item) => !currentItemValues.has(item.value))
 
-        // Nếu có item bị xóa, cập nhật lại sortedArr
         if (hasRemovedItems) {
-          // Lọc ra các mặt hàng cần giữ lại trong sortedArr
           const newSortedArr = sortedArr.filter((item) => item?.items?.value && currentItemValues.has(item.items.value))
           setSortedArr(newSortedArr)
         }
 
-        // Chỉ thêm các mặt hàng chưa tồn tại trong sortedArr
         const existingItemIds = new Set(sortedArr.map((item) => item?.items?.value))
 
-        // Lọc những mặt hàng chưa tồn tại
         const newItems = value.filter((item) => !existingItemIds.has(item.value))
 
         if (newItems.length > 0) {
           const newItemsFormatted = newItems.map((item) => {
-            let money = 0
-            if (item.e?.tax?.tax_rate == undefined) {
-              money = Number(1) * (1 + Number(0) / 100) * Number(item?.e?.quantity_left)
-            } else {
-              money =
-                Number(item?.e?.affterDiscount) * (1 + Number(item?.e?.tax?.tax_rate) / 100) * Number(item?.e?.quantity)
-            }
+            const itemPrice = Number(item?.e?.price || 1)
+            const itemDiscount = Number(discount || 0)
+            const itemQuantity = idPurchases?.length ? Number(item?.e?.quantity_left || 1) : 1
+            const itemTaxRate = Number(item?.e?.tax?.tax_rate || 0)
+
+            const affterDiscount = itemPrice * (1 - itemDiscount / 100)
+
+            let total = affterDiscount * (1 + itemTaxRate / 100) * itemQuantity
+            total = isNaN(total) ? 0 : Number(total.toFixed(2))
 
             return {
               id: Date.now() + Math.random(),
               items: item,
               unit: item?.e?.unit_name,
-              quantity: idPurchases?.length ? Number(item?.e?.quantity_left) : 1,
-              price: item?.e?.price || 1,
-              discount: discount ? discount : 0,
-              affterDiscount: 1,
+              quantity: itemQuantity,
+              price: itemPrice,
+              discount: itemDiscount,
+              affterDiscount: affterDiscount,
               tax: tax ? tax : 0,
               priceAffterTax: 1,
-              total: Number(money.toFixed(2)),
+              total: total,
               note: '',
             }
           })
@@ -465,7 +410,6 @@ const OrderForm = (props) => {
           setSortedArr([...sortedArr, ...newItemsFormatted])
         }
 
-        // Cập nhật itemAll sau khi đã cập nhật sortedArr
         sItemAll(value)
       }
     }
@@ -495,21 +439,21 @@ const OrderForm = (props) => {
     setSortedArr((prevOption) => {
       const newOption = [...prevOption]
 
-      const taxValue = tax?.tax_rate || 0
+      const taxValue = Number(tax?.tax_rate || 0)
 
-      const chietKhauValue = discount || 0
+      const chietKhauValue = Number(discount || 0)
 
       newOption.forEach((item, index) => {
         if (!item.id) return
 
-        const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100)
+        const dongiasauchietkhau = Number(item?.price) * (1 - chietKhauValue / 100)
 
-        const total = dongiasauchietkhau * (1 + taxValue / 100) * item.quantity
+        const total = dongiasauchietkhau * (1 + taxValue / 100) * Number(item.quantity)
 
         item.tax = tax
         item.discount = Number(chietKhauValue)
         item.affterDiscount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau
-        item.total = isNaN(total) ? 0 : total
+        item.total = isNaN(total) ? 0 : Number(total.toFixed(2))
       })
       return newOption
     })
@@ -520,16 +464,16 @@ const OrderForm = (props) => {
     setSortedArr((prevOption) => {
       const newOption = [...prevOption]
 
-      const taxValue = tax?.tax_rate != undefined ? tax?.tax_rate : 0
+      const taxValue = Number(tax?.tax_rate != undefined ? tax?.tax_rate : 0)
 
-      const chietKhauValue = discount ? discount : 0
+      const chietKhauValue = Number(discount ? discount : 0)
 
       newOption.forEach((item, index) => {
         if (!item.id) return
 
-        const dongiasauchietkhau = item?.price * (1 - chietKhauValue / 100)
+        const dongiasauchietkhau = Number(item?.price) * (1 - chietKhauValue / 100)
 
-        const total = dongiasauchietkhau * (1 + taxValue / 100) * item.quantity
+        const total = dongiasauchietkhau * (1 + taxValue / 100) * Number(item.quantity)
 
         item.tax = tax
 
@@ -537,7 +481,7 @@ const OrderForm = (props) => {
 
         item.affterDiscount = isNaN(dongiasauchietkhau) ? 0 : dongiasauchietkhau
 
-        item.total = isNaN(total) ? 0 : total
+        item.total = isNaN(total) ? 0 : Number(total.toFixed(2))
       })
       return newOption
     })
@@ -580,6 +524,22 @@ const OrderForm = (props) => {
         const { data } = await apiOrder.apiSearchProductItems(form)
 
         sDataItems(data?.result)
+
+        // Đánh dấu các sản phẩm đã chọn sau khi tải dữ liệu
+        if (sortedArr?.length > 0 && data?.result?.length > 0) {
+          const selectedItemIds = new Set(sortedArr.map((item) => item.items?.value))
+          const matchedItems = data.result
+            .filter((item) => selectedItemIds.has(item.id))
+            .map((item) => ({
+              label: `${item.name} <span style={{display: none}}>${item.code}</span><span style={{display: none}}>${item.product_variation} </span><span style={{display: none}}>${item.text_type} ${item.unit_name} </span>`,
+              value: item.id,
+              e: item,
+            }))
+
+          if (matchedItems.length > 0) {
+            sItemAll(matchedItems)
+          }
+        }
       } catch (error) {}
     } else {
       try {
@@ -591,13 +551,30 @@ const OrderForm = (props) => {
           },
         })
         sDataItems(data?.result)
+
+        // Đánh dấu các sản phẩm đã chọn sau khi tải dữ liệu
+        if (sortedArr?.length > 0 && data?.result?.length > 0) {
+          const selectedItemIds = new Set(sortedArr.map((item) => item.items?.value))
+          const matchedItems = data.result
+            .filter((item) => selectedItemIds.has(item.id))
+            .map((item) => ({
+              label: `${item.name} <span style={{display: none}}>${item.code}</span><span style={{display: none}}>${item.product_variation} </span><span style={{display: none}}>${item.text_type} ${item.unit_name} </span>`,
+              value: item.id,
+              e: item,
+            }))
+
+          if (matchedItems.length > 0) {
+            sItemAll(matchedItems)
+          }
+        }
       } catch (error) {}
     }
     sOnFetchingItemsAll(false)
   }
 
   const options = dataItems?.map((e) => ({
-    label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
+    label: `${e.name} - ${e.code} - ${e.product_variation} - ${e.text_type} ${e.unit_name}`,
+    // label: `${e.name} <span style={{display: none}}>${e.code}</span><span style={{display: none}}>${e.product_variation} </span><span style={{display: none}}>${e.text_type} ${e.unit_name} </span>`,
     value: e.id,
     e,
   }))
@@ -627,6 +604,28 @@ const OrderForm = (props) => {
     idPurchases?.length == 0 && sDataItems([])
   }, [idPurchases])
 
+  // Đồng bộ dataItems và itemAll để đảm bảo các sản phẩm đã chọn được hiển thị
+  useEffect(() => {
+    if (dataItems?.length > 0 && sortedArr?.length > 0) {
+      // Tạo một map các sản phẩm đã chọn để tìm kiếm nhanh
+      const selectedItemsMap = new Map(sortedArr.map((item) => [item.items?.value, item.items]))
+
+      // Tìm các sản phẩm đã chọn trong dataItems
+      const matchedItems = dataItems
+        .filter((item) => selectedItemsMap.has(item.id))
+        .map((item) => ({
+          label: `${item.name} <span style={{display: none}}>${item.code}</span><span style={{display: none}}>${item.product_variation} </span><span style={{display: none}}>${item.text_type} ${item.unit_name} </span>`,
+          value: item.id,
+          e: item,
+        }))
+
+      // Cập nhật itemAll nếu có sự thay đổi
+      if (matchedItems.length > 0 && itemAll.length !== matchedItems.length) {
+        sItemAll(matchedItems)
+      }
+    }
+  }, [dataItems])
+
   const dataOption = sortedArr?.map((e) => {
     return {
       item: e?.items?.value,
@@ -646,7 +645,7 @@ const OrderForm = (props) => {
 
   const _HandleSubmit = (e) => {
     e.preventDefault()
-    const check = newDataOption.some((e) => e?.price == 0 || e?.price == '' || e?.quantity == 0 || e?.quantity == '')
+    const check = newDataOption.some((e) => e?.price < 0 || e?.price === '' || e?.quantity <= 0 || e?.quantity === '')
     if (optionType == '0') {
       if (idSupplier == null || idStaff == null || idBranch == null || check) {
         idSupplier == null && sErrSupplier(true)
@@ -684,19 +683,6 @@ const OrderForm = (props) => {
   useEffect(() => {
     sErrPurchase(false)
   }, [idPurchases?.length > 0])
-
-  const _HandleSeachApi = debounce(async (inputValue) => {
-    if (optionType === '0' && idBranch != null) {
-      let form = new FormData()
-      form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : '')
-      form.append(`term`, inputValue)
-      form.append(`id_suppliers`, idSupplier?.value ?? '')
-      const { data } = await apiOrder.apiSearchProductItems(form)
-      sDataItems(data?.result)
-    } else {
-      return
-    }
-  }, 500)
 
   const hiddenOptions = idPurchases?.length > 3 ? idPurchases?.slice(0, 3) : []
 
@@ -771,101 +757,60 @@ const OrderForm = (props) => {
       setSortedArr([...sortedArr])
     } else if (type == 'price') {
       sortedArr[index].price = Number(value.value)
-      sortedArr[index].affterDiscount = +sortedArr[index].price * (1 - sortedArr[index].discount / 100)
+      sortedArr[index].affterDiscount = +sortedArr[index].price * (1 - Number(sortedArr[index].discount) / 100)
       sortedArr[index].affterDiscount = +(Math.round(sortedArr[index].affterDiscount + 'e+2') + 'e-2')
       if (sortedArr[index].tax?.tax_rate == undefined) {
         const money =
           Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       } else {
         const money =
           Number(sortedArr[index].affterDiscount) *
           (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
           Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       }
     } else if (type == 'discount') {
       sortedArr[index].discount = Number(value.value)
-      sortedArr[index].affterDiscount = +sortedArr[index].price * (1 - sortedArr[index].discount / 100)
+      sortedArr[index].affterDiscount = +sortedArr[index].price * (1 - Number(sortedArr[index].discount) / 100)
       sortedArr[index].affterDiscount = +(Math.round(sortedArr[index].affterDiscount + 'e+2') + 'e-2')
       if (sortedArr[index].tax?.tax_rate == undefined) {
         const money =
           Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       } else {
         const money =
           Number(sortedArr[index].affterDiscount) *
           (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
           Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       }
     } else if (type == 'tax') {
       sortedArr[index].tax = value
       if (sortedArr[index].tax?.tax_rate == undefined) {
         const money =
           Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       } else {
         const money =
           Number(sortedArr[index].affterDiscount) *
           (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
           Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
+        sortedArr[index].total = Number(money.toFixed(2)) || 0
       }
     } else if (type == 'note') {
       sortedArr[index].note = value?.target?.value
     }
     setSortedArr([...sortedArr])
   }
-  const handleIncrease = (id) => {
-    const index = sortedArr.findIndex((x) => x.id === id)
-    const newQuantity = sortedArr[index].quantity + 1
-    sortedArr[index].quantity = newQuantity
-    if (sortedArr[index].tax?.tax_rate == undefined) {
-      const money = Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity)
-      sortedArr[index].total = Number(money.toFixed(2))
-    } else {
-      const money =
-        Number(sortedArr[index].affterDiscount) *
-        (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
-        Number(sortedArr[index].quantity)
-      sortedArr[index].total = Number(money.toFixed(2))
-    }
-    setSortedArr([...sortedArr])
-  }
 
-  const handleDecrease = (id) => {
-    const index = sortedArr.findIndex((x) => x.id === id)
-    const newQuantity = Number(sortedArr[index].quantity) - 1
-    if (newQuantity >= 1) {
-      // chỉ giảm số lượng khi nó lớn hơn hoặc bằng 1
-      sortedArr[index].quantity = Number(newQuantity)
-      if (sortedArr[index].tax?.tax_rate == undefined) {
-        const money =
-          Number(sortedArr[index].affterDiscount) * (1 + Number(0) / 100) * Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
-      } else {
-        const money =
-          Number(sortedArr[index].affterDiscount) *
-          (1 + Number(sortedArr[index].tax?.tax_rate) / 100) *
-          Number(sortedArr[index].quantity)
-        sortedArr[index].total = Number(money.toFixed(2))
-      }
-      setSortedArr([...sortedArr])
-    } else {
-      return isShow('error', `${'Số lượng tối thiểu'}`)
-    }
-  }
   const _HandleDelete = (id) => {
-    // Tìm item cần xóa để lấy value của nó
     const itemToDelete = sortedArr.find((x) => x.id === id)
 
-    // Lọc ra các mặt hàng còn lại trong sortedArr
     const newOption = sortedArr.filter((x) => x.id !== id)
     setSortedArr(newOption)
 
     if (itemToDelete) {
-      // Cập nhật itemAll để đồng bộ với sortedArr
       const newItemAll = itemAll.filter((item) => item.value !== itemToDelete.items.value)
       sItemAll(newItemAll)
     }
@@ -874,30 +819,39 @@ const OrderForm = (props) => {
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
 
   const caculateMoney = (option) => {
-    const total = sortedArr.reduce(
-      (accumulator, currentValue) => accumulator + currentValue?.price * currentValue?.quantity,
-      0
-    )
+    const total = sortedArr.reduce((accumulator, currentValue) => {
+      const price = Number(currentValue?.price || 0)
+      const quantity = Number(currentValue?.quantity || 0)
+      return accumulator + price * quantity
+    }, 0)
 
     const totalDiscount = sortedArr.reduce((acc, item) => {
-      const caculate = item?.price * (item?.discount / 100) * item?.quantity
-
-      return acc + caculate
+      const price = Number(item?.price || 0)
+      const discount = Number(item?.discount || 0)
+      const quantity = Number(item?.quantity || 0)
+      const caculate = price * (discount / 100) * quantity
+      return acc + (isNaN(caculate) ? 0 : caculate)
     }, 0)
 
     const totalAfftertDiscount = sortedArr.reduce((acc, item) => {
-      const caculate = item?.quantity * item?.affterDiscount
-
-      return acc + caculate
+      const quantity = Number(item?.quantity || 0)
+      const affterDiscount = Number(item?.affterDiscount || 0)
+      const caculate = quantity * affterDiscount
+      return acc + (isNaN(caculate) ? 0 : caculate)
     }, 0)
 
     const totalTax = sortedArr.reduce((acc, item) => {
-      const caculate =
-        item?.affterDiscount * (isNaN(item?.tax?.tax_rate) ? 0 : item?.tax?.tax_rate / 100) * item?.quantity
-      return acc + caculate
+      const affterDiscount = Number(item?.affterDiscount || 0)
+      const taxRate = isNaN(Number(item?.tax?.tax_rate)) ? 0 : Number(item?.tax?.tax_rate) / 100
+      const quantity = Number(item?.quantity || 0)
+      const caculate = affterDiscount * taxRate * quantity
+      return acc + (isNaN(caculate) ? 0 : caculate)
     }, 0)
 
-    const totalMoney = sortedArr.reduce((acc, item) => acc + item?.total, 0)
+    const totalMoney = sortedArr.reduce((acc, item) => {
+      const total = Number(item?.total || 0)
+      return acc + (isNaN(total) ? 0 : total)
+    }, 0)
 
     return {
       total: total || 0,
@@ -983,7 +937,7 @@ const OrderForm = (props) => {
         setSortedArr([])
         router.push(routerOrder.home)
       } else {
-        if (totalMoney.total == 0) {
+        if (newDataOption.length === 0) {
           isShow('error', `Chưa nhập thông tin mặt hàng`)
         } else {
           isShow('error', dataLang[message] || message)
@@ -1002,12 +956,17 @@ const OrderForm = (props) => {
     const existingItemIds = new Set(sortedArr.map((item) => item?.items?.value))
 
     const newData = dataItems.map((item, index) => {
-      let money = 0
-      if (item.tax?.tax_rate == undefined) {
-        money = Number(1) * (1 + Number(0) / 100) * Number(item?.quantity_left)
-      } else {
-        money = Number(item?.affterDiscount) * (1 + Number(item.tax?.tax_rate) / 100) * Number(item.quantity)
-      }
+      const itemPrice = Number(item?.price || 1)
+      const itemDiscount = Number(discount || 0)
+      const itemQuantity = idPurchases?.length ? Number(item?.quantity_left || 1) : 1
+      const itemTaxRate = Number(item?.tax?.tax_rate || 0)
+
+      // Tính affterDiscount
+      const affterDiscount = itemPrice * (1 - itemDiscount / 100)
+
+      // Tính total
+      let total = affterDiscount * (1 + itemTaxRate / 100) * itemQuantity
+      total = isNaN(total) ? 0 : Number(total.toFixed(2))
 
       return {
         id: Date.now() + index,
@@ -1017,13 +976,13 @@ const OrderForm = (props) => {
           e: item,
         },
         unit: item?.unit_name,
-        quantity: idPurchases?.length ? Number(item?.quantity_left) : 1,
-        price: item?.price || 1,
-        discount: discount ? discount : 0,
-        affterDiscount: 1,
+        quantity: itemQuantity,
+        price: itemPrice,
+        discount: itemDiscount,
+        affterDiscount: affterDiscount,
         tax: tax ? tax : 0,
         priceAffterTax: 1,
-        total: Number(money.toFixed(2)),
+        total: total,
         note: '',
       }
     })
@@ -1035,55 +994,30 @@ const OrderForm = (props) => {
     setSortedArr([...sortedArr, ...uniqueNewData])
   }
 
-  const changeItem = (e) => {
-    // Kiểm tra xem mặt hàng đã tồn tại chưa
-    const existingItemIndex = sortedArr.findIndex((item) => item?.items?.value === e?.value)
-
-    // Nếu đã tồn tại, không thêm nữa và thông báo
-    if (existingItemIndex !== -1) {
-      isShow('warning', 'Mặt hàng này đã được thêm vào danh sách')
-      return
-    }
-
-    let moneyClient = 0
-    if (e.e?.tax?.tax_rate == undefined) {
-      moneyClient = Number(1) * (1 + Number(0) / 100) * Number(e?.e?.quantity_left)
-    } else {
-      moneyClient = Number(e?.e?.affterDiscount) * (1 + Number(e?.e?.tax?.tax_rate) / 100) * Number(e?.e?.quantity)
-    }
-
-    setSortedArr([
-      ...sortedArr,
-      {
-        ...e?.e,
-        id: Date.now() + Math.random(),
-        items: e,
-        unit: e?.e?.unit_name,
-        quantity: idPurchases?.length ? Number(e?.e?.quantity_left) : 1,
-        price: e?.e?.price || 1,
-        discount: discount ? discount : 0,
-        affterDiscount: 1,
-        tax: tax ? tax : 0,
-        priceAffterTax: 1,
-        total: Number(moneyClient.toFixed(2)),
-        note: '',
-      },
-    ])
-  }
-
   const breadcrumbItems = [
     {
       label: `${dataLang?.purchase_purchase || 'purchase_purchase'}`,
-      // href: "/",
+      href: '/purchase-order/order',
     },
     {
       label: `${'Đơn hàng mua (PO)'}`,
+      href: '/purchase-order/order',
     },
     {
       label: `${'Thông tin đơn hàng mua (PO)'}`,
     },
   ]
-  console.log(sortedArr)
+
+  // Tự động chọn nhân viên hiện tại khi có dữ liệu nhân viên
+  useEffect(() => {
+    if (listDataStaff?.length > 0 && authState.staff_id && !id) {
+      const currentStaff = listDataStaff.find((staff) => staff.value === authState.staff_id)
+      if (currentStaff) {
+        sIdStaff(currentStaff)
+      }
+    }
+  }, [listDataStaff, authState.staff_id, id])
+
   return (
     <React.Fragment>
       <LayoutForm
@@ -1102,13 +1036,13 @@ const OrderForm = (props) => {
           <>
             <div className="flex items-center justify-between">
               <h2 className="responsive-text-xl font-medium text-brand-color w-full">Thông tin mặt hàng</h2>
-              <SelectSearchBar
+              <SelectSearch
                 options={[...options]}
+                placeholder={dataLang?.N_search_product || 'Tìm kiếm mặt hàng'}
+                value={itemAll}
                 onChange={(value) => {
                   _HandleChangeInput('itemAll', value)
                 }}
-                value={itemAll}
-                // menuIsOpen={true}
                 MenuList={(props) => (
                   <MenuList
                     dataItems={itemAll}
@@ -1121,7 +1055,7 @@ const OrderForm = (props) => {
                   />
                 )}
                 formatOptionLabel={(option) => (
-                  <div className="flex items-start p-2 cursor-pointer font-deca">
+                  <div className="flex items-start p-1 cursor-pointer font-deca">
                     <div className="flex items-center gap-2">
                       <img
                         src={option.e?.images ?? '/icon/noimagelogo.png'}
@@ -1149,10 +1083,9 @@ const OrderForm = (props) => {
                     </div>
                   </div>
                 )}
-                placeholder={dataLang?.N_search_product || 'Tìm kiếm mặt hàng'}
               />
             </div>
-            <div className="grid grid-cols-26 items-center z-10">
+            <div className="grid grid-cols-26 items-center">
               <h4 className="col-span-6 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_purchase_from_item || 'purchase_order_purchase_from_item'}
                 {idPurchases?.length > 0 && (
@@ -1203,7 +1136,7 @@ const OrderForm = (props) => {
                   dataLang={dataLang}
                 />
               </div>
-              <h4 className="col-span-3 responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
+              <h4 className="col-span-3 text-right responsive-text-sm font-semibold text-neutral-02 py-2 px-3">
                 {dataLang?.purchase_order_detail_after_discount || 'purchase_order_detail_after_discount'}
               </h4>
               <div className="col-span-3 px-3">
@@ -1302,108 +1235,7 @@ const OrderForm = (props) => {
                                 className="responsive-text-xs placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 w-full text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
                               />
                             </div>
-                            {/* <SelectItemComponent
-                            onInputChange={(event) => {
-                              _HandleSeachApi(event)
-                            }}
-                            options={options}
-                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'items', index)}
-                            value={e?.items}
-                            formatOptionLabel={(option) => (
-                              <div className="flex items-center justify-between py-2">
-                                <div className="flex items-center gap-2">
-                                  <div>
-                                    {option.e?.images != null ? (
-                                      <img
-                                        src={option.e?.images}
-                                        alt="Product Image"
-                                        style={{
-                                          width: '40px',
-                                          height: '50px',
-                                        }}
-                                        className="object-cover rounded"
-                                      />
-                                    ) : (
-                                      <div className="w-[50px] h-[60px] object-cover  flex items-center justify-center rounded">
-                                        <img
-                                          src="/icon/noimagelogo.png"
-                                          alt="Product Image"
-                                          style={{
-                                            width: '40px',
-                                            height: '40px',
-                                          }}
-                                          className="object-cover rounded"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    <h3 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                      {option.e?.name}
-                                    </h3>
-                                    <div className="flex gap-2">
-                                      <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.code}
-                                      </h5>
-                                      <h5 className="font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                        {option.e?.product_variation}
-                                      </h5>
-                                    </div>
-                                    <h5
-                                      className={`${
-                                        optionType == '1' ? '' : 'flex items-center gap-1'
-                                      } text-gray-400 font-normal text-xs 2xl:text-[12px] xl:text-[13px] text-[12.5px]`}
-                                    >
-                                      {dataLang[option.e?.text_type]} {optionType == '1' ? '-' : ''}{' '}
-                                      {optionType == '1' ? option.e?.purchases_code : ''}{' '}
-                                      {optionType != '1' && (
-                                        <>
-                                          <h5>-</h5>
-                                          <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                            {dataLang?.purchase_survive || 'purchase_survive'}:
-                                          </h5>
-                                          <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                            {option.e?.qty_warehouse ? option.e?.qty_warehouse : '0'}
-                                          </h5>
-                                        </>
-                                      )}
-                                    </h5>
-                                    {optionType == '1' && (
-                                      <div className="flex items-center gap-2 text-gray-400">
-                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          Số lượng:
-                                        </h5>
-                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          {formatNumber(option.e?.quantity_left)}
-                                        </h5>
-                                        {'-'}
-                                        <h5 className="text-gray-400 font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          {dataLang?.purchase_survive || 'purchase_survive'}:
-                                        </h5>
-                                        <h5 className="text-black font-normal 2xl:text-[12px] xl:text-[13px] text-[12.5px]">
-                                          {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
-                                        </h5>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            placeholder={dataLang?.purchase_items || 'purchase_items'}
-                            hideSelectedOptions={false}
-                            className="rounded-md bg-white  xl:text-base text-[14.5px] z-20 mb-2"
-                            isSearchable={true}
-                            noOptionsMessage={() => 'Không có dữ liệu'}
-                            styles={{
-                              menu: {
-                                width: '100%',
-                              },
-                            }}
-                          /> */}
                           </div>
-                          {/* <div className="flex items-center justify-center col-span-1 text-center">
-                          <h3 className="2xl:text-[12px] xl:text-[13px] text-[12.5px]">{e?.unit}</h3>
-                        </div> */}
                           <div className="col-span-4 p-1 flex items-center justify-center">
                             <div className="flex items-center justify-center">
                               <InputCustom
@@ -1426,7 +1258,7 @@ const OrderForm = (props) => {
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'price', index)}
                                 readOnly={false}
                                 className={`${
-                                  (e?.price == 0 && 'border-red-500') || (e?.price == '' && 'border-red-500')
+                                  (e?.price < 0 && 'border-red-500') || (e?.price === '' && 'border-red-500')
                                 } rounded-lg appearance-none text-center py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400`}
                               />
                               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold underline">
@@ -1447,14 +1279,23 @@ const OrderForm = (props) => {
                               </span>
                             </div>
                           </div>
-                          <h3 className="col-span-3 flex items-center justify-center px-2 responsive-text-sm font-semibold text-neutral-07">
-                            {formatNumber(e?.affterDiscount || 1)}
+                          <h3 className="col-span-3 flex gap-1 items-center justify-end px-2 responsive-text-sm font-semibold text-neutral-07">
+                            {formatNumber(e?.affterDiscount || 0)}
+                            <span className="text-neutral-07 underline">đ</span>
                           </h3>
                           <div className="col-span-3 p-1 flex items-center justify-center">
                             <SelectCustomLabel
                               placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                               options={taxOptions}
-                              value={e?.tax}
+                              value={
+                                e?.tax
+                                  ? {
+                                      label: taxOptions.find((item) => item.value === e?.tax?.value)?.label,
+                                      value: e?.tax?.value,
+                                      tax_rate: e?.tax?.tax_rate,
+                                    }
+                                  : null
+                              }
                               onChange={(value) => _HandleChangeInputOption(e?.id, 'tax', index, value)}
                               renderOption={(option, isLabel) => (
                                 <div
@@ -1478,20 +1319,9 @@ const OrderForm = (props) => {
                           </div>
                           <div className="col-span-3 flex items-center justify-end">
                             <h3 className="px-4 responsive-text-sm font-semibold text-neutral-07">
-                              {formatNumber(e?.total)} <span className="text-neutral-07 underline">đ</span>
+                              {formatNumber(Number(e?.total || 0))} <span className="text-neutral-07 underline">đ</span>
                             </h3>
-                            {/* <h3 className='px-2'>{formatNumber(e?.affterDiscount * (1 + Number(e?.tax?.tax_rate || 0) / 100) * e?.quantity)}</h3> */}
                           </div>
-                          {/* <div className="flex items-center justify-center col-span-1">
-                          <input
-                            value={e?.note}
-                            onChange={_HandleChangeInputOption.bind(this, e?.id, 'note', index)}
-                            name="optionEmail"
-                            placeholder="Ghi chú"
-                            type="text"
-                            className="focus:border-[#92BFF7] border-[#d0d5dd] 2xl:text-[12px] xl:text-[13px] text-[12.5px]  placeholder:text-slate-300 w-full bg-[#ffffff] rounded-[5.5px] text-[#52575E] font-normal p-1.5 border outline-none mb-2"
-                          />
-                        </div> */}
                           <div className="col-span-1 flex items-center justify-center">
                             <ButtonDelete onDelete={_HandleDelete.bind(this, e?.id)} />
                           </div>
