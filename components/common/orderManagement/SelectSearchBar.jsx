@@ -16,7 +16,7 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         closeMenuOnSelect={false}
         onChange={onChange}
         value={value}
-        menuIsOpen={menuIsOpen}
+        // menuIsOpen={menuIsOpen}
         isMulti
         maxShowMuti={0}
         components={{ MenuList, MultiValue }}
