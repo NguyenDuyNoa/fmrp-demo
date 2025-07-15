@@ -29,7 +29,7 @@ const SelectCustomLabel = ({
           renderOption(opt, isLabel)
         ) : (
           <div className={`text-[#1C252E] ${isLabel ? 'py-[3px]' : ''} `}>
-            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-bold">
+            <h2 className="3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px] leading-normal font-semibold">
               {opt?.warehouse_name}
             </h2>
             <div className="flex gap-1">

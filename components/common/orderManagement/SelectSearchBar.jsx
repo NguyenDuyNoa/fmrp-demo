@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 import { CiSearch } from 'react-icons/ci'
 import Select from 'react-select'
 
-const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder, setSearch }) => {
+const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel, placeholder, setSearch, props }) => {
   const handleSeachApiProductItems = debounce(async (e) => {
     setSearch(e)
   }, 500)
@@ -19,7 +19,9 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         // menuIsOpen={menuIsOpen}
         isMulti
         maxShowMuti={0}
-        components={{ MenuList, MultiValue }}
+        {...(MenuList && {
+          components: { MenuList, MultiValue },
+        })}
         formatOptionLabel={formatOptionLabel}
         placeholder={placeholder}
         hideSelectedOptions={false}
@@ -30,6 +32,7 @@ const SelectSearchBar = ({ options, onChange, value, MenuList, formatOptionLabel
         onInputChange={(event) => {
           setSearch && handleSeachApiProductItems(event)
         }}
+        {...props}
         style={{
           border: 'none',
           boxShadow: 'none',

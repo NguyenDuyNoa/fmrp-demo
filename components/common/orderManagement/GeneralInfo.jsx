@@ -43,11 +43,10 @@ export const DocumentDate = ({ dataLang, value, onChange, errDate }) => (
             format: 'HH:mm',
           }}
           suffixIcon={null}
-          value={dayjs(value)}
+          value={value ? dayjs(value) : null}
           onChange={(date) => {
             if (date) {
-              const dateString = date.toDate().toString()
-              onChange(dateString)
+              onChange(date.toDate())
             }
           }}
         />
