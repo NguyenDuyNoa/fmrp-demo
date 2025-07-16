@@ -866,7 +866,7 @@ const DeliveryReceiptForm = (props) => {
       )
     )
     const hasNullPrice = listData.some((item) =>
-      item.child?.some((childItem) => childItem.price === null || childItem.price === '' || childItem.price == 0)
+      item.child?.some((childItem) => childItem.price === null || childItem.price === '')
     )
 
     const isTotalExceeded = listData?.some(
@@ -1144,7 +1144,7 @@ const DeliveryReceiptForm = (props) => {
                                             ? 'border-red-500'
                                             : errSurvive
                                             ? ' border-red-500'
-                                            : 'border-neutral-N400'
+                                            : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                         }  ${
                                           (ce?.quantity == 0 && 'border-red-500') ||
                                           (ce?.quantity == '' && 'border-red-500')
@@ -1157,7 +1157,7 @@ const DeliveryReceiptForm = (props) => {
                                             ce?.quantity === null ||
                                             ce?.quantity === 0
                                           }
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                         >
                                           <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -1193,7 +1193,7 @@ const DeliveryReceiptForm = (props) => {
                                           }}
                                         />
                                         <button
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                         >
                                           <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -1232,14 +1232,12 @@ const DeliveryReceiptForm = (props) => {
                                     {/* Đơn giá */}
                                     <div
                                       className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
-                                        errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                        errPrice && (ce?.price === null || ce?.price === '')
                                           ? 'border-red-500'
-                                          : errSurvivePrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                          : errSurvivePrice && (ce?.price === null || ce?.price === '')
                                           ? 'border-red-500'
-                                          : 'border-neutral-N400'
-                                      } ${
-                                        (ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')
-                                      } `}
+                                          : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                      } ${ce?.price === '' || (ce?.price === null && 'border-red-500')} `}
                                     >
                                       <InPutMoneyFormat
                                         className={`appearance-none text-center responsive-text-sm font-semibold w-full focus:outline-none `}
@@ -1247,15 +1245,17 @@ const DeliveryReceiptForm = (props) => {
                                         isAllowed={isAllowedNumber}
                                         value={ce?.price}
                                         isSuffix=" đ"
+                                        allowNegative={false}
                                       />
                                     </div>
                                     {/* % Chiết khấu */}
-                                    <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                    <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border focus:border-brand-color hover:border-brand-color border-neutral-N400 responsive-text-sm font-semibold">
                                       <InPutNumericFormat
                                         className="appearance-none w-full focus:outline-none text-right"
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                         value={ce?.discount}
                                         isAllowed={isAllowedDiscount}
+                                        allowNegative={false}
                                       />
                                       <span className="2xl:pl-1">%</span>
                                     </div>
@@ -1386,36 +1386,32 @@ const DeliveryReceiptForm = (props) => {
 
           {/* Địa chỉ giao hàng */}
           <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <div className="w-full flex">
-                <div className="relative flex flex-col select-with-radio">
-                  <SelectWithRadio
-                    isRequired={true}
-                    label={dataLang?.address || 'address'}
-                    placeholderText="Chọn địa chỉ giao hàng"
-                    options={dataAddress}
-                    value={idAddress}
-                    onChange={(value) => {
-                      const newValue = dataAddress.find((item) => item.value === value)
-                      _HandleChangeInput('idAddress', newValue)
-                    }}
-                    isError={errAddress}
-                    icon={<PiMapPinLight />}
-                  />
-                  <AiFillPlusCircle
-                    onClick={() => _HandleClosePopupAddress(true)}
-                    className="text-[13px] xl:text-base right-7 xl:right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
-                  />
-                  <PopupAddress
-                    dataLang={dataLang}
-                    clientId={idClient?.value || idClient}
-                    handleFetchingAddress={_ServerFetching_Address}
-                    openPopupAddress={openPopupAddress}
-                    handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
-                    className="hidden"
-                  />
-                </div>
-              </div>
+            <div className="relative flex flex-col select-with-radio">
+              <SelectWithRadio
+                isRequired={true}
+                label={dataLang?.address || 'address'}
+                placeholderText="Chọn địa chỉ giao hàng"
+                options={dataAddress}
+                value={idAddress}
+                onChange={(value) => {
+                  const newValue = dataAddress.find((item) => item.value === value)
+                  _HandleChangeInput('idAddress', newValue)
+                }}
+                isError={errAddress}
+                icon={<PiMapPinLight />}
+              />
+              <AiFillPlusCircle
+                onClick={() => _HandleClosePopupAddress(true)}
+                className="text-[13px] xl:text-base right-7 xl:right-8 top-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
+              />
+              <PopupAddress
+                dataLang={dataLang}
+                clientId={idClient?.value || idClient}
+                handleFetchingAddress={_ServerFetching_Address}
+                openPopupAddress={openPopupAddress}
+                handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
+                className="hidden"
+              />
             </div>
             {errAddress && (
               <label className="text-sm text-red-500">
@@ -1451,11 +1447,11 @@ const DeliveryReceiptForm = (props) => {
                     errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
                   />
 
-                  {/* Người dùng */}
+                  {/* Nhân viên */}
                   <SelectWithRadio
                     isRequired={true}
-                    label={dataLang?.import_branch || 'import_branch'}
-                    placeholderText="Chọn người dùng"
+                    label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
+                    placeholderText="Chọn nhân viên"
                     options={dataStaff}
                     value={idStaff}
                     onChange={(value) => {
