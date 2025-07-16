@@ -435,13 +435,23 @@ const ReturnSalesForm = (props) => {
   }
 
   const _HandleAddParent = (value) => {
-    const checkData = listData?.some((e) => e?.matHang?.value === value?.value)
-    if (!checkData) {
-      const { parent } = _DataValueItem(value)
-      sListData([parent, ...listData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
+    const selectedValues = value?.map((item) => item?.value) || []
+
+    // Lấy danh sách đã có trong listData
+    const existingMap = new Map(
+      listData?.map((e) => [e?.matHang?.value, e]) // tạo map để tra nhanh
+    )
+
+    // Danh sách mới: nếu đã có thì dùng lại, nếu chưa có thì tạo mới bằng _DataValueItem
+    const updatedList = selectedValues.map((val) => {
+      if (existingMap.has(val)) {
+        return existingMap.get(val) // dùng lại item cũ
+      } else {
+        return _DataValueItem(value.find((v) => v?.value === val))?.parent // tạo mới
+      }
+    })
+
+    sListData(updatedList)
   }
 
   const _HandleDeleteChild = (parentId, childId) => {
@@ -557,23 +567,6 @@ const ReturnSalesForm = (props) => {
     }, 1300)
   }
 
-  const _HandleChangeValue = (parentId, value) => {
-    const checkData = listData?.some((e) => e?.matHang?.value == value?.value)
-    if (!checkData) {
-      const newData = listData?.map((e) => {
-        if (e?.id == parentId) {
-          const { parent } = _DataValueItem(value)
-          return parent
-        } else {
-          return e
-        }
-      })
-      sListData([...newData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
-  }
-
   const selectItemsLabel = (option) => {
     return (
       <div className="py-2 font-deca">
@@ -628,7 +621,7 @@ const ReturnSalesForm = (props) => {
         case 'quantity':
           return childItem.quantity == null || childItem.quantity == '' || childItem.quantity == 0
         case 'price':
-          return childItem.price == null || childItem.price === '' || childItem.price == 0
+          return childItem.price == null || childItem.price === ''
         default:
           return false
       }
@@ -756,60 +749,12 @@ const ReturnSalesForm = (props) => {
           <SelectSearch
             options={options}
             onChange={(value) => {
-              _HandleAddParent(value[0])
+              _HandleAddParent(value)
             }}
             value={listData?.map((e) => e?.matHang)}
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={dataLang?.returns_items || 'returns_items'}
           />
-          {/* <Select
-            options={options}
-            value={null}
-            onChange={_HandleAddParent.bind(this)}
-            className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
-            placeholder={dataLang?.returns_items || 'returns_items'}
-            noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-            menuPortalTarget={document.body}
-            formatOptionLabel={selectItemsLabel}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              outline: 'none',
-            }}
-            theme={(theme) => ({
-              ...theme,
-              colors: {
-                ...theme.colors,
-                primary25: '#0000000A',
-                primary50: 'transparent',
-                primary: '#C7DFFB',
-              },
-            })}
-            styles={{
-              placeholder: (base) => ({
-                ...base,
-                color: '#cbd5e1',
-              }),
-              menuPortal: (base) => ({
-                ...base,
-                // zIndex: 9999,
-              }),
-              control: (base, state) => ({
-                ...base,
-                cursor: 'pointer',
-                borderRadius: '8px',
-                borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
-                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
-              }),
-              menu: (provided, state) => ({
-                ...provided,
-                width: '100%',
-              }),
-            }}
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
-            <CiSearch className="text-white responsive-text-lg" />
-          </div> */}
         </div>
       }
       tableLeft={
@@ -970,14 +915,12 @@ const ReturnSalesForm = (props) => {
                               <div
                                 className={`relative flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
                                   errors.errQuantity &&
-                                  (ce?.quantity == null || ce?.quantity == '' || ce?.quantity == 0)
+                                  (ce?.quantity === null || ce?.quantity === '' || ce?.quantity === 0)
                                     ? 'border-red-500'
                                     : errors.errSurvive
                                     ? 'border-red-500'
-                                    : 'border-neutral-N400'
-                                } ${
-                                  (ce?.quantity == 0 && 'border-red-500') || (ce?.quantity == '' && 'border-red-500')
-                                }  `}
+                                    : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                } ${(ce?.quantity === 0 || ce?.quantity === '') && 'border-red-500'}  `}
                               >
                                 <button
                                   disabled={
@@ -986,7 +929,7 @@ const ReturnSalesForm = (props) => {
                                     ce?.quantity === null ||
                                     ce?.quantity === 0
                                   }
-                                  className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                  className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                   onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                 >
                                   <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -997,9 +940,6 @@ const ReturnSalesForm = (props) => {
                                   className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
                                   allowNegative={false}
                                   isAllowed={({ floatValue }) => {
-                                    if (floatValue == 0) {
-                                      return true
-                                    }
                                     if (+floatValue > +ce?.quantityLeft) {
                                       isShow(
                                         'error',
@@ -1014,7 +954,7 @@ const ReturnSalesForm = (props) => {
                                   }}
                                 />
                                 <button
-                                  className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                  className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5  bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                   onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                 >
                                   <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -1052,12 +992,15 @@ const ReturnSalesForm = (props) => {
                             {/* Đơn giá */}
                             <div
                               className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
-                                errors.errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                errors.errPrice && (ce?.price === null || ce?.price === '')
                                   ? 'border-red-500'
-                                  : errors.errSurvivePrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                  : errors.errSurvivePrice && (ce?.price === null || ce?.price === '')
                                   ? 'border-red-500'
-                                  : 'border-neutral-N400'
-                              } ${(ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')} `}
+                                  : 'border-neutral-N400 focus:border-brand-color hover:border-brand-color'
+                              } ${
+                                (ce?.price === null || ce?.price === '') &&
+                                'border-red-500 hover:border-red-500 focus:border-red-500'
+                              } `}
                             >
                               <InPutMoneyFormat
                                 className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
@@ -1068,7 +1011,7 @@ const ReturnSalesForm = (props) => {
                               />
                             </div>
                             {/* % Chiết khấu */}
-                            <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                            <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 focus:border-brand-color hover:border-brand-color responsive-text-sm font-semibold">
                               <InPutNumericFormat
                                 className="appearance-none w-full focus:outline-none text-right"
                                 onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}

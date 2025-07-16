@@ -1244,10 +1244,12 @@ const OrderForm = (props) => {
                                 setState={(value) => _HandleChangeInputOption(e?.id, 'quantity', e, { value })}
                                 min={1}
                                 step={1}
-                                className="p-1"
-                                classNameInput={`${
-                                  (e?.quantity == 0 && 'border-red-500') || (e?.quantity == '' && 'border-red-500')
-                                } text-center !responsive-text-sm w-full`}
+                                className={`border p-1 ${
+                                  e?.quantity === 0 || e?.quantity === ''
+                                    ? 'border-red-500'
+                                    : 'border-[#D0D5DD] focus:border-brand-color hover:border-brand-color'
+                                }`}
+                                classNameInput={`text-center !responsive-text-sm w-full`}
                                 classNameButton="size-7"
                               />
                             </div>
@@ -1260,7 +1262,7 @@ const OrderForm = (props) => {
                                 readOnly={false}
                                 className={`${
                                   (e?.price < 0 && 'border-red-500') || (e?.price === '' && 'border-red-500')
-                                } rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400`}
+                                } rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-brand-color hover:border-brand-color border border-neutral-N400`}
                               />
                               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold underline">
                                 đ
@@ -1272,7 +1274,7 @@ const OrderForm = (props) => {
                               <InPutNumericFormat
                                 value={e?.discount}
                                 onValueChange={_HandleChangeInputOption.bind(this, e?.id, 'discount', index)}
-                                className="rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-neutral-05 border border-neutral-N400"
+                                className="rounded-lg appearance-none text-right py-2 pr-5 2xl:pr-6 pl-2 text-neutral-07 responsive-text-sm font-semibold w-full focus:outline-none focus:border-brand-color hover:border-brand-color border border-neutral-N400"
                                 isAllowed={isAllowedDiscount}
                               />
                               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-07 responsive-text-sm font-semibold">

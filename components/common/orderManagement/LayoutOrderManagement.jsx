@@ -79,12 +79,14 @@ const LayoutOrderManagement = ({
                 {/* Tổng tiền */}
                 <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-black-color">
                   <h4 className="w-full">{dataLang?.price_quote_total || 'price_quote_total'}</h4>
-                  <span>{isTotalMoney?.totalPrice ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
+                  <span>{isTotalMoney?.totalPrice != null ? formatMoney(isTotalMoney.totalPrice) : '-'}</span>
                 </div>
                 {/* Tiền chiết khấu */}
                 <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_discount || 'sales_product_discount'}</h4>
-                  <span>{isTotalMoney?.totalDiscountPrice ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}</span>
+                  <span>
+                    {isTotalMoney?.totalDiscountPrice != null ? formatMoney(isTotalMoney.totalDiscountPrice) : '-'}
+                  </span>
                 </div>
                 {/* Tiền sau chiết khấu */}
                 <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
@@ -92,13 +94,15 @@ const LayoutOrderManagement = ({
                     {dataLang?.sales_product_total_money_after_discount || 'sales_product_total_money_after_discount'}
                   </h4>
                   <span>
-                    {isTotalMoney?.totalDiscountAfterPrice ? formatMoney(isTotalMoney.totalDiscountAfterPrice) : '-'}
+                    {isTotalMoney?.totalDiscountAfterPrice != null
+                      ? formatMoney(isTotalMoney.totalDiscountAfterPrice)
+                      : '-'}
                   </span>
                 </div>
                 {/* Tiền thuế */}
                 <div className="flex justify-between items-center mb-4 responsive-text-base font-normal text-secondary-color-text">
                   <h4 className="w-full">{dataLang?.sales_product_total_tax || 'sales_product_total_tax'}</h4>
-                  <span>{isTotalMoney?.totalTax ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
+                  <span>{isTotalMoney?.totalTax != null ? formatMoney(isTotalMoney.totalTax) : '-'}</span>
                 </div>
                 {/* Thành tiền */}
                 <div className="flex justify-between responsive-text-base items-center mb-4">
@@ -106,7 +110,7 @@ const LayoutOrderManagement = ({
                     {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                   </h4>
                   <span className="text-blue-color font-semibold">
-                    {isTotalMoney?.totalAmount ? formatMoney(isTotalMoney.totalAmount) : '-'}
+                    {isTotalMoney?.totalAmount != null ? formatMoney(isTotalMoney.totalAmount) : '-'}
                   </span>
                 </div>
               </div>

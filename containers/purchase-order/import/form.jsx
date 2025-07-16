@@ -5,7 +5,6 @@ import { DocumentDate, DocumentNumber } from '@/components/common/orderManagemen
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
-import MenuList from '@/components/common/orderManagement/MenuList'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
 import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
@@ -106,8 +105,6 @@ const PurchaseImportForm = (props) => {
 
   const [errSerial, sErrSerial] = useState(false)
 
-  const [itemAll, sItemAll] = useState([])
-
   const [warehouseAll, sWarehouseAll] = useState(null)
 
   const [total, setTotal] = useState({
@@ -164,6 +161,7 @@ const PurchaseImportForm = (props) => {
     queryKey: ['api_detail_page_import', id],
     queryFn: async () => {
       const rResult = await apiImport.apiDetailPageImport(id)
+      console.log('rResult', rResult)
 
       sListData(
         rResult?.items.map((e) => ({
@@ -173,7 +171,9 @@ const PurchaseImportForm = (props) => {
             label: `${e.item?.name} <span style={{display: none}}>${
               e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
             }</span>`,
-            value: e.item?.id,
+            value:
+              e.item?.purchase_order_item_id === '0' ? e.item?.id : e.item?.id + '__' + e.item?.purchase_order_item_id,
+            // value: e.item?.id,
           },
           child: e?.child.map((ce) => ({
             id: Number(ce?.id),
@@ -249,7 +249,46 @@ const PurchaseImportForm = (props) => {
     sWarehouseAll(null)
   }, [idBranch])
 
+  const _DataValueItem = (e, index) => {
+    return {
+      id: uuidv4(),
+      time: index,
+      item: e,
+      child: [
+        {
+          id_plan: e?.e?.id_plan,
+          reference_no_plan: e?.e?.reference_no_plan,
+          warehouse: null,
+          disabledDate:
+            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
+            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
+            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
+            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
+          serial: '',
+          lot: '',
+          date: null,
+          unit: e?.e?.unit_name,
+          amount: Number(e?.e?.quantity_left) || 1,
+          price: e?.e?.price,
+          discount: discount ? discount : e?.e?.discount_percent,
+          priceAfter: Number(e?.e?.price_after_discount),
+          tax: tax
+            ? tax
+            : {
+                label: e?.e?.tax_name,
+                value: e?.e?.tax_id,
+                tax_rate: e?.e?.tax_rate,
+              },
+          totalMoney: Number(e?.e?.amount),
+          note: e?.e?.note,
+        },
+      ],
+    }
+  }
+
   const _HandleChangeInput = (type, value) => {
+    console.log('_HandleChangeInput', type, value)
+
     if (type == 'code') {
       sCode(value.target.value)
     } else if (type === 'date') {
@@ -266,7 +305,6 @@ const PurchaseImportForm = (props) => {
       }
       if (listData.length === 0) {
         sIdSupplier(value)
-        sItemAll([])
         sIdTheOrder(null)
       }
     } else if (type === 'theorder') {
@@ -294,47 +332,13 @@ const PurchaseImportForm = (props) => {
     } else if (type == 'idSurplusWarehouse') {
       sIdSurplusWarehouse(value)
     } else if (type == 'itemAll') {
-      sItemAll(value)
       if (value?.length === 0) {
         sListData([])
       } else if (value?.length > 0) {
         const newData = value?.map((e, index) => {
-          return {
-            id: uuidv4(),
-            time: index,
-            item: e,
-            child: [
-              {
-                id_plan: e?.e?.id_plan,
-                reference_no_plan: e?.e?.reference_no_plan,
-                warehouse: null,
-                disabledDate:
-                  (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-                  (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-                  (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-                  (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-                serial: '',
-                lot: '',
-                date: null,
-                unit: e?.e?.unit_name,
-                amount: Number(e?.e?.quantity_left) || 1,
-                price: e?.e?.price,
-                discount: discount ? discount : e?.e?.discount_percent,
-                priceAfter: Number(e?.e?.price_after_discount),
-                tax: tax
-                  ? tax
-                  : {
-                      label: e?.e?.tax_name,
-                      value: e?.e?.tax_id,
-                      tax_rate: e?.e?.tax_rate,
-                    },
-                totalMoney: Number(e?.e?.amount),
-                note: e?.e?.note,
-              },
-            ],
-          }
+          return _DataValueItem(e, index)
         })
-        sListData(newData?.sort((a, b) => b.time - a.time))
+        sListData(newData)
       }
     } else if (type === 'warehouseAll') {
       sWarehouseAll(value)
@@ -400,7 +404,12 @@ const PurchaseImportForm = (props) => {
 
     const checkNumber = listData.some((item) =>
       item.child?.some(
-        (childItem) => childItem.price == '' || childItem.price == 0 || childItem.amount == '' || childItem.amount == 0
+        (childItem) =>
+          childItem.price === '' ||
+          childItem.price === null ||
+          childItem.amount === '' ||
+          childItem.amount === 0 ||
+          childItem.amount === null
       )
     )
     if (
@@ -452,46 +461,6 @@ const PurchaseImportForm = (props) => {
   }, [idBranch])
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
-
-  const _HandleSelectAll = () => {
-    const newData = [...options]?.map((e) => ({
-      id: uuidv4(),
-      item: e,
-      child: [
-        {
-          id_plan: e?.e?.id_plan,
-          reference_no_plan: e?.e?.reference_no_plan,
-          purchase_order_item_id: e?.e?.purchase_order_item_id,
-          id: uuidv4(),
-          disabledDate:
-            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-          warehouse: warehouseAll ? warehouseAll : null,
-          serial: '',
-          lot: '',
-          date: null,
-          unit: e?.e?.unit_name,
-          amount: Number(e?.e?.quantity_left) || 1,
-          price: e?.e?.price,
-          discount: discount ? discount : e?.e?.discount_percent,
-          priceAfter: Number(e?.e?.price_after_discount),
-          tax: tax
-            ? tax
-            : {
-                label: e?.e?.tax_name,
-                value: e?.e?.tax_id,
-                tax_rate: e?.e?.tax_rate,
-              },
-          totalMoney: Number(e?.e?.amount),
-          note: e?.e?.note,
-        },
-      ],
-    }))
-    sItemAll(newData)
-    sListData(newData)
-  }
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
@@ -815,17 +784,17 @@ const PurchaseImportForm = (props) => {
           className={`${isOnTable ? 'size-12' : 'xl:size-16 size-12'} object-cover rounded-md`}
         />
         <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
-          <h3
+          <div
             className={`font-semibold responsive-text-sm truncate ${
               isOnTable ? 'text-brand-color xl:w-fit max-w-[75px]' : 'text-black'
             }`}
           >
             {option.e?.name}
-          </h3>
+          </div>
 
-          <h5 className={`${isOnTable ? 'text-neutral-03' : 'text-blue-color'} truncate`}>
+          <div className={`${isOnTable ? 'text-neutral-03' : 'text-blue-color'} flex flex-wrap`}>
             {option.e?.code}: {option?.e?.product_variation}
-          </h5>
+          </div>
 
           <div className="flex flex-wrap items-center text-neutral-03">
             {isOnTable && `ĐVT: ${option.e?.unit_name} - `} {dataLang[option.e?.text_type]} -{' '}
@@ -850,15 +819,7 @@ const PurchaseImportForm = (props) => {
         <SelectSearch
           options={options}
           onChange={_HandleChangeInput.bind(this, 'itemAll')}
-          value={itemAll.value ? itemAll?.value : listData?.map((e) => e?.item)}
-          MenuList={(props) => (
-            <MenuList
-              dataItems={itemAll}
-              handleSelectAll={_HandleSelectAll.bind(this)}
-              handleDeleteAll={() => sListData([])}
-              {...props}
-            />
-          )}
+          value={listData?.map((e) => e?.item)}
           formatOptionLabel={(option) => selectItemsLabel(option)}
           placeholder={dataLang?.import_click_items || 'import_click_items'}
           setSearch={setInputValue}
@@ -880,15 +841,15 @@ const PurchaseImportForm = (props) => {
                     className={`${
                       dataProductSerial?.is_enable == '1'
                         ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                          ? 'grid-cols-11'
+                          ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
                           : dataMaterialExpiry?.is_enable == '1'
                           ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
-                          : 'grid-cols-9'
+                          : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,0.2fr)]'
                         : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                         ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
                         : dataMaterialExpiry?.is_enable == '1'
-                        ? 'grid-cols-10'
-                        : 'grid-cols-8'
+                        ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                        : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,0.2fr)]'
                     } grid items-center gap-3`}
                   >
                     <Dropdown
@@ -1007,15 +968,15 @@ const PurchaseImportForm = (props) => {
                                 className={`${
                                   dataProductSerial?.is_enable == '1'
                                     ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                      ? 'grid-cols-11'
+                                      ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
                                       : dataMaterialExpiry?.is_enable == '1'
                                       ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
-                                      : 'grid-cols-9'
+                                      : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,0.2fr)]'
                                     : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
                                     ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
                                     : dataMaterialExpiry?.is_enable == '1'
-                                    ? 'grid-cols-10'
-                                    : 'grid-cols-8'
+                                    ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                                    : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,0.2fr)]'
                                 } grid items-center justify-center gap-3 h-full py-1`}
                               >
                                 {e?.child?.map((ce) => (
@@ -1046,7 +1007,7 @@ const PurchaseImportForm = (props) => {
                                       )}
                                     </div>
                                     {dataProductSerial.is_enable === '1' ? (
-                                      <div className="col-span-1 ">
+                                      <div className="col-span-1">
                                         <div className="flex justify-center flex-col items-center">
                                           <input
                                             value={ce?.serial}
@@ -1056,8 +1017,10 @@ const PurchaseImportForm = (props) => {
                                                 ? 'bg-gray-50'
                                                 : errSerial && (ce?.serial == '' || ce?.serial == null)
                                                 ? 'border-red-500'
-                                                : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                                            } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
+                                                : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                            } placeholder:text-secondary-color-text-disabled w-full rounded-lg font-normal p-2 outline-none responsive-text-sm ${
+                                              e?.item?.e?.text_type != 'products' ? 'cursor-not-allowed' : 'cursor-text'
+                                            }`}
                                             onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'serial')}
                                           />
                                         </div>
@@ -1118,11 +1081,13 @@ const PurchaseImportForm = (props) => {
                                     {/* Số lượng */}
                                     <div
                                       className={`flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
-                                        ce?.amount == 0 || ce?.amount == '' ? 'border-red-500' : 'border-neutral-N400'
+                                        ce?.amount === '' || ce?.amount === null || ce?.amount === 0
+                                          ? 'border-red-500'
+                                          : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                       }`}
                                     >
                                       <button
-                                        className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                        className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
                                         onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                       >
                                         <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
@@ -1132,9 +1097,10 @@ const PurchaseImportForm = (props) => {
                                         value={ce?.amount}
                                         isAllowed={isAllowedNumber}
                                         className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                        allowNegative={false}
                                       />
                                       <button
-                                        className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                        className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
                                         onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                       >
                                         <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
@@ -1143,7 +1109,7 @@ const PurchaseImportForm = (props) => {
                                     {/* Đơn giá */}
                                     <div
                                       className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
-                                        ce?.price == 0 || ce?.price == ''
+                                        ce?.price === '' || ce?.price === null
                                           ? 'border-red-500'
                                           : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                       }`}
@@ -1153,6 +1119,7 @@ const PurchaseImportForm = (props) => {
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
                                         value={ce?.price}
                                         isSuffix=" đ"
+                                        allowNegative={false}
                                       />
                                     </div>
                                     {/* % CK */}
@@ -1162,6 +1129,7 @@ const PurchaseImportForm = (props) => {
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                         value={ce?.discount}
                                         isAllowed={isAllowedDiscount}
+                                        allowNegative={false}
                                       />
                                     </div>
                                     {/* Đơn giá sau CK */}

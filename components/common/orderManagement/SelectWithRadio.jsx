@@ -133,7 +133,7 @@ const SelectWithRadio = ({
           </Select>
         </div>
       </div>
-      {isError && <label className="text-sm text-red-500">{errMess}</label>}
+      {isError && errMess && <label className="text-sm text-red-500">{errMess}</label>}
     </div>
   )
 }

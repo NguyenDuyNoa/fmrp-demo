@@ -95,7 +95,7 @@ const SelectSearch = ({ options, onChange, value, MenuList, formatOptionLabel, p
           onBlur={() => !isOpen && setIsFocused(false)}
         />
 
-        <div 
+        <div
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1 rounded-lg cursor-pointer"
           onClick={(e) => {
             e.stopPropagation()
@@ -108,7 +108,7 @@ const SelectSearch = ({ options, onChange, value, MenuList, formatOptionLabel, p
 
       {/* Dropdown */}
       {isOpen && (
-        <Customscrollbar className="absolute left-0 right-0 top-full mt-1 max-h-[400px] overflow-y-auto bg-white border rounded-lg shadow-[0_20px_40px_-4px_#919EAB3D,0_0_2_0_#919EAB3D] z-50">
+        <Customscrollbar className="absolute left-0 right-0 top-full mt-1 max-h-[400px] bg-white border rounded-lg shadow-[0_20px_40px_-4px_#919EAB3D,0_0_2_0_#919EAB3D] z-50">
           <div className="2xl:p-6 p-5 pl-4 flex items-center justify-between gap-4">
             <CheckboxDefault
               label={'Chọn mặt hàng'}

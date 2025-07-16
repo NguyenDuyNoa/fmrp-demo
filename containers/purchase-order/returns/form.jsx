@@ -23,7 +23,6 @@ import { useTaxList } from '@/hooks/common/useTaxs'
 import { useTreatmentList } from '@/hooks/common/useTreatment'
 import useFeature from '@/hooks/useConfigFeature'
 import useSetingServer from '@/hooks/useConfigNumber'
-import useStatusExprired from '@/hooks/useStatusExprired'
 import useToast from '@/hooks/useToast'
 import { useToggle } from '@/hooks/useToggle'
 import { isAllowedDiscount, isAllowedNumber } from '@/utils/helpers/common'
@@ -31,7 +30,7 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQueries, useQuery } from '@tanstack/react-query'
 import { Add, Minus, TableDocument } from 'iconsax-react'
 import moment from 'moment/moment'
 import Image from 'next/image'
@@ -44,7 +43,6 @@ import { useSelector } from 'react-redux'
 import { routerReturns } from 'routers/buyImportGoods'
 import { v4 as uuidv4 } from 'uuid'
 import { useReturnItemsBySupplier } from './hooks/useReturnItemsBySupplier'
-import { useReturnQuantitiStock } from './hooks/useReturnQuantitiStock'
 
 const PurchaseReturnsForm = (props) => {
   const router = useRouter()
@@ -56,8 +54,6 @@ const PurchaseReturnsForm = (props) => {
   const dataLang = props?.dataLang
 
   const dataSeting = useSetingServer()
-
-  const statusExprired = useStatusExprired()
 
   const { isOpen, isKeyState, handleQueryId } = useToggle()
 
@@ -78,7 +74,7 @@ const PurchaseReturnsForm = (props) => {
   //new
   const [listData, sListData] = useState([])
 
-  const [idParen, sIdParent] = useState(null)
+  const [parents, sParents] = useState([])
 
   const [qtyHouse, sQtyHouse] = useState(null)
 
@@ -104,8 +100,6 @@ const PurchaseReturnsForm = (props) => {
 
   const [errSurvive, sErrSurvive] = useState(false)
 
-  const [warehouseAll, sWarehouseAll] = useState(null)
-
   const { dataMaterialExpiry, dataProductExpiry, dataProductSerial } = useFeature()
 
   const { data: dataTasxes = [] } = useTaxList()
@@ -127,7 +121,27 @@ const PurchaseReturnsForm = (props) => {
 
   const dataSupplier = idBranch ? listSupplier?.rResult?.map((e) => ({ label: e?.name, value: e?.id, e })) : []
 
-  const { data: dataWarehouse = [] } = useReturnQuantitiStock(idParen, idBranch)
+  // Lấy danh sách kho theo từng parent id
+  const queries = parents.map((item) => ({
+    queryKey: ['api_quantity_stock_id', item.id, idBranch],
+    queryFn: async () => {
+      const result = await apiReturns.apiQuantityStock(item.id, { params: { 'filter[branch_id]': idBranch?.value } })
+
+      return result?.map((e) => ({
+        parentId: item.id,
+        label: e?.name,
+        value: e?.id,
+        warehouse_name: e?.warehouse_name,
+        qty: e?.quantity,
+      }))
+    },
+    enabled: !!parents,
+    ...optionsQuery,
+  }))
+
+  const results = useQueries({ queries })
+
+  const dataWarehouses = results.flatMap((query) => query.data ?? [])
 
   const [isTotalMoney, sIsTotalMoney] = useState({
     totalPrice: 0,
@@ -160,10 +174,13 @@ const PurchaseReturnsForm = (props) => {
     router.query && sIdSupplier(null)
   }, [router.query])
 
+  const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
+
   const { isFetching } = useQuery({
     queryKey: ['api_detailpage', id],
     queryFn: async () => {
       const rResult = await apiReturns.apiDetailPageReturns(id)
+
       sListData(
         rResult?.items.map((e) => ({
           id: e?.item?.id,
@@ -200,7 +217,7 @@ const PurchaseReturnsForm = (props) => {
             tax: {
               tax_rate: ce?.tax_rate,
               value: ce?.tax_id,
-              label: ce?.tax_name,
+              label: taxOptions.find((tax) => tax.value === ce?.tax_id)?.label,
             },
             note: ce?.note,
           })),
@@ -215,7 +232,13 @@ const PurchaseReturnsForm = (props) => {
           return obj
         }, {})
 
-      sIdParent(checkQty?.id)
+      const checkQty1 = rResult?.items?.map((e) => ({
+        id: e?.item?.id,
+        qty: Number(e?.item?.quantity_left),
+      }))
+
+      sParents(checkQty1)
+
       sQtyHouse(checkQty?.qty)
       sCode(rResult?.code)
       sIdBranch({
@@ -337,7 +360,6 @@ const PurchaseReturnsForm = (props) => {
       } else {
         sIdBranch(value)
         sIdSupplier(null)
-        sWarehouseAll(null)
       }
     } else if (type == 'tax') {
       sTax(value)
@@ -367,6 +389,36 @@ const PurchaseReturnsForm = (props) => {
   const handleTimeChange = (date) => {
     sStartDate(date)
   }
+
+  useEffect(() => {
+    sErrDate(false)
+  }, [date != null])
+
+  useEffect(() => {
+    sErrSupplier(false)
+  }, [idSupplier != null])
+
+  useEffect(() => {
+    sErrBranch(false)
+  }, [idBranch != null])
+
+  useEffect(() => {
+    sErrTreatment(false)
+  }, [idTreatment != null])
+
+  const formatNumber = (number) => {
+    return formatNumberConfig(+number, dataSeting)
+  }
+
+  const formatMoney = (number) => {
+    return formatMoneyConfig(+number, dataSeting)
+  }
+
+  const handingReturn = useMutation({
+    mutationFn: (data) => {
+      return apiReturns.apiHandingReturn(id, data)
+    },
+  })
 
   const _HandleSubmit = (e) => {
     e.preventDefault()
@@ -422,35 +474,6 @@ const PurchaseReturnsForm = (props) => {
       sOnSending(true)
     }
   }
-  useEffect(() => {
-    sErrDate(false)
-  }, [date != null])
-
-  useEffect(() => {
-    sErrSupplier(false)
-  }, [idSupplier != null])
-
-  useEffect(() => {
-    sErrBranch(false)
-  }, [idBranch != null])
-
-  useEffect(() => {
-    sErrTreatment(false)
-  }, [idTreatment != null])
-
-  const formatNumber = (number) => {
-    return formatNumberConfig(+number, dataSeting)
-  }
-
-  const formatMoney = (number) => {
-    return formatMoneyConfig(+number, dataSeting)
-  }
-
-  const handingReturn = useMutation({
-    mutationFn: (data) => {
-      return apiReturns.apiHandingReturn(id, data)
-    },
-  })
 
   const _ServerSending = () => {
     let formData = new FormData()
@@ -484,6 +507,7 @@ const PurchaseReturnsForm = (props) => {
         formData.append(`items[${index}][child][${childIndex}][discount_percent]`, childItem?.discount)
       })
     })
+
     handingReturn.mutate(formData, {
       onSuccess: ({ isSuccess, message }) => {
         if (isSuccess) {
@@ -552,47 +576,60 @@ const PurchaseReturnsForm = (props) => {
     })
     sListData(newData)
   }
-  const _HandleAddParent = (value) => {
-    const checkData = listData?.some((e) => e?.item?.value === value?.value)
-    if (!checkData) {
-      sIdParent(value?.value)
-      sQtyHouse(value?.e?.quantity_left)
-      const newData = {
-        id: Date.now(),
-        item: value,
-        child: [
-          {
-            id: uuidv4(),
-            disabledDate:
-              (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-              (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-              (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-              (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-            kho: null,
-            unit: value?.e?.unit_name,
-            quantityLeft: Number(value?.e?.quantity_left),
-            quantityReturned: Number(value?.e?.quantity_returned),
-            quantityCreate: Number(value?.e?.quantity_create),
-            price: Number(value?.e?.price),
-            amount: Number(value?.e?.quantity_left),
-            discount: discount ? discount : Number(value?.e?.discount_percent),
-            priceAfter: Number(value?.e?.price_after_discount),
-            tax: tax
-              ? tax
-              : {
-                  label: value?.e?.tax_name == null ? 'Miễn thuế' : value?.e?.tax_name,
-                  value: value?.e?.tax_id,
-                  tax_rate: value?.e?.tax_rate,
-                },
-            totalMoney: Number(value?.e?.amount),
-            note: value?.e?.note,
-          },
-        ],
-      }
-      sListData([newData, ...listData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
+
+  const _DataValueItem = (value) => {
+    return {
+      id: value.value,
+      item: value,
+      child: [
+        {
+          id: uuidv4(),
+          disabledDate:
+            (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
+            (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
+            (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
+            (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
+          kho: null,
+          unit: value?.e?.unit_name,
+          quantityLeft: Number(value?.e?.quantity_left),
+          quantityReturned: Number(value?.e?.quantity_returned),
+          quantityCreate: Number(value?.e?.quantity_create),
+          price: Number(value?.e?.price),
+          amount: Number(value?.e?.quantity_left),
+          discount: discount ? discount : Number(value?.e?.discount_percent),
+          priceAfter: Number(value?.e?.price_after_discount),
+          tax: tax
+            ? tax
+            : {
+                label: value?.e?.tax_name == null ? 'Miễn thuế' : value?.e?.tax_name,
+                value: value?.e?.tax_id,
+                tax_rate: value?.e?.tax_rate,
+              },
+          totalMoney: Number(value?.e?.amount),
+          note: value?.e?.note,
+        },
+      ],
     }
+  }
+
+  const _HandleAddParent = (value) => {
+    const firstItem = value?.[0]
+    if (firstItem) {
+      sQtyHouse(firstItem?.e?.quantity_left) // Đang bị sai
+    }
+
+    sParents(value?.map((e) => ({ id: e?.value, qty: Number(e?.e?.quantity_left) })))
+
+    // Tạo Map để tra xem item đã có trong listData chưa
+    const existingMap = new Map(listData?.map((e) => [e?.item?.value, e]))
+
+    // Tạo danh sách cập nhật
+    const updatedList = value?.map((item) => {
+      const existing = existingMap.get(item?.value)
+      return existing ? existing : _DataValueItem(item)
+    })
+
+    sListData(updatedList)
   }
 
   const _HandleDeleteChild = (parentId, childId) => {
@@ -650,38 +687,6 @@ const PurchaseReturnsForm = (props) => {
               sErrSurvive(false)
               ce.amount = Number(value?.value)
               FunCheckQuantity(parentId, childId)
-              // const totalSoLuong = e.child.reduce((sum, opt) => sum + parseFloat(opt?.amount || 0), 0);
-              // if (totalSoLuong > qtyHouse) {
-              //     e.child.forEach((opt, optIndex) => {
-              //         const currentValue = ce.amount; // Lưu giá trị hiện tại
-              //         ce.amount = "";
-              //         if (optIndex === index) {
-              //             ce.amount = currentValue; // Gán lại giá trị hiện tại
-              //         }
-              //     });
-              //     Toast.fire({
-              //         title: `Tổng số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-              //             qtyHouse
-              //         )} số lượng còn lại`,
-              //         icon: "error",
-              //         confirmButtonColor: "#296dc1",
-              //         cancelButtonColor: "#d33",
-              //         confirmButtonText: dataLang?.aler_yes,
-              //         timer: 3000,
-              //     });
-              //     ce.amount = "" || null;
-              //     setTimeout(() => {
-              //         sLoad(true);
-              //     }, 500);
-              //     setTimeout(() => {
-              //         sLoad(false);
-              //     }, 1000);
-              //     return { ...ce };
-              // } else {
-              //     sLoad(false);
-              //     console.log(" ce.amount", ce.amount);
-              //     return { ...ce };
-              // }
               return { ...ce }
             } else if (type === 'increase') {
               sErrSurvive(false)
@@ -813,6 +818,7 @@ const PurchaseReturnsForm = (props) => {
       </div>
     </div>
   )
+  console.log('listData', listData)
 
   return (
     <LayoutOrderManagement
@@ -830,136 +836,15 @@ const PurchaseReturnsForm = (props) => {
       }
       searchBar={
         <div className="flex flex-col w-full">
-          {/* <SelectSearchBar
-            options={dataItems}
-            onChange={_HandleAddParent.bind(this)}
-            value={null}
-            formatOptionLabel={(option) => selectItemsLabel(option)}
-            placeholder={dataLang?.returns_items || 'returns_items'}
-          /> */}
           <SelectSearch
             options={dataItems}
             onChange={(value) => {
-              _HandleAddParent(value[0])
+              _HandleAddParent(value)
             }}
-            value={null}
+            value={listData?.map((e) => e?.item)}
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={dataLang?.returns_items || 'returns_items'}
           />
-          {/* <SelectCore
-            options={dataItems}
-            value={null}
-            onChange={_HandleAddParent.bind(this)}
-            className="col-span-2 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]"
-            placeholder={dataLang?.returns_items || 'returns_items'}
-            noOptionsMessage={() => dataLang?.returns_nodata || 'returns_nodata'}
-            menuPortalTarget={document.body}
-            formatOptionLabel={(option) => (
-              <div className="py-2">
-                <div className="flex items-center ">
-                  <div className="w-[40px] h-[50px]">
-                    {option.e?.images != null ? (
-                      <img
-                        src={option.e?.images}
-                        alt="Product Image"
-                        className="max-w-[40px] h-[50px] text-[8px] object-cover rounded"
-                      />
-                    ) : (
-                      <div className=" w-[40px] h-[50px] object-cover  flex items-center justify-center rounded">
-                        <img
-                          src="/icon/noimagelogo.png"
-                          alt="Product Image"
-                          className="w-[30px] h-[30px] object-cover rounded"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                      {option.e?.name}
-                    </h3>
-                    <div className="flex gap-2">
-                      <h5 className="text-gray-400 font-normal 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                        {option.e?.code}
-                      </h5>
-                      <h5 className="font-medium 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                        {option.e?.product_variation}
-                      </h5>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                        {option.e?.import_code} -{' '}
-                      </h5>
-                      <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                        {`(ĐGSCK: ${formatMoney(option.e?.price_after_discount)}) -`}
-                      </h5>
-                      <h5 className="text-gray-400 font-medium text-xs 3xl:text-[12px] 2xl:text-[10px] xl:text-[9.5px] text-[9px]">
-                        {dataLang[option.e?.text_type]}
-                      </h5>
-                    </div>
-
-                    <div className="flex items-center gap-2 italic">
-                      {dataProductSerial.is_enable === '1' && (
-                        <div className="text-[11px] text-[#667085] font-[500]">
-                          Serial: {option.e?.serial ? option.e?.serial : '-'}
-                        </div>
-                      )}
-                      {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
-                        <>
-                          <div className="text-[11px] text-[#667085] font-[500]">
-                            Lot: {option.e?.lot ? option.e?.lot : '-'}
-                          </div>
-                          <div className="text-[11px] text-[#667085] font-[500]">
-                            Date:{' '}
-                            {option.e?.expiration_date
-                              ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                              : '-'}
-                          </div>
-                        </>
-                      ) : (
-                        ''
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              outline: 'none',
-            }}
-            theme={(theme) => ({
-              ...theme,
-              colors: {
-                ...theme.colors,
-                primary25: '#EBF5FF',
-                primary50: '#92BFF7',
-                primary: '#0F4F9E',
-              },
-            })}
-            styles={{
-              placeholder: (base) => ({
-                ...base,
-                color: '#cbd5e1',
-              }),
-              menuPortal: (base) => ({
-                ...base,
-                // zIndex: 9999,
-              }),
-              control: (base, state) => ({
-                ...base,
-                ...(state.isFocused && {
-                  border: '0 0 0 1px #92BFF7',
-                  boxShadow: 'none',
-                }),
-              }),
-              menu: (provided, state) => ({
-                ...provided,
-                width: '150%',
-              }),
-            }}
-          /> */}
         </div>
       }
       tableLeft={
@@ -994,7 +879,7 @@ const PurchaseReturnsForm = (props) => {
                       value={tax}
                       onChange={_HandleChangeInput.bind(this, 'tax')}
                       dataLang={dataLang}
-                      taxOptions={[{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]}
+                      taxOptions={taxOptions}
                     />
 
                     <TableHeader className="text-right">
@@ -1070,7 +955,7 @@ const PurchaseReturnsForm = (props) => {
                                         <SelectCustomLabel
                                           dataLang={dataLang}
                                           placeholder={dataLang?.returns_point || 'returns_point'}
-                                          options={dataWarehouse}
+                                          options={dataWarehouses.filter((o) => o.parentId === e.id)}
                                           value={ce?.kho}
                                           onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'kho')}
                                           isError={
@@ -1110,14 +995,14 @@ const PurchaseReturnsForm = (props) => {
                                       {/* Số lượng */}
                                       <div
                                         className={`relative flex items-center justify-center 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
-                                          errAmount && (ce?.amount == null || ce?.amount == '' || ce?.amount == 0)
+                                          errAmount && (ce?.amount === null || ce?.amount === '' || ce?.amount === 0)
                                             ? 'border-red-500'
                                             : errSurvive
                                             ? 'border-red-500'
-                                            : 'border-neutral-N400'
+                                            : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                         } ${
-                                          ce?.amount == null || ce?.amount == '' || ce?.amount == 0
-                                            ? 'border-red-500'
+                                          ce?.amount === null || ce?.amount === '' || ce?.amount === 0
+                                            ? 'border-red-500 hover:border-red-500 focus:border-red-500'
                                             : ''
                                         }`}
                                       >
@@ -1128,7 +1013,7 @@ const PurchaseReturnsForm = (props) => {
                                             ce?.amount === null ||
                                             ce?.amount === 0
                                           }
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                         >
                                           <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
@@ -1150,9 +1035,10 @@ const PurchaseReturnsForm = (props) => {
                                             }
                                             return floatValue <= ce?.quantityLeft
                                           }}
+                                          allowNegative={false}
                                         />
                                         <button
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                         >
                                           <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
@@ -1192,27 +1078,29 @@ const PurchaseReturnsForm = (props) => {
                                       {/* Đơn giá */}
                                       <div
                                         className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
-                                          ce?.price == 0 || ce?.price == '' || ce?.price == null
+                                          ce?.price === '' || ce?.price === null
                                             ? 'border-red-500'
-                                            : 'border-neutral-N400'
+                                            : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                         }`}
                                       >
                                         <InPutMoneyFormat
                                           className={`appearance-none text-center responsive-text-sm font-semibold w-full focus:outline-none`}
                                           onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
                                           value={ce?.price}
+                                          allowNegative={false}
                                           isAllowed={isAllowedNumber}
                                           isSuffix=" đ"
                                         />
                                       </div>
                                       {/* % Chiết khấu */}
-                                      <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                      <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 focus:border-brand-color hover:border-brand-color responsive-text-sm font-semibold">
                                         <NumericFormat
                                           className="appearance-none w-full focus:outline-none text-right"
                                           onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                           value={ce?.discount}
                                           isAllowed={isAllowedDiscount}
                                           suffix=" %"
+                                          allowNegative={false}
                                         />
                                       </div>
                                       {/* Đơn giá sau Chiết khấu */}
@@ -1224,14 +1112,7 @@ const PurchaseReturnsForm = (props) => {
                                       <div className="flex justify-center">
                                         <SelectCustomLabel
                                           placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                          options={[
-                                            {
-                                              label: 'Miễn thuế',
-                                              value: '0',
-                                              tax_rate: '0',
-                                            },
-                                            ...dataTasxes,
-                                          ]}
+                                          options={taxOptions}
                                           value={ce?.tax}
                                           onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
                                           renderOption={(option, isLabel) => (
