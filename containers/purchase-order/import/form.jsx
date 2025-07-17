@@ -1216,6 +1216,21 @@ const PurchaseImportForm = (props) => {
             icon={<PiUsersLight />}
             errMess={dataLang?.purchase_order_errSupplier || 'purchase_order_errSupplier'}
           />
+          
+          {/* Đơn đặt hàng (PO) */}
+          <SelectWithRadio
+            isRequired={false}
+            label={dataLang?.import_the_orders || 'import_the_orders'}
+            placeholderText="Chọn đơn đặt hàng"
+            options={dataTheOrder}
+            value={idTheOrder}
+            onChange={(value) => {
+              const newValue = dataTheOrder.find((item) => item.value === value)
+              _HandleChangeInput('theorder', newValue)
+            }}
+            sSearch={sSearchOrder}
+            icon={<PiClipboardTextLight />}
+          />
           {/* Chi nhánh */}
           <SelectWithRadio
             isRequired={true}
@@ -1230,20 +1245,6 @@ const PurchaseImportForm = (props) => {
             isError={errBranch}
             icon={<PiMapPinLight />}
             errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-          />
-          {/* Đơn đặt hàng (PO) */}
-          <SelectWithRadio
-            isRequired={false}
-            label={dataLang?.import_the_orders || 'import_the_orders'}
-            placeholderText="Chọn đơn đặt hàng"
-            options={dataTheOrder}
-            value={idTheOrder}
-            onChange={(value) => {
-              const newValue = dataTheOrder.find((item) => item.value === value)
-              _HandleChangeInput('theorder', newValue)
-            }}
-            sSearch={sSearchOrder}
-            icon={<PiClipboardTextLight />}
           />
           {/* Chọn kho nhập dư (nếu có) */}
           <AnimatePresence mode="wait">

@@ -3,11 +3,11 @@ import { useClientList } from '@/containers/clients/clients/hooks/useClientList'
 import { useProvinceList } from '@/hooks/common/useAddress'
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems'
 import useActionRole from '@/hooks/useRole'
-import { Empty, Radio, Select } from 'antd'
+import { Empty, Select } from 'antd'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { PiPlus } from 'react-icons/pi'
+import { PiPlus, PiCaretDownBold } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
 import InfoFormLabel from './InfoFormLabel'
 
@@ -16,6 +16,16 @@ const { Option } = Select
 const initalState = {
   keySearch: '',
   idBranch: null,
+}
+
+const CustomRadio = ({ checked }) => {
+  return (
+    <div className="relative flex items-center justify-center">
+      <div className={`w-4 h-4 rounded-full border ${checked ? 'border-blue-color' : 'border-border-gray-1'} flex items-center justify-center`}>
+        {checked && <div className="w-2 h-2 rounded-full bg-blue-color" />}
+      </div>
+    </div>
+  )
 }
 
 const SelectWithRadio = ({
@@ -75,7 +85,7 @@ const SelectWithRadio = ({
         <div className="relative flex select-with-radio">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-[#7a7a7a]">{icon}</span>
           <Select
-            className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer select-with-radio w-full"
+            className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer select-with-radio w-full custom-select-no-bg"
             showSearch
             onSearch={handleSearch}
             placeholder={placeholderText}
@@ -84,6 +94,7 @@ const SelectWithRadio = ({
             onChange={onChange}
             onClear={onClear}
             disabled={disabled}
+            // open={true}
             filterOption={
               sSearch ? false : (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
@@ -110,21 +121,22 @@ const SelectWithRadio = ({
                     </>
                   )}
                 </div>
-                <div>{menu}</div>
+                <div className="custom-select-dropdown">
+                  {menu}
+                </div>
               </>
             )}
             optionLabelProp="label"
             status={isError ? 'error' : ''}
+            suffixIcon={<PiCaretDownBold color="#9295A4" className="size-4" />}
           >
             {options?.map((opt, index) => {
               return (
-                <Option key={opt.value} value={opt.value} label={opt.label}>
+                <Option key={opt.value} value={opt.value} label={opt.label} className={`${index !== options.length - 1 ? 'border-b border-gray-100' : ''}`}>
                   <div
-                    className={`flex items-center py-2 gap-x-2 responsive-text-base ${
-                      index !== options.length - 1 ? 'border-b border-gray-100' : ''
-                    }`}
+                    className={`flex items-center py-2 gap-x-2 responsive-text-sm font-normal text-neutral-07 `}
                   >
-                    <Radio checked={value?.value === opt.value} />
+                    <CustomRadio checked={value?.value === opt.value} />
                     {opt.label}
                   </div>
                 </Option>
@@ -134,6 +146,44 @@ const SelectWithRadio = ({
         </div>
       </div>
       {isError && errMess && <label className="text-sm text-red-500">{errMess}</label>}
+      
+      <style jsx global>{`
+        /* Loại bỏ màu nền xanh cho option được chọn */
+        .custom-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+          background-color: transparent !important;
+          color: inherit !important;
+          font-weight: normal !important;
+        }
+        
+        /* Màu xám khi hover */
+        .custom-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+          background-color: #f5f5f5 !important;
+        }
+        
+        .ant-select-dropdown .ant-select-item-option-selected {
+          background-color: transparent !important;
+          color: inherit !important;
+        }
+        
+        .ant-select-item-option-content {
+          background-color: transparent !important;
+        }
+        
+        /* Màu xám khi hover */
+        .ant-select-dropdown .ant-select-item:hover {
+          background-color: #f5f5f5 !important;
+        }
+        
+        /* Màu xám khi hover */
+        .ant-select-dropdown .ant-select-item-option-active {
+          background-color: #f5f5f5 !important;
+        }
+        
+        /* Loại bỏ màu nền xanh cho option được chọn trong dropdown */
+        .select-with-radio .ant-select-dropdown .ant-select-item-option-selected {
+          background-color: transparent !important;
+        }
+      `}</style>
     </div>
   )
 }
