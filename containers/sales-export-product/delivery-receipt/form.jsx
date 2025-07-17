@@ -6,6 +6,7 @@ import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
@@ -13,7 +14,6 @@ import EmptyData from '@/components/UI/emptyData'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
-import MultiValue from '@/components/UI/mutiValue/multiValue'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
 import { CONFIRMATION_OF_CHANGES, TITLE_DELETE_ITEMS } from '@/constants/delete/deleteItems'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
@@ -31,7 +31,7 @@ import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { PopupParent } from '@/utils/lib/Popup'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker, Empty } from 'antd'
+import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -42,16 +42,16 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { AiFillPlusCircle } from 'react-icons/ai'
 import { BsCalendarEvent } from 'react-icons/bs'
-import { CiSearch } from 'react-icons/ci'
 import { LuBriefcase } from 'react-icons/lu'
 import { PiMapPinLight, PiUser } from 'react-icons/pi'
 import { TbNotes } from 'react-icons/tb'
 import { useSelector } from 'react-redux'
-import Select, { components } from 'react-select'
+import { components } from 'react-select'
 import { routerDeliveryReceipt } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import PopupAddress from './components/PopupAddress'
 import { useDeliveryReceipItemAll } from './hooks/useDeliveryReceipItemAll'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 
 const DeliveryReceiptForm = (props) => {
   // Router and API hooks
@@ -635,16 +635,6 @@ const DeliveryReceiptForm = (props) => {
     sListData(newData)
   }
 
-  const _HandleAddParent = (value) => {
-    const checkData = listData?.some((e) => e?.matHang?.value === value?.value)
-    if (!checkData) {
-      const { parent } = _DataValueItem(value)
-      sListData([parent, ...listData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
-  }
-
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData
       .map((e) => {
@@ -777,47 +767,8 @@ const DeliveryReceiptForm = (props) => {
     const ce = e.child.find((child) => child?.id == childId)
     if (!ce) return
 
-    const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0)
-    const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
-
-    // if (checkChild > quantityAmount) {
-    //   isShow('error', `Tổng số lượng vượt quá ${formatNumber(quantityAmount)} số lượng chưa giao`)
-    //   ce.quantity = ''
-    //   HandTimeout()
-    //   sErrQuantity(true)
-    // }
-    // if (checkChild > +ce?.warehouse?.qty) {
-    //   isShow('error', `Tổng số lượng vượt quá ${formatNumber(+ce?.warehouse?.qty)} số lượng tồn`)
-    //   ce.quantity = ''
-    //   sErrQuantity(true)
-    //   HandTimeout()
-    // }
-  }
-
-  const HandTimeout = () => {
-    setTimeout(() => {
-      sLoad(true)
-    }, 500)
-    setTimeout(() => {
-      sLoad(false)
-    }, 1000)
-  }
-
-  const _HandleChangeValue = (parentId, value) => {
-    const checkData = listData?.some((e) => e?.matHang?.value === value?.value)
-    if (!checkData) {
-      const newData = listData?.map((e) => {
-        if (e?.id === parentId) {
-          const { parent } = _DataValueItem(value)
-          return parent
-        } else {
-          return e
-        }
-      })
-      sListData([...newData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
+    // const checkChild = e.child.reduce((sum, opt) => sum + parseFloat(opt?.quantity || 0), 0)
+    // const quantityAmount = +ce?.quantityStock - +ce?.quantityDelive
   }
 
   const handleSelectAll = (type) => {
@@ -916,7 +867,7 @@ const DeliveryReceiptForm = (props) => {
       )
     )
     const hasNullPrice = listData.some((item) =>
-      item.child?.some((childItem) => childItem.price === null || childItem.price === '' || childItem.price == 0)
+      item.child?.some((childItem) => childItem.price === null || childItem.price === '')
     )
 
     const isTotalExceeded = listData?.some(
@@ -1050,60 +1001,15 @@ const DeliveryReceiptForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={id ? 'Sửa Phiếu Giao Hàng' : 'Thêm Phiếu Giao Hàng'}
       searchBar={
-        <div className="relative w-full">
-          <Select
+        <div className="w-full">
+          <SelectSearch
             options={idProductOrder ? options : []}
-            closeMenuOnSelect={false}
             onChange={_HandleChangeInput.bind(this, 'itemAll')}
             value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.matHang)}
-            isMulti
-            maxShowMuti={0}
-            components={{ MenuList, MultiValue }}
+            MenuList={MenuList}
             formatOptionLabel={(option) => selectItemsLabel(option)}
             placeholder={'Chọn nhanh mặt hàng'}
-            hideSelectedOptions={false}
-            className="rounded-md bg-white 3xl:text-[15px] text-[13px]"
-            isSearchable={true}
-            noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-            menuPortalTarget={document.body}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              outline: 'none',
-            }}
-            theme={(theme) => ({
-              ...theme,
-              colors: {
-                ...theme.colors,
-                primary25: '#0000000A',
-                primary50: 'transparent',
-                primary: '#C7DFFB',
-              },
-            })}
-            styles={{
-              placeholder: (base) => ({
-                ...base,
-                color: '#cbd5e1',
-              }),
-              menuPortal: (base) => ({
-                ...base,
-              }),
-              control: (base, state) => ({
-                ...base,
-                cursor: 'pointer',
-                borderRadius: '8px',
-                borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
-                boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
-              }),
-              menu: (provided, state) => ({
-                ...provided,
-                width: '100%',
-              }),
-            }}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
-            <CiSearch className="text-white responsive-text-lg" />
-          </div>
         </div>
       }
       tableLeft={
@@ -1113,7 +1019,7 @@ const DeliveryReceiptForm = (props) => {
           ) : (
             <div>
               {/* Thông tin mặt hàng Header */}
-              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 2xl:gap-5 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
+              <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-4 2xl:gap-5 items-center sticky top-0 z-10 py-2 mb-2 border-b border-gray-100">
                 <TableHeader className="text-left">{dataLang?.import_from_items || 'import_from_items'}</TableHeader>
                 <TableHeader className="text-center">Kho - Vị trí kho</TableHeader>
                 <TableHeader className="text-center">Số lượng</TableHeader>
@@ -1124,7 +1030,7 @@ const DeliveryReceiptForm = (props) => {
                   onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
                   dataLang={dataLang}
                 />
-                <TableHeader className="text-center">Đơn giá SCK</TableHeader>
+                <TableHeader className="text-center">{dataLang?.returns_sck || 'returns_sck'}</TableHeader>
                 {/* Chọn hàng loại % Thuế */}
                 <DropdownTax
                   value={generalTax}
@@ -1132,7 +1038,7 @@ const DeliveryReceiptForm = (props) => {
                   dataLang={dataLang}
                   taxOptions={taxOptions}
                 />
-                <TableHeader className="text-center">
+                <TableHeader className="text-right">
                   {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                 </TableHeader>
               </div>
@@ -1197,7 +1103,6 @@ const DeliveryReceiptForm = (props) => {
                                   value={firstChild?.note}
                                   onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
                                   placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
-                                  name="optionEmail"
                                   type="text"
                                   className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
                                 />
@@ -1212,7 +1117,7 @@ const DeliveryReceiptForm = (props) => {
                               )}
                             </div>
                             {/* Body */}
-                            <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1.2fr)] gap-4 2xl:gap-5 items-center">
+                            <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-4 2xl:gap-5 items-center">
                               {e?.child?.map((ce) => {
                                 const discountedPrice = formatMoney(
                                   Number(ce?.price) * (1 - Number(ce?.discount) / 100)
@@ -1240,7 +1145,7 @@ const DeliveryReceiptForm = (props) => {
                                             ? 'border-red-500'
                                             : errSurvive
                                             ? ' border-red-500'
-                                            : 'border-neutral-N400'
+                                            : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                         }  ${
                                           (ce?.quantity == 0 && 'border-red-500') ||
                                           (ce?.quantity == '' && 'border-red-500')
@@ -1253,7 +1158,7 @@ const DeliveryReceiptForm = (props) => {
                                             ce?.quantity === null ||
                                             ce?.quantity === 0
                                           }
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
                                         >
                                           <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -1289,7 +1194,7 @@ const DeliveryReceiptForm = (props) => {
                                           }}
                                         />
                                         <button
-                                          className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                          className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
                                           onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
                                         >
                                           <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
@@ -1297,7 +1202,7 @@ const DeliveryReceiptForm = (props) => {
                                         <div className="absolute -top-4 -right-2 p-1 cursor-pointer">
                                           <PopupParent
                                             trigger={
-                                              <div className="relative ">
+                                              <div className="relative">
                                                 <TableDocument size="18" color="#4f46e5" className="font-medium" />
                                                 <span className="h-2 w-2 absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
                                                   <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
@@ -1328,14 +1233,12 @@ const DeliveryReceiptForm = (props) => {
                                     {/* Đơn giá */}
                                     <div
                                       className={`flex items-center justify-center py-2 px-2 2xl:px-3 rounded-lg border ${
-                                        errPrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                        errPrice && (ce?.price === null || ce?.price === '')
                                           ? 'border-red-500'
-                                          : errSurvivePrice && (ce?.price == null || ce?.price == '' || ce?.price == 0)
+                                          : errSurvivePrice && (ce?.price === null || ce?.price === '')
                                           ? 'border-red-500'
-                                          : 'border-neutral-N400'
-                                      } ${
-                                        (ce?.price == 0 && 'border-red-500') || (ce?.price == '' && 'border-red-500')
-                                      } `}
+                                          : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                      } ${ce?.price === '' || (ce?.price === null && 'border-red-500')} `}
                                     >
                                       <InPutMoneyFormat
                                         className={`appearance-none text-center responsive-text-sm font-semibold w-full focus:outline-none `}
@@ -1343,27 +1246,27 @@ const DeliveryReceiptForm = (props) => {
                                         isAllowed={isAllowedNumber}
                                         value={ce?.price}
                                         isSuffix=" đ"
+                                        allowNegative={false}
                                       />
                                     </div>
                                     {/* % Chiết khấu */}
-                                    <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 responsive-text-sm font-semibold">
+                                    <div className="flex items-center justify-end py-2 px-2 2xl:px-3 rounded-lg border focus:border-brand-color hover:border-brand-color border-neutral-N400 responsive-text-sm font-semibold">
                                       <InPutNumericFormat
                                         className="appearance-none w-full focus:outline-none text-right"
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
                                         value={ce?.discount}
                                         isAllowed={isAllowedDiscount}
+                                        allowNegative={false}
                                       />
                                       <span className="2xl:pl-1">%</span>
                                     </div>
                                     {/* Đơn giá sau CK */}
-                                    <div
-                                      className={`flex items-center justify-center text-center responsive-text-sm font-semibold`}
-                                    >
+                                    <div className="flex items-center justify-center text-center responsive-text-sm font-semibold">
                                       <h3>{discountedPrice}</h3>
                                       <span className="pl-1 underline">đ</span>
                                     </div>
                                     {/* % Thuế */}
-                                    <div className="flex flex-col justify-center h-full">
+                                    <div className="flex justify-center">
                                       <SelectCustomLabel
                                         placeholder={dataLang?.import_from_tax || 'import_from_tax'}
                                         options={taxOptions}
@@ -1422,7 +1325,7 @@ const DeliveryReceiptForm = (props) => {
 
             <div className="relative w-full flex flex-row custom-date-picker date-form">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                <BsCalendarEvent color="#7a7a7a" />
+                <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
               </span>
               <ConfigProvider locale={viVN}>
                 <DatePicker
@@ -1484,36 +1387,32 @@ const DeliveryReceiptForm = (props) => {
 
           {/* Địa chỉ giao hàng */}
           <div className="flex flex-col gap-y-2">
-            <div className="flex flex-col flex-wrap items-center gap-y-3">
-              <div className="w-full flex">
-                <div className="relative flex flex-col select-with-radio">
-                  <SelectWithRadio
-                    isRequired={true}
-                    label={dataLang?.address || 'address'}
-                    placeholderText="Chọn địa chỉ giao hàng"
-                    options={dataAddress}
-                    value={idAddress}
-                    onChange={(value) => {
-                      const newValue = dataAddress.find((item) => item.value === value)
-                      _HandleChangeInput('idAddress', newValue)
-                    }}
-                    isError={errAddress}
-                    icon={<PiMapPinLight />}
-                  />
-                  <AiFillPlusCircle
-                    onClick={() => _HandleClosePopupAddress(true)}
-                    className="text-[13px] xl:text-base right-7 xl:right-8 top-1/3 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
-                  />
-                  <PopupAddress
-                    dataLang={dataLang}
-                    clientId={idClient?.value || idClient}
-                    handleFetchingAddress={_ServerFetching_Address}
-                    openPopupAddress={openPopupAddress}
-                    handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
-                    className="hidden"
-                  />
-                </div>
-              </div>
+            <div className="relative flex flex-col select-with-radio">
+              <SelectWithRadio
+                isRequired={true}
+                label={dataLang?.address || 'address'}
+                placeholderText="Chọn địa chỉ giao hàng"
+                options={dataAddress}
+                value={idAddress}
+                onChange={(value) => {
+                  const newValue = dataAddress.find((item) => item.value === value)
+                  _HandleChangeInput('idAddress', newValue)
+                }}
+                isError={errAddress}
+                icon={<PiMapPinLight />}
+              />
+              <AiFillPlusCircle
+                onClick={() => _HandleClosePopupAddress(true)}
+                className="text-[13px] xl:text-base right-7 xl:right-8 top-[60%] 2xl:scale-150 scale-125 cursor-pointer text-sky-400 hover:text-sky-500 bg-white 3xl:hover:scale-[1.7] 2xl:hover:scale-[1.6] hover:scale-150 hover:rotate-180 transition-all ease-in-out absolute "
+              />
+              <PopupAddress
+                dataLang={dataLang}
+                clientId={idClient?.value || idClient}
+                handleFetchingAddress={_ServerFetching_Address}
+                openPopupAddress={openPopupAddress}
+                handleClosePopupAddress={() => _HandleClosePopupAddress(false)}
+                className="hidden"
+              />
             </div>
             {errAddress && (
               <label className="text-sm text-red-500">
@@ -1533,6 +1432,22 @@ const DeliveryReceiptForm = (props) => {
                 className="overflow-hidden"
               >
                 <div className="flex flex-col gap-y-3">
+                  {/* Nhân viên */}
+                  <SelectWithRadio
+                    isRequired={true}
+                    label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'}
+                    placeholderText="Chọn nhân viên"
+                    options={dataStaff}
+                    value={idStaff}
+                    onChange={(value) => {
+                      const newValue = dataStaff.find((item) => item.value === value)
+                      _HandleChangeInput('idStaff', newValue)
+                    }}
+                    isError={errStaff}
+                    icon={<PiUser />}
+                    errMess={dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
+                  />
+
                   {/* Chi nhánh */}
                   <SelectWithRadio
                     isRequired={true}
@@ -1547,22 +1462,6 @@ const DeliveryReceiptForm = (props) => {
                     isError={errBranch}
                     icon={<PiMapPinLight />}
                     errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                  />
-
-                  {/* Người dùng */}
-                  <SelectWithRadio
-                    isRequired={true}
-                    label={dataLang?.import_branch || 'import_branch'}
-                    placeholderText="Chọn người dùng"
-                    options={dataStaff}
-                    value={idStaff}
-                    onChange={(value) => {
-                      const newValue = dataStaff.find((item) => item.value === value)
-                      _HandleChangeInput('idStaff', newValue)
-                    }}
-                    isError={errStaff}
-                    icon={<PiUser />}
-                    errMess={dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
                   />
                 </div>
               </motion.div>

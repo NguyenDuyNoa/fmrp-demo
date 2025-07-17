@@ -6,6 +6,7 @@ import ButtonDelete from '@/components/common/orderManagement/ButtonDelete'
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import QuantitySelector from '@/components/common/orderManagement/QuantitySelector'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import LayoutForm from '@/components/layout/LayoutForm'
@@ -21,9 +22,8 @@ import { routerInternalPlan } from '@/routers/manufacture'
 import { isAllowedNumber } from '@/utils/helpers/common'
 import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
-import { SelectCore } from '@/utils/lib/Select'
 import { useQuery } from '@tanstack/react-query'
-import { ConfigProvider, DatePicker as DatePickerAntd, Dropdown, Empty } from 'antd'
+import { ConfigProvider, DatePicker as DatePickerAntd, Dropdown } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { ArrowDown2 } from 'iconsax-react'
@@ -273,13 +273,24 @@ const InternalPlanForm = (props) => {
   }
 
   const _HandleAddParent = (value) => {
-    const checkData = listData?.some((e) => e?.item?.value === value?.value)
-    if (!checkData) {
-      const { parent } = _DataValueItem(value)
-      sListData([parent, ...listData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
+    // Tạo Map để tra xem item đã có trong listData chưa
+    const selectedValues = value?.map((item) => item?.value) || []
+
+    // Lấy danh sách đã có trong listData
+    const existingMap = new Map(
+      listData?.map((e) => [e?.item?.value, e]) // tạo map để tra nhanh
+    )
+
+    // Danh sách mới: nếu đã có thì dùng lại, nếu chưa có thì tạo mới bằng _DataValueItem
+    const updatedList = selectedValues.map((val) => {
+      if (existingMap.has(val)) {
+        return existingMap.get(val) // dùng lại item cũ
+      } else {
+        return _DataValueItem(value.find((v) => v?.value === val))?.parent // tạo mới
+      }
+    })
+
+    sListData(updatedList)
   }
 
   const _HandleDeleteParent = (parentId) => {
@@ -312,22 +323,6 @@ const InternalPlanForm = (props) => {
       return e
     })
     sListData([...newData])
-  }
-  const _HandleChangeValue = (parentId, value) => {
-    const checkData = listData?.some((e) => e?.item?.value === value?.value)
-    if (!checkData) {
-      const newData = listData?.map((e) => {
-        if (e?.id === parentId) {
-          const { parent } = _DataValueItem(value)
-          return parent
-        } else {
-          return e
-        }
-      })
-      sListData([...newData])
-    } else {
-      isShow('error', `${dataLang?.returns_err_ItemSelect || 'returns_err_ItemSelect'}`)
-    }
   }
 
   const selectItemsLabel = (option, isOnTable = false) => (
@@ -479,54 +474,16 @@ const InternalPlanForm = (props) => {
                 {dataLang?.import_item_information || 'import_item_information'}
               </div>
               <div className="relative w-full">
-                <SelectCore
+                <SelectSearch
                   options={dataItems}
-                  value={null}
-                  onInputChange={(event) => {
-                    _HandleSeachApi(event)
+                  onChange={(value) => {
+                    _HandleAddParent(value)
                   }}
-                  onChange={_HandleAddParent.bind(this)}
-                  className="3xl:text-[15px] text-[13px]"
+                  value={listData?.map((e) => e?.item)}
+                  formatOptionLabel={(option) => selectItemsLabel(option)}
                   placeholder={dataLang?.returns_items || 'returns_items'}
-                  noOptionsMessage={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
-                  menuPortalTarget={document.body}
-                  formatOptionLabel={selectItemsLabel}
-                  style={{
-                    border: 'none',
-                    boxShadow: 'none',
-                    outline: 'none',
-                  }}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary25: '#0000000A',
-                      primary50: 'transparent',
-                      primary: '#C7DFFB',
-                    },
-                  })}
-                  styles={{
-                    placeholder: (base) => ({
-                      ...base,
-                      color: '#cbd5e1',
-                    }),
-                    menuPortal: (base) => ({
-                      ...base,
-                      // zIndex: 9999,
-                    }),
-                    control: (base, state) => ({
-                      ...base,
-                      cursor: 'pointer',
-                      borderRadius: '8px',
-                      borderColor: state.isFocused || state.isHovered ? 'transparent' : '#d9d9d9',
-                      boxShadow: state.isFocused || state.isHovered ? '0 0 0 2px #003DA0' : 'none',
-                    }),
-                    menu: (provided, state) => ({
-                      ...provided,
-                      width: '100%',
-                    }),
-                  }}
                 />
+
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-[#1760B9] p-1.5 rounded-lg pointer-events-none">
                   <CiSearch className="text-white responsive-text-lg" />
                 </div>
@@ -611,13 +568,13 @@ const InternalPlanForm = (props) => {
                               <QuantitySelector
                                 ce={e}
                                 clsxErrorBorder={`${
-                                  errors.errQuantity && (e.quantity == null || e.quantity == '' || e.quantity <= 0)
+                                  errors.errQuantity && (e.quantity === null || e.quantity === '' || e.quantity === 0)
                                     ? 'border-red-500'
-                                    : 'border-gray-200'
+                                    : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
                                 } ${
-                                  e.quantity == null || e.quantity == '' || e.quantity <= 0
-                                    ? 'border-red-500'
-                                    : 'border-gray-200'
+                                  e.quantity === null || e.quantity === '' || e.quantity === 0
+                                    ? 'border-red-500 hover:border-red-500 focus:border-red-500'
+                                    : ''
                                 }`}
                                 onValueChange={_HandleChangeChild.bind(this, e.id, 'quantity')}
                                 isAllowedNumber={isAllowedNumber}
@@ -645,13 +602,13 @@ const InternalPlanForm = (props) => {
                               </ConfigProvider>
                             </div>
                             {/* Ghi chú */}
-                            <div className="flex items-center justify-center col-span-1 h-8 2xl:h-10 3xl:p-2 p-[2px] border border-gray-200 rounded-lg">
+                            <div className="flex items-center justify-center col-span-1 h-8 2xl:h-10 3xl:p-2 p-[2px] border focus:border-brand-color hover:border-brand-color border-neutral-N400 rounded-lg">
                               <input
                                 value={e.note}
                                 onChange={_HandleChangeChild.bind(this, e.id, 'note')}
                                 placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
                                 type="text"
-                                className="pl-2 placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] text-[#52575E] font-normal outline-none"
+                                className="pl-2 placeholder:text-slate-300 text-xs px-1 w-full bg-[#ffffff] font-normal outline-none"
                               />
                             </div>
                             {/* Thao tác */}

@@ -5,14 +5,14 @@ import { DocumentDate, DocumentNumber } from '@/components/common/orderManagemen
 import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
 import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
-import MenuList from '@/components/common/orderManagement/MenuList'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
-import SelectSearchBar from '@/components/common/orderManagement/SelectSearchBar'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import TextareaNote from '@/components/common/orderManagement/TextareaNote'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import { TagColorProduct } from '@/components/UI/common/Tag/TagStatus'
+import EmptyData from '@/components/UI/emptyData'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import Loading from '@/components/UI/loading/loading'
@@ -105,8 +105,6 @@ const PurchaseImportForm = (props) => {
 
   const [errSerial, sErrSerial] = useState(false)
 
-  const [itemAll, sItemAll] = useState([])
-
   const [warehouseAll, sWarehouseAll] = useState(null)
 
   const [total, setTotal] = useState({
@@ -163,6 +161,8 @@ const PurchaseImportForm = (props) => {
     queryKey: ['api_detail_page_import', id],
     queryFn: async () => {
       const rResult = await apiImport.apiDetailPageImport(id)
+      console.log('rResult', rResult)
+
       sListData(
         rResult?.items.map((e) => ({
           id: e?.item?.id,
@@ -171,7 +171,9 @@ const PurchaseImportForm = (props) => {
             label: `${e.item?.name} <span style={{display: none}}>${
               e.item?.code + e.item?.product_variation + e.item?.text_type + e.item?.unit_name
             }</span>`,
-            value: e.item?.id,
+            value:
+              e.item?.purchase_order_item_id === '0' ? e.item?.id : e.item?.id + '__' + e.item?.purchase_order_item_id,
+            // value: e.item?.id,
           },
           child: e?.child.map((ce) => ({
             id: Number(ce?.id),
@@ -247,7 +249,46 @@ const PurchaseImportForm = (props) => {
     sWarehouseAll(null)
   }, [idBranch])
 
+  const _DataValueItem = (e, index) => {
+    return {
+      id: uuidv4(),
+      time: index,
+      item: e,
+      child: [
+        {
+          id_plan: e?.e?.id_plan,
+          reference_no_plan: e?.e?.reference_no_plan,
+          warehouse: null,
+          disabledDate:
+            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
+            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
+            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
+            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
+          serial: '',
+          lot: '',
+          date: null,
+          unit: e?.e?.unit_name,
+          amount: Number(e?.e?.quantity_left) || 1,
+          price: e?.e?.price,
+          discount: discount ? discount : e?.e?.discount_percent,
+          priceAfter: Number(e?.e?.price_after_discount),
+          tax: tax
+            ? tax
+            : {
+                label: e?.e?.tax_name,
+                value: e?.e?.tax_id,
+                tax_rate: e?.e?.tax_rate,
+              },
+          totalMoney: Number(e?.e?.amount),
+          note: e?.e?.note,
+        },
+      ],
+    }
+  }
+
   const _HandleChangeInput = (type, value) => {
+    console.log('_HandleChangeInput', type, value)
+
     if (type == 'code') {
       sCode(value.target.value)
     } else if (type === 'date') {
@@ -264,7 +305,6 @@ const PurchaseImportForm = (props) => {
       }
       if (listData.length === 0) {
         sIdSupplier(value)
-        sItemAll([])
         sIdTheOrder(null)
       }
     } else if (type === 'theorder') {
@@ -292,46 +332,13 @@ const PurchaseImportForm = (props) => {
     } else if (type == 'idSurplusWarehouse') {
       sIdSurplusWarehouse(value)
     } else if (type == 'itemAll') {
-      sItemAll(value)
       if (value?.length === 0) {
-        //new
         sListData([])
       } else if (value?.length > 0) {
-        const newData = value?.map((e, index) => ({
-          id: uuidv4(),
-          time: index,
-          item: e,
-          child: [
-            {
-              id_plan: e?.e?.id_plan,
-              reference_no_plan: e?.e?.reference_no_plan,
-              warehouse: null,
-              disabledDate:
-                (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-                (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-                (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-                (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-              serial: '',
-              lot: '',
-              date: null,
-              unit: e?.e?.unit_name,
-              amount: Number(e?.e?.quantity_left) || 1,
-              price: e?.e?.price,
-              discount: discount ? discount : e?.e?.discount_percent,
-              priceAfter: Number(e?.e?.price_after_discount),
-              tax: tax
-                ? tax
-                : {
-                    label: e?.e?.tax_name,
-                    value: e?.e?.tax_id,
-                    tax_rate: e?.e?.tax_rate,
-                  },
-              totalMoney: Number(e?.e?.amount),
-              note: e?.e?.note,
-            },
-          ],
-        }))
-        sListData(newData?.sort((a, b) => b.time - a.time))
+        const newData = value?.map((e, index) => {
+          return _DataValueItem(e, index)
+        })
+        sListData(newData)
       }
     } else if (type === 'warehouseAll') {
       sWarehouseAll(value)
@@ -397,7 +404,12 @@ const PurchaseImportForm = (props) => {
 
     const checkNumber = listData.some((item) =>
       item.child?.some(
-        (childItem) => childItem.price == '' || childItem.price == 0 || childItem.amount == '' || childItem.amount == 0
+        (childItem) =>
+          childItem.price === '' ||
+          childItem.price === null ||
+          childItem.amount === '' ||
+          childItem.amount === 0 ||
+          childItem.amount === null
       )
     )
     if (
@@ -449,46 +461,6 @@ const PurchaseImportForm = (props) => {
   }, [idBranch])
 
   const taxOptions = [{ label: 'Miễn thuế', value: '0', tax_rate: '0' }, ...dataTasxes]
-
-  const _HandleSelectAll = () => {
-    const newData = [...options]?.map((e) => ({
-      id: uuidv4(),
-      item: e,
-      child: [
-        {
-          id_plan: e?.e?.id_plan,
-          reference_no_plan: e?.e?.reference_no_plan,
-          purchase_order_item_id: e?.e?.purchase_order_item_id,
-          id: uuidv4(),
-          disabledDate:
-            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-            (e?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-            (e?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-          warehouse: warehouseAll ? warehouseAll : null,
-          serial: '',
-          lot: '',
-          date: null,
-          unit: e?.e?.unit_name,
-          amount: Number(e?.e?.quantity_left) || 1,
-          price: e?.e?.price,
-          discount: discount ? discount : e?.e?.discount_percent,
-          priceAfter: Number(e?.e?.price_after_discount),
-          tax: tax
-            ? tax
-            : {
-                label: e?.e?.tax_name,
-                value: e?.e?.tax_id,
-                tax_rate: e?.e?.tax_rate,
-              },
-          totalMoney: Number(e?.e?.amount),
-          note: e?.e?.note,
-        },
-      ],
-    }))
-    sItemAll(newData)
-    sListData(newData)
-  }
 
   const formatNumber = (number) => {
     return formatNumberConfig(+number, dataSeting)
@@ -579,13 +551,10 @@ const PurchaseImportForm = (props) => {
     formData.append('warehouse_id', idSurplusWarehouse?.value ?? 0)
     formData.append('note', note)
     listData.forEach((item, index) => {
-      console.log('item', item)
-
       formData.append(`items[${index}][id]`, item?.id)
       formData.append(`items[${index}][item]`, item?.item?.value)
       formData.append(`items[${index}][purchase_order_item_id]`, item?.item?.e?.purchase_order_item_id ?? 0)
       item?.child?.forEach((childItem, childIndex) => {
-        // formData.append(`items[${index}][child][${childIndex}][purchase_order_item_id]`, childItem?.purchase_order_item_id ?? 0);
         formData.append(`items[${index}][child][${childIndex}][id]`, childItem?.id)
         formData.append(`items[${index}][child][${childIndex}][id_plan]`, childItem?.id_plan ?? 0)
         {
@@ -698,48 +667,6 @@ const PurchaseImportForm = (props) => {
     })
     sListData(newData)
   }
-  const _HandleAddParent = (value) => {
-    const checkData = listData?.some((e) => e?.item?.value === value?.value)
-    if (!checkData) {
-      const newData = {
-        id: Date.now(),
-        item: value,
-        child: [
-          {
-            id_plan: value?.e?.id_plan,
-            reference_no_plan: value?.e?.reference_no_plan,
-            id: uuidv4(),
-            disabledDate:
-              (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-              (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-              (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-              (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-            warehouse: warehouseAll ? warehouseAll : null,
-            serial: '',
-            lot: '',
-            date: null,
-            unit: value?.e?.unit_name,
-            price: value?.e?.price,
-            amount: Number(value?.e?.quantity_left) || 1,
-            discount: discount ? discount : Number(value?.e?.discount_percent),
-            priceAfter: Number(value?.e?.price_after_discount),
-            tax: tax
-              ? tax
-              : {
-                  label: value?.e?.tax_name == null ? 'Miễn thuế' : value?.e?.tax_name,
-                  value: value?.e?.tax_id,
-                  tax_rate: value?.e?.tax_rate,
-                },
-            totalMoney: Number(value?.e?.amount),
-            note: value?.e?.note,
-          },
-        ],
-      }
-      sListData([newData, ...listData])
-    } else {
-      isShow('error', 'Mặt hàng đã được chọn')
-    }
-  }
 
   const _HandleDeleteChild = (parentId, childId) => {
     const newData = listData
@@ -831,55 +758,6 @@ const PurchaseImportForm = (props) => {
 
   const handleQuantityError = (e) => isShow('error', e)
 
-  const _HandleChangeValue = (parentId, value) => {
-    const checkData = listData?.some((e) => e?.item?.value === value?.value)
-
-    if (!checkData) {
-      // const newData = { id: Date.now(), item: value, child: [{id: uuidv4(), warehouse: warehouseAll ? warehouseAll : null, unit: value?.e?.unit_name, price: value?.e?.price, amount: Number(value?.e?.quantity_left) || 1, discount: discount ? discount : Number(value?.e?.discount_percent), priceAfter: Number(value?.e?.price_after_discount), tax: tax ? tax : {label: value?.e?.tax_name == null ? "Miễn thuế" : value?.e?.tax_name, value: value?.e?.tax_id, tax_rate: value?.e?.tax_rate}, totalMoney: Number(value?.e?.amount), note: value?.e?.note}] }
-      const newData = listData?.map((e) => {
-        if (e?.id === parentId) {
-          return {
-            ...e,
-            item: value,
-            child: [
-              {
-                id: uuidv4(),
-                warehouse: warehouseAll ? warehouseAll : null,
-                disabledDate:
-                  (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '1' && false) ||
-                  (value?.e?.text_type === 'material' && dataMaterialExpiry?.is_enable === '0' && true) ||
-                  (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '1' && false) ||
-                  (value?.e?.text_type === 'products' && dataProductExpiry?.is_enable === '0' && true),
-                serial: '',
-                lot: '',
-                date: null,
-                unit: value?.e?.unit_name,
-                price: value?.e?.price,
-                amount: Number(value?.e?.quantity_left) || 1,
-                discount: discount ? discount : Number(value?.e?.discount_percent),
-                priceAfter: Number(value?.e?.price_after_discount),
-                tax: tax
-                  ? tax
-                  : {
-                      label: value?.e?.tax_name == null ? 'Miễn thuế' : value?.e?.tax_name,
-                      value: value?.e?.tax_id,
-                      tax_rate: value?.e?.tax_rate,
-                    },
-                totalMoney: Number(value?.e?.amount),
-                note: value?.e?.note,
-              },
-            ],
-          }
-        } else {
-          return e
-        }
-      })
-      sListData([...newData])
-    } else {
-      isShow('error', `${'Mặt hàng đã được chọn'}`)
-    }
-  }
-
   const breadcrumbItems = [
     {
       label: `${dataLang?.import_title || 'import_title'}`,
@@ -894,7 +772,7 @@ const PurchaseImportForm = (props) => {
   ]
 
   const selectItemsLabel = (option, isOnTable = false) => (
-    <div className="flex items-start py-2 cursor-pointer font-deca">
+    <div className={`flex items-start py-2 font-deca ${!isOnTable && 'cursor-pointer'}`}>
       <div
         className={`flex ${isOnTable && 'xl:flex-row flex-col'} ${
           isOnTable ? 'xl:items-center items-start' : 'items-center'
@@ -906,15 +784,19 @@ const PurchaseImportForm = (props) => {
           className={`${isOnTable ? 'size-12' : 'xl:size-16 size-12'} object-cover rounded-md`}
         />
         <div className="flex flex-col gap-1 3xl:text-[10px] text-[9px] font-normal overflow-hidden w-full">
-          <h3 className={`font-semibold responsive-text-sm truncate ${isOnTable ? 'text-brand-color' : 'text-black'}`}>
+          <div
+            className={`font-semibold responsive-text-sm truncate ${
+              isOnTable ? 'text-brand-color xl:w-fit max-w-[75px]' : 'text-black'
+            }`}
+          >
             {option.e?.name}
-          </h3>
+          </div>
 
-          <h5 className={`${isOnTable ? 'text-neutral-03' : 'text-blue-color'} truncate`}>
+          <div className={`${isOnTable ? 'text-neutral-03' : 'text-blue-color'} flex flex-wrap`}>
             {option.e?.code}: {option?.e?.product_variation}
-          </h5>
+          </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-neutral-03">
+          <div className="flex flex-wrap items-center text-neutral-03">
             {isOnTable && `ĐVT: ${option.e?.unit_name} - `} {dataLang[option.e?.text_type]} -{' '}
             {dataLang?.purchase_survive || 'purchase_survive'}:{' '}
             {option.e?.qty_warehouse ? formatNumber(option.e?.qty_warehouse) : '0'}
@@ -934,370 +816,376 @@ const PurchaseImportForm = (props) => {
       breadcrumbItems={breadcrumbItems}
       titleLayout={dataLang?.import_title || 'import_title'}
       searchBar={
-        <SelectSearchBar
-          options={[...options]}
+        <SelectSearch
+          options={options}
           onChange={_HandleChangeInput.bind(this, 'itemAll')}
-          value={itemAll?.value ? itemAll?.value : listData?.map((e) => e?.item)}
-          MenuList={(props) => (
-            <MenuList
-              dataItems={itemAll}
-              handleSelectAll={_HandleSelectAll.bind(this)}
-              handleDeleteAll={() => sListData([])}
-              {...props}
-            />
-          )}
+          value={listData?.map((e) => e?.item)}
           formatOptionLabel={(option) => selectItemsLabel(option)}
           placeholder={dataLang?.import_click_items || 'import_click_items'}
           setSearch={setInputValue}
         />
       }
       tableLeft={
-        <div>
-          <div className="grid grid-cols-13 items-center gap-3 sticky top-0 z-10 py-2 border-b border-gray-100">
-            <TableHeader className="col-span-2 text-left">
-              {dataLang?.import_from_items || 'import_from_items'}
-            </TableHeader>
-
-            <div className="col-span-11">
-              <div
-                className={`${
-                  dataProductSerial?.is_enable == '1'
-                    ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                      ? 'grid-cols-11'
-                      : dataMaterialExpiry?.is_enable == '1'
-                      ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
-                      : 'grid-cols-9'
-                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                    ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.3fr)]'
-                    : dataMaterialExpiry?.is_enable == '1'
-                    ? 'grid-cols-10'
-                    : 'grid-cols-8'
-                } grid items-center gap-3`}
-              >
-                <Dropdown
-                  overlay={
-                    <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
-                      <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
-                        Chọn nhanh kho - Vị trí
-                      </p>
-                      <SelectCustomLabel
-                        dataLang={dataLang}
-                        placeholder={'Chọn nhanh kho - Vị trí'}
-                        options={dataWarehouse}
-                        value={warehouseAll}
-                        onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
-                        isVisibleLotDate={false}
-                      />
-                    </div>
-                  }
-                  trigger={['click']}
-                  placement="bottomCenter"
-                  arrow
-                >
-                  <div className="inline-flex items-center justify-between cursor-pointer group">
-                    <TableHeader className="text-start group-hover:text-neutral-05">
-                      {dataLang?.PDF_house || 'PDF_house'}
-                    </TableHeader>
-                    <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
-                  </div>
-                </Dropdown>
-
-                {dataProductSerial?.is_enable === '1' && (
-                  <TableHeader className="col-span-1 text-center">{'Serial'}</TableHeader>
-                )}
-                {(dataMaterialExpiry?.is_enable === '1' || dataProductExpiry?.is_enable === '1') && (
-                  <>
-                    <TableHeader className="col-span-1 text-center">{'Lot'}</TableHeader>
-                    <TableHeader className="col-span-1 text-center">
-                      {props.dataLang?.warehouses_detail_date || 'Date'}
-                    </TableHeader>
-                  </>
-                )}
-                <TableHeader className="col-span-1 text-center">
-                  {dataLang?.import_from_quantity || 'import_from_quantity'}
-                </TableHeader>
-                <TableHeader className="col-span-1 text-center">
-                  {dataLang?.import_from_unit_price || 'import_from_unit_price'}
+        <>
+          {listData.length === 0 ? (
+            <EmptyData />
+          ) : (
+            <div>
+              <div className="grid grid-cols-13 items-center gap-3 sticky top-0 z-10 py-2 border-b border-gray-100">
+                <TableHeader className="col-span-2 text-left">
+                  {dataLang?.import_from_items || 'import_from_items'}
                 </TableHeader>
 
-                <DropdownDiscount value={discount} onChange={_HandleChangeInput.bind(this, 'discount')} />
-
-                <TableHeader className="col-span-1 text-center">Đơn giá SCK</TableHeader>
-
-                <DropdownTax
-                  taxOptions={taxOptions}
-                  totalTax={tax}
-                  onChange={_HandleChangeInput.bind(this, 'tax')}
-                  dataLang={dataLang}
-                />
-
-                <TableHeader className="col-span-1 text-center">
-                  {dataLang?.import_into_money || 'import_into_money'}
-                </TableHeader>
-              </div>
-            </div>
-          </div>
-
-          <Customscrollbar className="max-h-[840px] overflow-auto pb-2">
-            <div className="h-full">
-              {isFetching ? (
-                <Loading className="h-[840px]" color="#0f4f9e" />
-              ) : (
-                <>
-                  {listData?.map((e, index) => {
-                    const firstChild = e?.child?.[0]
-                    const isLast = index === listData.length - 1
-
-                    return (
-                      <div
-                        key={e?.id?.toString()}
-                        className={`grid items-start gap-3 py-2 grid-cols-13 ${
-                          isLast ? '' : 'border-b border-[#F3F3F4]'
-                        }`}
-                      >
-                        {/* Mặt hàng */}
-                        <div className="col-span-2 h-full">
-                          <div className="flex items-center justify-between gap-1 xl:gap-2">
-                            {selectItemsLabel(e?.item, true)}
-                            <button
-                              onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
-                              className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
-                            >
-                              <Add />
-                            </button>
-                          </div>
-                          {/* Ghi chú */}
-                          <div className="flex items-center justify-center mt-2">
-                            <Image
-                              src={'/icon/pen.svg'}
-                              alt="icon pen"
-                              width={16}
-                              height={16}
-                              className="size-3 object-cover"
-                            />
-                            <input
-                              value={firstChild?.note}
-                              // onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'note')}
-                              placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
-                              name="optionEmail"
-                              type="text"
-                              className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
-                            />
-                          </div>
+                <div className="col-span-11">
+                  <div
+                    className={`${
+                      dataProductSerial?.is_enable == '1'
+                        ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                          ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                          : dataMaterialExpiry?.is_enable == '1'
+                          ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
+                          : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,0.2fr)]'
+                        : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                        ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                        : dataMaterialExpiry?.is_enable == '1'
+                        ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                        : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,0.2fr)]'
+                    } grid items-center gap-3`}
+                  >
+                    <Dropdown
+                      overlay={
+                        <div className="border px-4 py-5 shadow-lg bg-white rounded-lg">
+                          <p className="3xl:text-base 2xl:text-sm text-[12px] font-normal font-deca text-secondary-color-text mb-2">
+                            Chọn nhanh kho - Vị trí
+                          </p>
+                          <SelectCustomLabel
+                            dataLang={dataLang}
+                            placeholder={'Chọn nhanh kho - Vị trí'}
+                            options={dataWarehouse}
+                            value={warehouseAll}
+                            onChange={_HandleChangeInput.bind(this, 'warehouseAll')}
+                            isVisibleLotDate={false}
+                          />
                         </div>
-                        <div className="h-full col-span-11">
+                      }
+                      trigger={['click']}
+                      placement="bottomCenter"
+                      arrow
+                    >
+                      <div className="inline-flex items-center justify-between cursor-pointer group">
+                        <TableHeader className="text-start group-hover:text-neutral-05">
+                          {dataLang?.PDF_house || 'PDF_house'}
+                        </TableHeader>
+                        <ArrowDown2 size={16} className="text-neutral-02 font-medium group-hover:text-neutral-05" />
+                      </div>
+                    </Dropdown>
+
+                    {dataProductSerial?.is_enable === '1' && (
+                      <TableHeader className="col-span-1 text-center">{'Serial'}</TableHeader>
+                    )}
+                    {(dataMaterialExpiry?.is_enable === '1' || dataProductExpiry?.is_enable === '1') && (
+                      <>
+                        <TableHeader className="col-span-1 text-center">{'Lot'}</TableHeader>
+                        <TableHeader className="col-span-1 text-center">
+                          {props.dataLang?.warehouses_detail_date || 'Date'}
+                        </TableHeader>
+                      </>
+                    )}
+                    <TableHeader className="col-span-1 text-center">
+                      {dataLang?.import_from_quantity || 'import_from_quantity'}
+                    </TableHeader>
+                    <TableHeader className="col-span-1 text-center">
+                      {dataLang?.import_from_unit_price || 'import_from_unit_price'}
+                    </TableHeader>
+
+                    <DropdownDiscount value={discount} onChange={_HandleChangeInput.bind(this, 'discount')} />
+
+                    <TableHeader className="col-span-1 text-center">Đơn giá SCK</TableHeader>
+
+                    <DropdownTax
+                      taxOptions={taxOptions}
+                      totalTax={tax}
+                      onChange={_HandleChangeInput.bind(this, 'tax')}
+                      dataLang={dataLang}
+                    />
+
+                    <TableHeader className="col-span-1 text-right">
+                      {dataLang?.import_into_money || 'import_into_money'}
+                    </TableHeader>
+                  </div>
+                </div>
+              </div>
+
+              <Customscrollbar className="max-h-[840px] overflow-auto pb-2">
+                <div className="h-full">
+                  {isFetching ? (
+                    <Loading className="h-[840px]" color="#0f4f9e" />
+                  ) : (
+                    <>
+                      {listData?.map((e, index) => {
+                        const firstChild = e?.child?.[0]
+                        const isLast = index === listData.length - 1
+
+                        return (
                           <div
-                            className={`${
-                              dataProductSerial?.is_enable == '1'
-                                ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                  ? 'grid-cols-11'
-                                  : dataMaterialExpiry?.is_enable == '1'
-                                  ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
-                                  : 'grid-cols-9'
-                                : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
-                                ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.3fr)]'
-                                : dataMaterialExpiry?.is_enable == '1'
-                                ? 'grid-cols-10'
-                                : 'grid-cols-8'
-                            } grid items-center justify-center gap-3 h-full py-1`}
+                            key={e?.id?.toString()}
+                            className={`grid items-start gap-3 py-2 grid-cols-13 ${
+                              isLast ? '' : 'border-b border-[#F3F3F4]'
+                            }`}
                           >
-                            {e?.child?.map((ce) => (
-                              <React.Fragment key={ce?.id?.toString()}>
-                                {/* Kho - Vị trí */}
-                                <div className={`flex flex-col items-center justify-center`}>
-                                  {ce?.id_plan > 0 && ce?.reference_no_plan ? (
-                                    <TagColorProduct
-                                      lang={false}
-                                      dataKey={6}
-                                      name={`Vị trí theo ${ce?.reference_no_plan}`}
-                                      className="3xl:!text-[13px] xl:!text-[10px] !text-[9px]"
-                                    />
-                                  ) : (
-                                    <SelectCustomLabel
-                                      dataLang={dataLang}
-                                      placeholder={dataLang?.PDF_house || 'PDF_house'}
-                                      options={dataWarehouse}
-                                      value={ce?.warehouse}
-                                      onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'warehouse')}
-                                      isError={
-                                        (errWarehouse && ce?.warehouse == null) ||
-                                        (errWarehouse &&
-                                          (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
-                                      }
-                                      isVisibleLotDate={false}
-                                    />
-                                  )}
-                                </div>
-                                {dataProductSerial.is_enable === '1' ? (
-                                  <div className="col-span-1 ">
-                                    <div className="flex justify-center flex-col items-center">
-                                      <input
-                                        value={ce?.serial}
-                                        disabled={e?.item?.e?.text_type != 'products'}
-                                        className={`border ${
-                                          e?.item?.e?.text_type != 'products'
-                                            ? 'bg-gray-50'
-                                            : errSerial && (ce?.serial == '' || ce?.serial == null)
-                                            ? 'border-red-500'
-                                            : 'focus:border-[#92BFF7] border-[#d0d5dd]'
-                                        } placeholder:text-slate-300 w-full bg-[#ffffff] rounded text-[#52575E] font-normal p-2 outline-none cursor-pointer`}
-                                        onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'serial')}
+                            {/* Mặt hàng */}
+                            <div className="col-span-2 h-full">
+                              <div className="flex items-center justify-between gap-1 xl:gap-2">
+                                {selectItemsLabel(e?.item, true)}
+                                <button
+                                  onClick={_HandleAddChild.bind(this, e?.id, e?.item)}
+                                  className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
+                                >
+                                  <Add />
+                                </button>
+                              </div>
+                              {/* Ghi chú */}
+                              <div className="flex items-center justify-center mt-2">
+                                <Image
+                                  src={'/icon/pen.svg'}
+                                  alt="icon pen"
+                                  width={16}
+                                  height={16}
+                                  className="size-3 object-cover"
+                                />
+                                <input
+                                  value={firstChild?.note}
+                                  // onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'note')}
+                                  placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
+                                  name="optionEmail"
+                                  type="text"
+                                  className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
+                                />
+                              </div>
+                            </div>
+                            <div className="h-full col-span-11">
+                              <div
+                                className={`${
+                                  dataProductSerial?.is_enable == '1'
+                                    ? dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                                      ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                                      : dataMaterialExpiry?.is_enable == '1'
+                                      ? 'grid-cols-[repeat(11_minmax(0_1fr))]'
+                                      : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,0.2fr)]'
+                                    : dataMaterialExpiry?.is_enable != dataProductExpiry?.is_enable
+                                    ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                                    : dataMaterialExpiry?.is_enable == '1'
+                                    ? 'grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.2fr)]'
+                                    : 'grid-cols-[minmax(0,1.5fr)_minmax(0,1.3fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,0.2fr)]'
+                                } grid items-center justify-center gap-3 h-full py-1`}
+                              >
+                                {e?.child?.map((ce) => (
+                                  <React.Fragment key={ce?.id?.toString()}>
+                                    {/* Kho - Vị trí */}
+                                    <div className={`flex flex-col items-center justify-center`}>
+                                      {ce?.id_plan > 0 && ce?.reference_no_plan ? (
+                                        <TagColorProduct
+                                          lang={false}
+                                          dataKey={6}
+                                          name={`Vị trí theo ${ce?.reference_no_plan}`}
+                                          className="3xl:!text-[13px] xl:!text-[10px] !text-[9px]"
+                                        />
+                                      ) : (
+                                        <SelectCustomLabel
+                                          dataLang={dataLang}
+                                          placeholder={dataLang?.PDF_house || 'PDF_house'}
+                                          options={dataWarehouse}
+                                          value={ce?.warehouse}
+                                          onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'warehouse')}
+                                          isError={
+                                            (errWarehouse && ce?.warehouse == null) ||
+                                            (errWarehouse &&
+                                              (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
+                                          }
+                                          isVisibleLotDate={false}
+                                        />
+                                      )}
+                                    </div>
+                                    {dataProductSerial.is_enable === '1' ? (
+                                      <div className="col-span-1">
+                                        <div className="flex justify-center flex-col items-center">
+                                          <input
+                                            value={ce?.serial}
+                                            disabled={e?.item?.e?.text_type != 'products'}
+                                            className={`border ${
+                                              e?.item?.e?.text_type != 'products'
+                                                ? 'bg-gray-50'
+                                                : errSerial && (ce?.serial == '' || ce?.serial == null)
+                                                ? 'border-red-500'
+                                                : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                            } placeholder:text-secondary-color-text-disabled w-full rounded-lg font-normal p-2 outline-none responsive-text-sm ${
+                                              e?.item?.e?.text_type != 'products' ? 'cursor-not-allowed' : 'cursor-text'
+                                            }`}
+                                            onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'serial')}
+                                          />
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      ''
+                                    )}
+                                    {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
+                                      <>
+                                        {/* Lot */}
+                                        <div>
+                                          <div className="flex justify-center items-center">
+                                            <input
+                                              value={ce?.lot}
+                                              disabled={ce?.disabledDate}
+                                              className={`border ${
+                                                ce?.disabledDate
+                                                  ? 'bg-gray-50'
+                                                  : errLot && (ce?.lot == '' || ce?.lot == null)
+                                                  ? 'border-red-500'
+                                                  : ' focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                              } placeholder:text-secondary-color-text-disabled w-full rounded-lg font-normal p-2 outline-none cursor-text responsive-text-sm`}
+                                              onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'lot')}
+                                              placeholder={
+                                                dataLang?.purchase_order_system_default ||
+                                                'purchase_order_system_default'
+                                              }
+                                            />
+                                          </div>
+                                        </div>
+                                        {/* Date */}
+                                        <div>
+                                          <div className="flex justify-center items-center">
+                                            <ConfigProvider locale={viVN}>
+                                              <DatePickerAntd
+                                                className="p-[6.7px]"
+                                                isError={errDateList && ce?.date == null}
+                                                allowClear={false}
+                                                placeholder={'DD/MM/YYYY'}
+                                                disabled={ce?.disabledDate}
+                                                format="DD/MM/YYYY"
+                                                suffixIcon={null}
+                                                value={ce?.date ? dayjs(ce?.date) : null}
+                                                onChange={(date) => {
+                                                  if (date) {
+                                                    const dateString = date.toDate().toString()
+                                                    _HandleChangeChild(e?.id, ce?.id, 'date', dateString)
+                                                  }
+                                                }}
+                                              />
+                                            </ConfigProvider>
+                                          </div>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      ''
+                                    )}
+                                    {/* Số lượng */}
+                                    <div
+                                      className={`flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                        ce?.amount === '' || ce?.amount === null || ce?.amount === 0
+                                          ? 'border-red-500'
+                                          : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                      }`}
+                                    >
+                                      <button
+                                        className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
+                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
+                                      >
+                                        <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
+                                      </button>
+                                      <InPutNumericFormat
+                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'amount')}
+                                        value={ce?.amount}
+                                        isAllowed={isAllowedNumber}
+                                        className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                        allowNegative={false}
+                                      />
+                                      <button
+                                        className="2xl:scale-100 xl:scale-90 scale-75 hover:bg-typo-blue-4/50 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
+                                        onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
+                                      >
+                                        <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
+                                      </button>
+                                    </div>
+                                    {/* Đơn giá */}
+                                    <div
+                                      className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
+                                        ce?.price === '' || ce?.price === null
+                                          ? 'border-red-500'
+                                          : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                      }`}
+                                    >
+                                      <InPutMoneyFormat
+                                        className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
+                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
+                                        value={ce?.price}
+                                        isSuffix=" đ"
+                                        allowNegative={false}
                                       />
                                     </div>
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                                {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
-                                  <>
-                                    {/* Lot */}
-                                    <div>
-                                      <div className="flex justify-center items-center">
-                                        <input
-                                          value={ce?.lot}
-                                          disabled={ce?.disabledDate}
-                                          className={`border ${
-                                            ce?.disabledDate
-                                              ? 'bg-gray-50'
-                                              : errLot && (ce?.lot == '' || ce?.lot == null)
-                                              ? 'border-red-500'
-                                              : ' focus:border-brand-color hover:border-brand-color border-neutral-N400'
-                                          } placeholder:text-secondary-color-text-disabled w-full rounded-lg font-normal p-2 outline-none cursor-text responsive-text-sm`}
-                                          onChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'lot')}
-                                          placeholder={
-                                            dataLang?.purchase_order_system_default || 'purchase_order_system_default'
-                                          }
-                                        />
-                                      </div>
+                                    {/* % CK */}
+                                    <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border focus:border-brand-color hover:border-brand-color border-neutral-N400 responsive-text-sm font-semibold">
+                                      <InPutNumericFormat
+                                        className="appearance-none w-full focus:outline-none text-right"
+                                        onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
+                                        value={ce?.discount}
+                                        isAllowed={isAllowedDiscount}
+                                        allowNegative={false}
+                                      />
                                     </div>
-                                    {/* Date */}
-                                    <div>
-                                      <div className="flex justify-center items-center">
-                                        <ConfigProvider locale={viVN}>
-                                          <DatePickerAntd
-                                            className="p-[6.7px]"
-                                            isError={errDateList && ce?.date == null}
-                                            allowClear={false}
-                                            placeholder={'DD/MM/YYYY'}
-                                            disabled={ce?.disabledDate}
-                                            format="DD/MM/YYYY"
-                                            suffixIcon={null}
-                                            value={ce?.date ? dayjs(ce?.date) : null}
-                                            onChange={(date) => {
-                                              if (date) {
-                                                const dateString = date.toDate().toString()
-                                                _HandleChangeChild(e?.id, ce?.id, 'date', dateString)
-                                              }
-                                            }}
-                                          />
-                                        </ConfigProvider>
-                                      </div>
+                                    {/* Đơn giá sau CK */}
+                                    <div className="flex items-center justify-center text-center responsive-text-sm font-semibold">
+                                      <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
+                                      <span className="pl-1 underline">đ</span>
                                     </div>
-                                  </>
-                                ) : (
-                                  ''
-                                )}
-                                {/* Số lượng */}
-                                <div
-                                  className={`flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
-                                    ce?.amount == 0 || ce?.amount == '' ? 'border-red-500' : 'border-neutral-N400'
-                                  }`}
-                                >
-                                  <button
-                                    className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5 bg-primary-05 rounded-full"
-                                    onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
-                                  >
-                                    <Minus className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
-                                  </button>
-                                  <InPutNumericFormat
-                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'amount')}
-                                    value={ce?.amount}
-                                    isAllowed={isAllowedNumber}
-                                    className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
-                                  />
-                                  <button
-                                    className="2xl:scale-100 xl:scale-90 scale-75 text-black hover:bg-[#e2f0fe] hover:text-gray-600 font-bold flex items-center justify-center p-0.5  bg-primary-05 rounded-full"
-                                    onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
-                                  >
-                                    <Add className="scale-50 2xl:scale-100 xl:scale-100" size="16" />
-                                  </button>
-                                </div>
-                                {/* Đơn giá */}
-                                <div
-                                  className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
-                                    ce?.price == 0 || ce?.price == ''
-                                      ? 'border-red-500'
-                                      : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
-                                  }`}
-                                >
-                                  <InPutMoneyFormat
-                                    className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
-                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
-                                    value={ce?.price}
-                                    isSuffix=" đ"
-                                  />
-                                </div>
-                                {/* % CK */}
-                                <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border focus:border-brand-color hover:border-brand-color border-neutral-N400 responsive-text-sm font-semibold">
-                                  <InPutNumericFormat
-                                    className="appearance-none w-full focus:outline-none text-right"
-                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
-                                    value={ce?.discount}
-                                    isAllowed={isAllowedDiscount}
-                                  />
-                                </div>
-                                {/* Đơn giá sau CK */}
-                                <div className="flex items-center justify-center text-center responsive-text-sm font-semibold">
-                                  <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
-                                  <span className="pl-1 underline">đ</span>
-                                </div>
-                                {/* Thuế */}
-                                <div className="flex items-center">
-                                  <SelectCustomLabel
-                                    placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                    options={taxOptions}
-                                    value={ce?.tax}
-                                    onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
-                                    renderOption={(option, isLabel) => (
-                                      <div
-                                        className={`flex items-center justify-start gap-1 responsive-text-sm ${
-                                          isLabel ? 'py-1 2xl:py-2' : ''
-                                        }`}
-                                      >
-                                        <h2 className="">{option?.label}</h2>
-                                        {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
-                                          <h2>
-                                            {option?.tax_rate === '20'
-                                              ? `(${option?.tax_rate}%)`
-                                              : `${option?.tax_rate}%`}
-                                          </h2>
+                                    {/* Thuế */}
+                                    <div className="flex items-center">
+                                      <SelectCustomLabel
+                                        placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                                        options={taxOptions}
+                                        value={ce?.tax}
+                                        onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
+                                        renderOption={(option, isLabel) => (
+                                          <div
+                                            className={`flex items-center justify-start gap-1 responsive-text-sm ${
+                                              isLabel ? 'py-1 2xl:py-2' : ''
+                                            }`}
+                                          >
+                                            <h2 className="">{option?.label}</h2>
+                                            {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                              <h2>
+                                                {option?.tax_rate === '20'
+                                                  ? `(${option?.tax_rate}%)`
+                                                  : `${option?.tax_rate}%`}
+                                              </h2>
+                                            )}
+                                          </div>
                                         )}
-                                      </div>
-                                    )}
-                                  />
-                                </div>
-                                {/* Thành tiền và nút xóa */}
-                                <ItemTotalAndDelete
-                                  total={formatMoney(
-                                    ce?.price *
-                                      (1 - Number(ce?.discount || 0) / 100) *
-                                      (1 + Number(ce?.tax?.tax_rate ? ce?.tax?.tax_rate : 0) / 100) *
-                                      Number(ce?.amount)
-                                  )}
-                                  onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
-                                />
-                              </React.Fragment>
-                            ))}
+                                      />
+                                    </div>
+                                    {/* Thành tiền và nút xóa */}
+                                    <ItemTotalAndDelete
+                                      total={formatMoney(
+                                        ce?.price *
+                                          (1 - Number(ce?.discount || 0) / 100) *
+                                          (1 + Number(ce?.tax?.tax_rate ? ce?.tax?.tax_rate : 0) / 100) *
+                                          Number(ce?.amount)
+                                      )}
+                                      onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                    />
+                                  </React.Fragment>
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </>
-              )}
+                        )
+                      })}
+                    </>
+                  )}
+                </div>
+              </Customscrollbar>
             </div>
-          </Customscrollbar>
-        </div>
+          )}
+        </>
       }
       info={
         <div className="flex flex-col gap-4">
@@ -1328,6 +1216,21 @@ const PurchaseImportForm = (props) => {
             icon={<PiUsersLight />}
             errMess={dataLang?.purchase_order_errSupplier || 'purchase_order_errSupplier'}
           />
+          
+          {/* Đơn đặt hàng (PO) */}
+          <SelectWithRadio
+            isRequired={false}
+            label={dataLang?.import_the_orders || 'import_the_orders'}
+            placeholderText="Chọn đơn đặt hàng"
+            options={dataTheOrder}
+            value={idTheOrder}
+            onChange={(value) => {
+              const newValue = dataTheOrder.find((item) => item.value === value)
+              _HandleChangeInput('theorder', newValue)
+            }}
+            sSearch={sSearchOrder}
+            icon={<PiClipboardTextLight />}
+          />
           {/* Chi nhánh */}
           <SelectWithRadio
             isRequired={true}
@@ -1342,20 +1245,6 @@ const PurchaseImportForm = (props) => {
             isError={errBranch}
             icon={<PiMapPinLight />}
             errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-          />
-          {/* Đơn đặt hàng (PO) */}
-          <SelectWithRadio
-            isRequired={false}
-            label={dataLang?.import_the_orders || 'import_the_orders'}
-            placeholderText="Chọn đơn đặt hàng"
-            options={dataTheOrder}
-            value={idTheOrder}
-            onChange={(value) => {
-              const newValue = dataTheOrder.find((item) => item.value === value)
-              _HandleChangeInput('theorder', newValue)
-            }}
-            sSearch={sSearchOrder}
-            icon={<PiClipboardTextLight />}
           />
           {/* Chọn kho nhập dư (nếu có) */}
           <AnimatePresence mode="wait">
