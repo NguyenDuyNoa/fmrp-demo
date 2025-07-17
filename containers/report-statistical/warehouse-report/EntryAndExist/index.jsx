@@ -1,11 +1,10 @@
-import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination'
-import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination'
-import { ColumnTable, RowItemTable, RowTable } from '@/components/UI/common/Table'
-import { ContainerTotal } from '@/components/UI/common/layout'
-import Pagination from '@/components/UI/pagination'
+import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table'
+import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit'
+import SearchComponent from '@/components/UI/filterComponents/searchComponent'
+import SelectComponent from '@/components/UI/filterComponents/selectComponent'
+import Loading from "@/components/UI/loading/loading"
+import NoData from "@/components/UI/noData/nodata"
 import ReportLayout from '@/components/layout/ReportLayout'
-import ReportFilter from '@/components/layout/ReportLayout/ReportFilter'
-import ReportTable from '@/components/layout/ReportLayout/ReportTable'
 import useSetingServer from '@/hooks/useConfigNumber'
 import { useLimitAndTotalItems } from '@/hooks/useLimitAndTotalItems'
 import usePagination from '@/hooks/usePagination'
@@ -139,68 +138,100 @@ const EntryAndExist = (props) => {
       statusExprired={statusExprired}
       breadcrumbItems={breadcrumbItems}
       filterSection={
-        <ReportFilter
-          onSearch={() => {}}
-          onReset={() => {}}
-          onExport={() => {}}
-          filterOptions={filterOptions}
-          limit={limit}
-          sLimit={sLimit}
-          dataLang={dataLang}
-        />
+        <div className="w-full items-center flex justify-between gap-2">
+          <div className="flex gap-3 items-center w-full">
+            <div className="flex gap-2">
+              <SearchComponent
+                colSpan={1}
+                dataLang={dataLang}
+                placeholder={dataLang?.branch_search}
+                // onChange={onSearch}
+              />
+              {filterOptions.map((option, index) => (
+                <SelectComponent
+                  key={index}
+                  options={option.options}
+                  placeholder={option.placeholder}
+                  isSearchable={true}
+                  colSpan={1}
+                  onChange={option.onChange}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 space-x-2 items-center">
+            {/* <OnResetData sOnFetching={onReset} /> */}
+            {/* {onExport && (
+              <button
+                onClick={onExport}
+                className="xl:px-4 px-3 xl:py-2.5 py-1.5 2xl:text-xs xl:text-xs text-[7px] flex items-center space-x-2 bg-[#C7DFFB] rounded hover:scale-105 transition"
+              >
+                <span>{dataLang?.client_list_exportexcel}</span>
+              </button>
+            )} */}
+            <DropdowLimit sLimit={sLimit} limit={limit} dataLang={dataLang} />
+          </div>
+        </div>
       }
       tableSection={
-        <ReportTable
-          isLoading={isState.isLoading}
-          data={isState.data}
-          headerContent={headerContent}
-          renderRow={renderRow}
-        />
+        <div className="2xl:w-[100%] pr-2">
+        <HeaderTable>{headerContent}</HeaderTable>
+        
+        {/* {isLoading ? (
+            <Loading className="3xl:h-[620px] 2xl:h-[550px] h-[550px]" color="#0f4f9e" />
+        ) : data?.length > 0 ? (
+            <div className="min-h-[400px] h-[100%] w-full max-h-[600px]">
+                {data.map((item) => renderRow(item))}
+            </div>
+        ) : (
+            <NoData />
+        )} */}
+    </div>
       }
-      totalSection={
-        isState?.data?.length > 0 && (
-          <ContainerTotal>
-            <ColumnTable colSpan={5} textAlign={'center'} className="p-2">
-              {dataLang?.productsWarehouse_total || 'productsWarehouse_total'}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-            <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
-              {formatNumber(isState.total?.total_quantity)}
-            </ColumnTable>
-          </ContainerTotal>
-        )
-      }
-      paginationSection={
-        isState?.data?.length > 0 && (
-          <ContainerPagination>
-            <TitlePagination dataLang={dataLang} totalItems={isState?.total?.iTotalDisplayRecords} />
-            <Pagination
-              postsPerPage={isState.limitItemWarehouseDetail}
-              totalPosts={Number(isState?.total?.iTotalDisplayRecords)}
-              paginate={paginate}
-              currentPage={router.query?.page || 1}
-              className="3xl:text-base text-sm"
-            />
-          </ContainerPagination>
-        )
-      }
+      // totalSection={
+      //   isState?.data?.length > 0 && (
+      //     <ContainerTotal>
+      //       <ColumnTable colSpan={5} textAlign={'center'} className="p-2">
+      //         {dataLang?.productsWarehouse_total || 'productsWarehouse_total'}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //       <ColumnTable colSpan={1} textAlign={'right'} className="p-2 mr-1">
+      //         {formatNumber(isState.total?.total_quantity)}
+      //       </ColumnTable>
+      //     </ContainerTotal>
+      //   )
+      // }
+      // paginationSection={
+      //   isState?.data?.length > 0 && (
+      //     <ContainerPagination>
+      //       <TitlePagination dataLang={dataLang} totalItems={isState?.total?.iTotalDisplayRecords} />
+      //       <Pagination
+      //         postsPerPage={isState.limitItemWarehouseDetail}
+      //         totalPosts={Number(isState?.total?.iTotalDisplayRecords)}
+      //         paginate={paginate}
+      //         currentPage={router.query?.page || 1}
+      //         className="3xl:text-base text-sm"
+      //       />
+      //     </ContainerPagination>
+      //   )
+      // }
     />
   )
 }

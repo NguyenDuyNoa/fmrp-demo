@@ -305,7 +305,7 @@ const Navbar = (props) => {
   }, [router.pathname])
 
   return (
-    <ul className="w-1/5 h-fit p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-[#F7FAFE] rounded-lg">
+    <ul className="w-1/5 h-fit xl:p-4 2xl:p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-[#F7FAFE] rounded-lg">
       {navbar &&
         navbar.map((item) => {
           return (
