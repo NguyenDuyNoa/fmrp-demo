@@ -1324,7 +1324,7 @@ const DeliveryReceiptForm = (props) => {
 
             <div className="relative w-full flex flex-row custom-date-picker date-form">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                <BsCalendarEvent color="#7a7a7a" />
+                <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
               </span>
               <ConfigProvider locale={viVN}>
                 <DatePicker
@@ -1431,22 +1431,6 @@ const DeliveryReceiptForm = (props) => {
                 className="overflow-hidden"
               >
                 <div className="flex flex-col gap-y-3">
-                  {/* Chi nhánh */}
-                  <SelectWithRadio
-                    isRequired={true}
-                    label={dataLang?.import_branch || 'import_branch'}
-                    placeholderText="Chọn chi nhánh"
-                    options={dataBranch}
-                    value={idBranch}
-                    onChange={(value) => {
-                      const newValue = dataBranch.find((item) => item.value === value)
-                      _HandleChangeInput('branch', newValue)
-                    }}
-                    isError={errBranch}
-                    icon={<PiMapPinLight />}
-                    errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
-                  />
-
                   {/* Nhân viên */}
                   <SelectWithRadio
                     isRequired={true}
@@ -1461,6 +1445,22 @@ const DeliveryReceiptForm = (props) => {
                     isError={errStaff}
                     icon={<PiUser />}
                     errMess={dataLang?.delivery_receipt_err_userStaff || 'delivery_receipt_err_userStaff'}
+                  />
+
+                  {/* Chi nhánh */}
+                  <SelectWithRadio
+                    isRequired={true}
+                    label={dataLang?.import_branch || 'import_branch'}
+                    placeholderText="Chọn chi nhánh"
+                    options={dataBranch}
+                    value={idBranch}
+                    onChange={(value) => {
+                      const newValue = dataBranch.find((item) => item.value === value)
+                      _HandleChangeInput('branch', newValue)
+                    }}
+                    isError={errBranch}
+                    icon={<PiMapPinLight />}
+                    errMess={dataLang?.purchase_order_errBranch || 'purchase_order_errBranch'}
                   />
                 </div>
               </motion.div>

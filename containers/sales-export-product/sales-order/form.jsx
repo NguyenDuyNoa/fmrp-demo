@@ -23,10 +23,9 @@ import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { BsCalendarEvent } from 'react-icons/bs'
 import { FiUser } from 'react-icons/fi'
 import { LuBriefcase } from 'react-icons/lu'
-import { PiMapPinLight } from 'react-icons/pi'
+import { PiHash, PiMapPinLight } from 'react-icons/pi'
 import { v4 as uuidv4 } from 'uuid'
 
 // Optimize UI
@@ -40,6 +39,7 @@ import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
 import SelectWithSort from '@/components/common/select/SelectWithSort'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import EmptyData from '@/components/UI/emptyData'
 import { ConfigProvider, DatePicker } from 'antd'
@@ -1211,7 +1211,9 @@ const SalesOrderForm = (props) => {
           <div className="flex flex-col flex-wrap items-center gap-y-3">
             <InfoFormLabel label={dataLang?.sales_product_code || 'sales_product_code'} />
             <div className="w-full relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-neutral-02">
+                <PiHash />
+              </span>
               <input
                 value={codeProduct}
                 onChange={handleOnChangeInput.bind(this, 'codeProduct')}
@@ -1228,7 +1230,7 @@ const SalesOrderForm = (props) => {
             <div className="w-full">
               <div className="relative w-full flex flex-row custom-date-picker date-form">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                  <BsCalendarEvent color="#7a7a7a" />
+                  <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
                 </span>
                 <ConfigProvider locale={viVN}>
                   <DatePicker
@@ -1264,7 +1266,7 @@ const SalesOrderForm = (props) => {
             <div className="w-full">
               <div className="relative flex flex-row custom-date-picker date-form">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                  <BsCalendarEvent color="#7a7a7a" />
+                  <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
                 </span>
                 <ConfigProvider locale={viVN}>
                   <DatePicker
@@ -1321,30 +1323,7 @@ const SalesOrderForm = (props) => {
                 className="overflow-hidden"
               >
                 <React.Fragment>
-                  {/* Chi nhánh */}
-                  <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
-                    <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
-                    <div className="w-full">
-                      <div className="relative flex flex-row select-with-sort">
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                          <PiMapPinLight color="#7a7a7a" />
-                        </div>
-                        <SelectWithSort
-                          title="Chi nhánh"
-                          placeholderText="Chọn chi nhánh"
-                          options={dataBranch}
-                          value={selectedBranch}
-                          onChange={(value) => setSelectedBranch(value)}
-                          isError={errBranch}
-                        />
-                      </div>
-                      {errBranch && (
-                        <label className="text-sm text-red-500">
-                          {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
-                        </label>
-                      )}
-                    </div>
-                  </div>
+                  
                   {/* Nhân viên */}
                   <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
                     <InfoFormLabel isRequired label={dataLang?.sales_product_staff_in_charge || 'Nhân viên'} />
@@ -1385,12 +1364,36 @@ const SalesOrderForm = (props) => {
                       />
                     </div>
                   </div>
+                  {/* Chi nhánh */}
+                  <div className="flex flex-col flex-wrap items-center mb-4 gap-y-3">
+                    <InfoFormLabel isRequired label={dataLang?.branch || 'Chi nhánh'} />
+                    <div className="w-full">
+                      <div className="relative flex flex-row select-with-sort">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                          <PiMapPinLight color="#7a7a7a" />
+                        </div>
+                        <SelectWithSort
+                          title="Chi nhánh"
+                          placeholderText="Chọn chi nhánh"
+                          options={dataBranch}
+                          value={selectedBranch}
+                          onChange={(value) => setSelectedBranch(value)}
+                          isError={errBranch}
+                        />
+                      </div>
+                      {errBranch && (
+                        <label className="text-sm text-red-500">
+                          {dataLang?.sales_product_err_branch || 'sales_product_err_branch'}
+                        </label>
+                      )}
+                    </div>
+                  </div>
                 </React.Fragment>
               </motion.div>
             )}
           </AnimatePresence>
           {/* Xem thêm Button */}
-          <div className="flex items-center justify-center p-1 pb-6 hover:underline">
+          <div className="flex items-center justify-center p-1 hover:underline">
             <button
               onClick={() => setShowMoreInfo(!showMoreInfo)}
               className="text-gray-700 text-sm font-normal inline-flex items-center gap-x-1"

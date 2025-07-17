@@ -9,6 +9,7 @@ import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomL
 import SelectSearch from '@/components/common/orderManagement/SelectSearch'
 import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import TableHeader from '@/components/common/orderManagement/TableHeader'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
@@ -37,7 +38,6 @@ import moment from 'moment/moment'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { BsCalendarEvent } from 'react-icons/bs'
 import { LuBriefcase, LuRefreshCcw } from 'react-icons/lu'
 import { PiMapPinLight } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
@@ -45,6 +45,7 @@ import Popup from 'reactjs-popup'
 import { routerReturnSales } from 'routers/sellingGoods'
 import { v4 as uuidv4 } from 'uuid'
 import { useReturnSalesItems } from './hooks/useReturnSalesItems'
+import EmptyData from '@/components/UI/emptyData'
 
 const initsFetching = {
   onFetchingCondition: false,
@@ -758,322 +759,334 @@ const ReturnSalesForm = (props) => {
         </div>
       }
       tableLeft={
-        <div>
-          <div className="grid grid-cols-12 items-center gap-3 2xl:gap-4 sticky top-0 z-10 py-2 border-b border-gray-100">
-            <TableHeader className="text-left col-span-3">
-              {dataLang?.import_from_items || 'import_from_items'}
-            </TableHeader>
-            <div className="col-span-9">
-              <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-3 2xl:gap-4">
-                <TableHeader className="text-center">{dataLang?.PDF_house || 'PDF_house'}</TableHeader>
-                <TableHeader className="text-center">
-                  {dataLang?.import_from_quantity || 'import_from_quantity'}
+        <>
+          {listData.length === 0 ? (
+            <EmptyData />
+          ) : (
+            <div>
+              <div className="grid grid-cols-12 items-center gap-3 2xl:gap-4 sticky top-0 z-10 py-2 border-b border-gray-100">
+                <TableHeader className="text-left col-span-3">
+                  {dataLang?.import_from_items || 'import_from_items'}
                 </TableHeader>
-                <TableHeader className="text-center">
-                  {dataLang?.import_from_unit_price || 'import_from_unit_price'}
-                </TableHeader>
-                {/* Chọn hàng loạt % Chiếu khấu */}
-                <DropdownDiscount
-                  value={generalDiscount}
-                  onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
-                  dataLang={dataLang}
-                />
-                <TableHeader className="text-center">{dataLang?.returns_sck || 'returns_sck'}</TableHeader>
-                {/* Chọn hàng loại % Thuế */}
-                <DropdownTax
-                  value={generalTax}
-                  onChange={_HandleChangeInput.bind(this, 'generalTax')}
-                  dataLang={dataLang}
-                  taxOptions={taxOptions}
-                />
-                <TableHeader className="text-right">{dataLang?.import_into_money || 'import_into_money'}</TableHeader>
+                <div className="col-span-9">
+                  <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] gap-3 2xl:gap-4">
+                    <TableHeader className="text-center">{dataLang?.PDF_house || 'PDF_house'}</TableHeader>
+                    <TableHeader className="text-center">
+                      {dataLang?.import_from_quantity || 'import_from_quantity'}
+                    </TableHeader>
+                    <TableHeader className="text-center">
+                      {dataLang?.import_from_unit_price || 'import_from_unit_price'}
+                    </TableHeader>
+                    {/* Chọn hàng loạt % Chiếu khấu */}
+                    <DropdownDiscount
+                      value={generalDiscount}
+                      onChange={_HandleChangeInput.bind(this, 'generalDiscount')}
+                      dataLang={dataLang}
+                    />
+                    <TableHeader className="text-center">{dataLang?.returns_sck || 'returns_sck'}</TableHeader>
+                    {/* Chọn hàng loại % Thuế */}
+                    <DropdownTax
+                      value={generalTax}
+                      onChange={_HandleChangeInput.bind(this, 'generalTax')}
+                      dataLang={dataLang}
+                      taxOptions={taxOptions}
+                    />
+                    <TableHeader className="text-right">
+                      {dataLang?.import_into_money || 'import_into_money'}
+                    </TableHeader>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <Customscrollbar className="max-h-[780px] overflow-auto pb-2">
-            <div className="h-full w-full">
-              {/* {isFetching ? (
+              <Customscrollbar className="max-h-[780px] overflow-auto pb-2">
+                <div className="h-full w-full">
+                  {/* {isFetching ? (
                 <Loading className="w-full h-10" color="#0f4f9e" />
               ) : (
                 <> */}
-              {listData?.map((e, index) => {
-                const option = e?.matHang
-                const firstChild = e.child[0]
-                const isLast = index === listData.length - 1
+                  {listData?.map((e, index) => {
+                    const option = e?.matHang
+                    const firstChild = e.child[0]
+                    const isLast = index === listData.length - 1
 
-                return (
-                  <div
-                    key={e?.id?.toString()}
-                    className={`grid items-center grid-cols-12 gap-3 2xl:gap-4 py-2 ${
-                      isLast ? '' : 'border-b border-[#F3F3F4]'
-                    }`}
-                  >
-                    {/* Mặt hàng */}
-                    <div className="h-full col-span-3">
-                      <div className="flex items-center justify-between gap-1 xl:gap-2">
-                        <div className="flex items-start">
-                          <div className="flex xl:flex-row flex-col items-start gap-3">
-                            <img
-                              src={option?.e?.images ?? '/icon/noimagelogo.png'}
-                              alt={option?.e?.name}
-                              className="size-12 object-cover rounded-md"
-                            />
-                            <div className="flex flex-col gap-[2px] responsive-text-xxs overflow-hidden text-neutral-03 font-normal">
-                              <h3 className="font-semibold responsive-text-sm text-brand-color">{option.e?.name}</h3>
-                              <div>
-                                {option.e?.code} : {option.e?.product_variation}
-                              </div>
-                              <div>ĐVT: {firstChild?.unit}</div>
-                              {option.e?.import_code && (
-                                <div className="flex items-center gap-1">
-                                  <h5>
-                                    {option.e?.import_code} - {dataLang[option.e?.text_type]}
-                                  </h5>
-                                </div>
-                              )}
-
-                              <div className="flex items-center gap-2 italic">
-                                {dataProductSerial.is_enable === '1' && (
-                                  <div>Serial: {option.e?.serial ? option.e?.serial : '-'}</div>
-                                )}
-                                {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
-                                  <div>
-                                    Lot: {option.e?.lot ? option.e?.lot : '-'} - Date:{' '}
-                                    {option.e?.expiration_date
-                                      ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
-                                      : '-'}
-                                  </div>
-                                ) : (
-                                  ''
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
-                          className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
-                        >
-                          <Add />
-                        </button>
-                      </div>
-                      {/* Ghi chú */}
-                      <div className="flex items-center justify-center mt-2">
-                        <Image
-                          src={'/icon/pen.svg'}
-                          alt="icon pen"
-                          width={16}
-                          height={16}
-                          className="size-3 object-cover"
-                        />
-                        <input
-                          value={firstChild?.note}
-                          onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
-                          placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
-                          name="optionEmail"
-                          type="text"
-                          className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
-                        />
-                      </div>
-                      {/* Xóa mặt hàng chưa chọn kho*/}
-                      {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
-                        <button
-                          onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
-                          className="text-xs text-center w-full rounded-lg mt-2 px-5 py-2 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white transition-all ease-out duration-300"
-                        >
-                          Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
-                        </button>
-                      )}
-                    </div>
-                    <div className="items-center col-span-9">
-                      <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] items-center gap-3 2xl:gap-4 py-1">
-                        {/* {fetChingData.load ? (
-                          <Loading className="h-2 col-span-8" color="#0f4f9e" />
-                        ) : ( */}
-                        {e?.child?.map((ce) => (
-                          <React.Fragment key={ce?.id?.toString()}>
-                            {/* Kho - Vị trí kho */}
-                            <div className="flex items-center h-full">
-                              <SelectCustomLabel
-                                dataLang={dataLang}
-                                placeholder={fetChingData.onLoadingChild ? '' : dataLang?.PDF_house || 'PDF_house'}
-                                options={dataWarehouse}
-                                value={ce?.warehouse}
-                                onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'warehouse', value)}
-                                formatNumber={formatNumber}
-                                isError={
-                                  (errors.errWarehouse && ce?.warehouse == null) ||
-                                  (errors.errWarehouse &&
-                                    (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
-                                }
-                                isVisibleLotDate={false}
-                              />
-                            </div>
-                            {/* Số lượng */}
-                            <div className="flex items-center justify-center">
-                              <div
-                                className={`relative flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
-                                  errors.errQuantity &&
-                                  (ce?.quantity === null || ce?.quantity === '' || ce?.quantity === 0)
-                                    ? 'border-red-500'
-                                    : errors.errSurvive
-                                    ? 'border-red-500'
-                                    : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
-                                } ${(ce?.quantity === 0 || ce?.quantity === '') && 'border-red-500'}  `}
-                              >
-                                <button
-                                  disabled={
-                                    ce?.quantity === 1 ||
-                                    ce?.quantity === '' ||
-                                    ce?.quantity === null ||
-                                    ce?.quantity === 0
-                                  }
-                                  className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
-                                  onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
-                                >
-                                  <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                </button>
-                                <InPutNumericFormat
-                                  onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
-                                  value={ce?.quantity || null}
-                                  className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
-                                  allowNegative={false}
-                                  isAllowed={({ floatValue }) => {
-                                    if (+floatValue > +ce?.quantityLeft) {
-                                      isShow(
-                                        'error',
-                                        `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
-                                          +ce?.quantityLeft
-                                        )} số lượng còn lại`
-                                      )
-                                      return false
-                                    } else {
-                                      return true
-                                    }
-                                  }}
+                    return (
+                      <div
+                        key={e?.id?.toString()}
+                        className={`grid items-center grid-cols-12 gap-3 2xl:gap-4 py-2 ${
+                          isLast ? '' : 'border-b border-[#F3F3F4]'
+                        }`}
+                      >
+                        {/* Mặt hàng */}
+                        <div className="h-full col-span-3">
+                          <div className="flex items-center justify-between gap-1 xl:gap-2">
+                            <div className="flex items-start">
+                              <div className="flex xl:flex-row flex-col items-start gap-3">
+                                <img
+                                  src={option?.e?.images ?? '/icon/noimagelogo.png'}
+                                  alt={option?.e?.name}
+                                  className="size-12 object-cover rounded-md"
                                 />
-                                <button
-                                  className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5  bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
-                                  onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
-                                >
-                                  <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
-                                </button>
-                                <div className="absolute -top-4 -right-2 p-1 cursor-pointer">
-                                  <Popup
-                                    trigger={
-                                      <div className="relative ">
-                                        <TableDocument size="18" color="#4f46e5" className="font-medium" />
-                                        <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
-                                          <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
-                                            <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
-                                          </span>
-                                        </span>
-                                      </div>
-                                    }
-                                    position="bottom center"
-                                    on={['hover', 'focus']}
-                                  >
-                                    <div className="flex flex-col bg-primary-06 px-2.5 py-0.5 rounded-lg font-deca">
-                                      <span className="text-xs font-medium">
-                                        Sl đã giao: {formatNumber(+ce?.quantityDelivered)}
-                                      </span>
-                                      <span className="text-xs font-medium">
-                                        Sl đã trả: {formatNumber(ce?.quantityPay)}
-                                      </span>
-                                      <span className="text-xs font-medium">
-                                        Sl còn lại: {formatNumber(ce?.quantityLeft)}
-                                      </span>
+                                <div className="flex flex-col gap-[2px] responsive-text-xxs overflow-hidden text-neutral-03 font-normal">
+                                  <h3 className="font-semibold responsive-text-sm text-brand-color">
+                                    {option.e?.name}
+                                  </h3>
+                                  <div>
+                                    {option.e?.code} : {option.e?.product_variation}
+                                  </div>
+                                  <div>ĐVT: {firstChild?.unit}</div>
+                                  {option.e?.import_code && (
+                                    <div className="flex items-center gap-1">
+                                      <h5>
+                                        {option.e?.import_code} - {dataLang[option.e?.text_type]}
+                                      </h5>
                                     </div>
-                                  </Popup>
-                                </div>
-                              </div>
-                            </div>
-                            {/* Đơn giá */}
-                            <div
-                              className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
-                                errors.errPrice && (ce?.price === null || ce?.price === '')
-                                  ? 'border-red-500'
-                                  : errors.errSurvivePrice && (ce?.price === null || ce?.price === '')
-                                  ? 'border-red-500'
-                                  : 'border-neutral-N400 focus:border-brand-color hover:border-brand-color'
-                              } ${
-                                (ce?.price === null || ce?.price === '') &&
-                                'border-red-500 hover:border-red-500 focus:border-red-500'
-                              } `}
-                            >
-                              <InPutMoneyFormat
-                                className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
-                                value={ce?.price}
-                                isAllowed={isAllowedNumber}
-                                isSuffix=" đ"
-                              />
-                            </div>
-                            {/* % Chiết khấu */}
-                            <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 focus:border-brand-color hover:border-brand-color responsive-text-sm font-semibold">
-                              <InPutNumericFormat
-                                className="appearance-none w-full focus:outline-none text-right"
-                                onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
-                                value={ce?.discount}
-                                isAllowed={isAllowedDiscount}
-                                allowNegative={false}
-                              />
-                              <span className="pl-[2px] 2xl:pl-1">%</span>
-                            </div>
-                            {/* Đơn giá sau chiết khấu */}
-                            <div
-                              className={`flex items-center justify-center text-center responsive-text-sm font-semibold`}
-                            >
-                              <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
-                              <span className="pl-1 underline">đ</span>
-                            </div>
-                            {/* % Thuế */}
-                            <div className="flex items-center h-full">
-                              <SelectCustomLabel
-                                placeholder={dataLang?.import_from_tax || 'import_from_tax'}
-                                options={taxOptions}
-                                value={ce?.tax}
-                                onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
-                                renderOption={(option, isLabel) => (
-                                  <div
-                                    className={`flex items-center justify-start gap-1 responsive-text-sm ${
-                                      isLabel ? 'py-1 2xl:py-2' : ''
-                                    }`}
-                                  >
-                                    <h2 className="">{option?.label}</h2>
-                                    {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
-                                      <h2>
-                                        {option?.tax_rate === '20' ? `(${option?.tax_rate}%)` : `${option?.tax_rate}%`}
-                                      </h2>
+                                  )}
+
+                                  <div className="flex items-center gap-2 italic">
+                                    {dataProductSerial.is_enable === '1' && (
+                                      <div>Serial: {option.e?.serial ? option.e?.serial : '-'}</div>
+                                    )}
+                                    {dataMaterialExpiry.is_enable === '1' || dataProductExpiry.is_enable === '1' ? (
+                                      <div>
+                                        Lot: {option.e?.lot ? option.e?.lot : '-'} - Date:{' '}
+                                        {option.e?.expiration_date
+                                          ? formatMoment(option.e?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                          : '-'}
+                                      </div>
+                                    ) : (
+                                      ''
                                     )}
                                   </div>
-                                )}
-                              />
+                                </div>
+                              </div>
                             </div>
-                            {/* Thành tiền và nút xóa*/}
-                            <ItemTotalAndDelete
-                              total={formatMoney(
-                                ce?.price *
-                                  (1 - Number(ce?.discount) / 100) *
-                                  (1 + Number(ce?.tax?.tax_rate) / 100) *
-                                  Number(ce?.quantity)
-                              )}
-                              onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                            <button
+                              onClick={_HandleAddChild.bind(this, e?.id, e?.matHang)}
+                              className="flex items-center justify-center xl:size-7 size-5 transition ease-in-out rounded text-typo-blue-1 bg-primary-05 hover:rotate-45 hover:hover:bg-[#e2f0fe] hover:scale-105 hover:text-red-500"
+                            >
+                              <Add />
+                            </button>
+                          </div>
+                          {/* Ghi chú */}
+                          <div className="flex items-center justify-center mt-2">
+                            <Image
+                              src={'/icon/pen.svg'}
+                              alt="icon pen"
+                              width={16}
+                              height={16}
+                              className="size-3 object-cover"
                             />
-                          </React.Fragment>
-                        ))}
-                        {/*   )} */}
+                            <input
+                              value={firstChild?.note}
+                              onChange={_HandleChangeChild.bind(this, e?.id, firstChild?.id, 'note')}
+                              placeholder={dataLang?.delivery_receipt_note || 'delivery_receipt_note'}
+                              name="optionEmail"
+                              type="text"
+                              className="focus:border-[#92BFF7] placeholder:responsive-text-xs 2xl:h-7 xl:h-5 py-0 px-1 responsive-text-xs placeholder-slate-300 w-full bg-white rounded-[5.5px] text-[#1C252E] font-normal outline-none placeholder:text-typo-gray-4"
+                            />
+                          </div>
+                          {/* Xóa mặt hàng chưa chọn kho*/}
+                          {e?.child?.filter((e) => e?.warehouse == null).length >= 2 && (
+                            <button
+                              onClick={_HandleDeleteAllChild.bind(this, e?.id, e?.matHang)}
+                              className="text-xs text-center w-full rounded-lg mt-2 px-5 py-2 overflow-hidden group bg-rose-500 relative hover:bg-gradient-to-r hover:from-rose-500 hover:to-rose-400 text-white transition-all ease-out duration-300"
+                            >
+                              Xóa {e?.child?.filter((e) => e?.warehouse == null).length} hàng chưa chọn kho
+                            </button>
+                          )}
+                        </div>
+                        <div className="items-center col-span-9">
+                          <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.2fr)] items-center gap-3 2xl:gap-4 py-1">
+                            {/* {fetChingData.load ? (
+                          <Loading className="h-2 col-span-8" color="#0f4f9e" />
+                        ) : ( */}
+                            {e?.child?.map((ce) => (
+                              <React.Fragment key={ce?.id?.toString()}>
+                                {/* Kho - Vị trí kho */}
+                                <div className="flex items-center h-full">
+                                  <SelectCustomLabel
+                                    dataLang={dataLang}
+                                    placeholder={fetChingData.onLoadingChild ? '' : dataLang?.PDF_house || 'PDF_house'}
+                                    options={dataWarehouse}
+                                    value={ce?.warehouse}
+                                    onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'warehouse', value)}
+                                    formatNumber={formatNumber}
+                                    isError={
+                                      (errors.errWarehouse && ce?.warehouse == null) ||
+                                      (errors.errWarehouse &&
+                                        (ce?.warehouse?.label == null || ce?.warehouse?.warehouse_name == null))
+                                    }
+                                    isVisibleLotDate={false}
+                                  />
+                                </div>
+                                {/* Số lượng */}
+                                <div className="flex items-center justify-center">
+                                  <div
+                                    className={`relative flex items-center justify-center h-8 2xl:h-10 3xl:p-2 xl:p-[2px] p-[1px] border rounded-3xl ${
+                                      errors.errQuantity &&
+                                      (ce?.quantity === null || ce?.quantity === '' || ce?.quantity === 0)
+                                        ? 'border-red-500'
+                                        : errors.errSurvive
+                                        ? 'border-red-500'
+                                        : 'focus:border-brand-color hover:border-brand-color border-neutral-N400'
+                                    } ${(ce?.quantity === 0 || ce?.quantity === '') && 'border-red-500'}  `}
+                                  >
+                                    <button
+                                      disabled={
+                                        ce?.quantity === 1 ||
+                                        ce?.quantity === '' ||
+                                        ce?.quantity === null ||
+                                        ce?.quantity === 0
+                                      }
+                                      className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5 bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
+                                      onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'decrease')}
+                                    >
+                                      <Minus size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                    </button>
+                                    <InPutNumericFormat
+                                      onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'quantity')}
+                                      value={ce?.quantity || null}
+                                      className={`appearance-none text-center responsive-text-sm font-normal w-full focus:outline-none`}
+                                      allowNegative={false}
+                                      isAllowed={({ floatValue }) => {
+                                        if (+floatValue > +ce?.quantityLeft) {
+                                          isShow(
+                                            'error',
+                                            `Số lượng chỉ được bé hơn hoặc bằng ${formatNumber(
+                                              +ce?.quantityLeft
+                                            )} số lượng còn lại`
+                                          )
+                                          return false
+                                        } else {
+                                          return true
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      className="2xl:scale-100 xl:scale-90 scale-75 font-bold flex items-center justify-center p-0.5  bg-primary-05 hover:bg-typo-blue-4/50 rounded-full"
+                                      onClick={_HandleChangeChild.bind(this, e?.id, ce?.id, 'increase')}
+                                    >
+                                      <Add size="16" className="scale-75 2xl:scale-100 xl:scale-90" />
+                                    </button>
+                                    <div className="absolute -top-4 -right-2 p-1 cursor-pointer">
+                                      <Popup
+                                        trigger={
+                                          <div className="relative ">
+                                            <TableDocument size="18" color="#4f46e5" className="font-medium" />
+                                            <span className="h-2 w-2  absolute top-0 left-1/2  translate-x-[50%] -translate-y-[50%]">
+                                              <span className="relative inline-flex w-2 h-2 bg-indigo-500 rounded-full">
+                                                <span className="absolute inline-flex w-full h-full bg-indigo-400 rounded-full opacity-75 animate-ping"></span>
+                                              </span>
+                                            </span>
+                                          </div>
+                                        }
+                                        position="bottom center"
+                                        on={['hover', 'focus']}
+                                      >
+                                        <div className="flex flex-col bg-primary-06 px-2.5 py-0.5 rounded-lg font-deca">
+                                          <span className="text-xs font-medium">
+                                            Sl đã giao: {formatNumber(+ce?.quantityDelivered)}
+                                          </span>
+                                          <span className="text-xs font-medium">
+                                            Sl đã trả: {formatNumber(ce?.quantityPay)}
+                                          </span>
+                                          <span className="text-xs font-medium">
+                                            Sl còn lại: {formatNumber(ce?.quantityLeft)}
+                                          </span>
+                                        </div>
+                                      </Popup>
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Đơn giá */}
+                                <div
+                                  className={`flex items-center justify-center h-8 2xl:h-10 py-1 px-2 2xl:px-3 rounded-lg border ${
+                                    errors.errPrice && (ce?.price === null || ce?.price === '')
+                                      ? 'border-red-500'
+                                      : errors.errSurvivePrice && (ce?.price === null || ce?.price === '')
+                                      ? 'border-red-500'
+                                      : 'border-neutral-N400 focus:border-brand-color hover:border-brand-color'
+                                  } ${
+                                    (ce?.price === null || ce?.price === '') &&
+                                    'border-red-500 hover:border-red-500 focus:border-red-500'
+                                  } `}
+                                >
+                                  <InPutMoneyFormat
+                                    className={`appearance-none text-center responsive-text-sm font-semibold w-full mx-0 focus:outline-none`}
+                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'price')}
+                                    value={ce?.price}
+                                    isAllowed={isAllowedNumber}
+                                    isSuffix=" đ"
+                                  />
+                                </div>
+                                {/* % Chiết khấu */}
+                                <div className="flex items-center justify-end h-8 2xl:h-10 py-2 px-2 2xl:px-3 rounded-lg border border-neutral-N400 focus:border-brand-color hover:border-brand-color responsive-text-sm font-semibold">
+                                  <InPutNumericFormat
+                                    className="appearance-none w-full focus:outline-none text-right"
+                                    onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
+                                    value={ce?.discount}
+                                    isAllowed={isAllowedDiscount}
+                                    allowNegative={false}
+                                  />
+                                  <span className="pl-[2px] 2xl:pl-1">%</span>
+                                </div>
+                                {/* Đơn giá sau chiết khấu */}
+                                <div
+                                  className={`flex items-center justify-center text-center responsive-text-sm font-semibold`}
+                                >
+                                  <h3>{formatMoney(Number(ce?.price) * (1 - Number(ce?.discount) / 100))}</h3>
+                                  <span className="pl-1 underline">đ</span>
+                                </div>
+                                {/* % Thuế */}
+                                <div className="flex items-center h-full">
+                                  <SelectCustomLabel
+                                    placeholder={dataLang?.import_from_tax || 'import_from_tax'}
+                                    options={taxOptions}
+                                    value={ce?.tax}
+                                    onChange={(value) => _HandleChangeChild(e?.id, ce?.id, 'tax', value)}
+                                    renderOption={(option, isLabel) => (
+                                      <div
+                                        className={`flex items-center justify-start gap-1 responsive-text-sm ${
+                                          isLabel ? 'py-1 2xl:py-2' : ''
+                                        }`}
+                                      >
+                                        <h2 className="">{option?.label}</h2>
+                                        {option?.tax_rate !== '0' && option?.tax_rate !== '5' && (
+                                          <h2>
+                                            {option?.tax_rate === '20'
+                                              ? `(${option?.tax_rate}%)`
+                                              : `${option?.tax_rate}%`}
+                                          </h2>
+                                        )}
+                                      </div>
+                                    )}
+                                  />
+                                </div>
+                                {/* Thành tiền và nút xóa*/}
+                                <ItemTotalAndDelete
+                                  total={formatMoney(
+                                    ce?.price *
+                                      (1 - Number(ce?.discount) / 100) *
+                                      (1 + Number(ce?.tax?.tax_rate) / 100) *
+                                      Number(ce?.quantity)
+                                  )}
+                                  onDelete={_HandleDeleteChild.bind(this, e?.id, ce?.id)}
+                                />
+                              </React.Fragment>
+                            ))}
+                            {/*   )} */}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )
-              })}
-              {/* </>
+                    )
+                  })}
+                  {/* </>
               )} */}
+                </div>
+              </Customscrollbar>
             </div>
-          </Customscrollbar>
-        </div>
+          )}
+        </>
       }
       info={
         <div className="flex flex-col gap-4 relative">
@@ -1085,7 +1098,7 @@ const ReturnSalesForm = (props) => {
 
             <div className="relative w-full flex flex-row custom-date-picker date-form">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-                <BsCalendarEvent color="#7a7a7a" />
+                <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
               </span>
               <ConfigProvider locale={viVN}>
                 <DatePicker
