@@ -3,13 +3,17 @@ import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import { BsCalendarEvent } from 'react-icons/bs'
 import InfoFormLabel from './InfoFormLabel'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
+import { PiHash } from 'react-icons/pi'
 
 //  Mã chứng từ
 export const DocumentNumber = ({ dataLang, value, onChange }) => (
   <div className="flex flex-col flex-wrap items-center gap-y-3">
     <InfoFormLabel label={dataLang?.import_code_vouchers || 'import_code_vouchers'} />
     <div className="w-full relative">
-      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-gray-500">#</span>
+      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-neutral-02">
+        <PiHash />
+      </span>
       <input
         value={value}
         onChange={onChange}
@@ -23,13 +27,25 @@ export const DocumentNumber = ({ dataLang, value, onChange }) => (
 )
 
 // Ngày chứng từ
-export const DocumentDate = ({ dataLang, value, onChange, errDate }) => (
+export const DocumentDate = ({ 
+  dataLang, 
+  value, 
+  onChange, 
+  errDate, 
+  isRequired = true,
+  label,
+  showTime = true,
+  format = showTime ? "DD/MM/YYYY HH:mm" : "DD/MM/YYYY"
+}) => (
   <div className="flex flex-col flex-wrap items-center gap-y-3">
-    <InfoFormLabel isRequired={true} label={dataLang?.import_day_vouchers || 'import_day_vouchers'} />
+    <InfoFormLabel 
+      isRequired={isRequired} 
+      label={label || dataLang?.import_day_vouchers || 'import_day_vouchers'} 
+    />
 
     <div className="relative w-full flex flex-row custom-date-picker date-form">
       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-        <BsCalendarEvent color="#7a7a7a" />
+        <CalendarBlankIcon color="#7a7a7a" className="size-4 opacity-60" />
       </span>
       <ConfigProvider locale={viVN}>
         <DatePicker
@@ -37,11 +53,11 @@ export const DocumentDate = ({ dataLang, value, onChange, errDate }) => (
           status={errDate ? 'error' : ''}
           allowClear={false}
           placeholder="Chọn ngày"
-          format="DD/MM/YYYY HH:mm"
-          showTime={{
+          format={format}
+          showTime={showTime ? {
             defaultValue: dayjs('00:00', 'HH:mm'),
             format: 'HH:mm',
-          }}
+          } : false}
           suffixIcon={null}
           value={value ? dayjs(value) : null}
           onChange={(date) => {
