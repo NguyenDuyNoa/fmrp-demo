@@ -760,7 +760,7 @@ const ReturnSalesForm = (props) => {
       }
       tableLeft={
         <>
-          {listData.length === 0 ? (
+          {listData?.length === 0 ? (
             <EmptyData />
           ) : (
             <div>
