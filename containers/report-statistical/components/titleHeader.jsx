@@ -3,7 +3,7 @@ import Head from 'next/head'
 
 const TitleHeader = ({ breadcrumbItems, title }) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 h-fit">
       <Head>
         <title>{title}</title>
       </Head>
