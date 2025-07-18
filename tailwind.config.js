@@ -10,6 +10,7 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx}',
     './node_modules/react-tailwindcss-datepicker/dist/index.esm.js',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontSize: {
@@ -51,6 +52,7 @@ module.exports = {
         'secondary-color-text-disabled': '#919EAB',
         'light-blue-color': '#0375F3',
         primary: {
+          '01': '#0F4F9E',
           '05': '#C7DFFB',
           '06': '#E2F0FE',
           '07': '#EBF5FF',
@@ -63,7 +65,7 @@ module.exports = {
           '01': '#F9FAFB',
           '02': '#9295A4',
           '03': '#667085',
-          '04': '',
+          '04': '#52575E',
           '05': '#3A3E4C',
           '06': '',
           '07': '#141522',
