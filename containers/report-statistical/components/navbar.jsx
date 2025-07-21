@@ -305,7 +305,7 @@ const Navbar = (props) => {
   }, [router.pathname])
 
   return (
-    <ul className="w-1/5 h-fit xl:p-4 2xl:p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-primary-06 rounded-lg">
+    <ul className="w-[16%] h-fit xl:p-4 2xl:p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-primary-06 rounded-lg">
       {navbar &&
         navbar.map((item) => {
           return (
@@ -321,8 +321,12 @@ const Navbar = (props) => {
                             router.pathname === child.path ? 'bg-typo-blue-5 text-white' : ''
                           } `}
                         >
-                          <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
-                            <div className="size-1.5 rounded-full bg-white/60 group-hover:bg-white transition-all duration-300 ease-in-out" />
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`size-1.5 rounded-full flex-shrink-0 ${
+                                router.pathname === child.path ? 'bg-white/60' : 'bg-primary-01'
+                              } group-hover:bg-white/60 transition-all duration-300 ease-in-out`}
+                            />
                             <div className="flex flex-col items-start w-full">
                               <div className="responsive-text-sm">{child.name}</div>
                             </div>
@@ -339,7 +343,11 @@ const Navbar = (props) => {
                       } `}
                     >
                       <div className="flex xl:w-[90%] xl:max-w-[90%] w-[85%] max-w-[85%] items-center gap-2">
-                        <div className="size-1.5 rounded-full bg-white/60 group-hover:bg-white transition-all duration-300 ease-in-out" />
+                        <div
+                          className={`size-1.5 rounded-full flex-shrink-0 ${
+                            router.pathname === item.path ? 'bg-white/60' : 'bg-primary-01'
+                          } group-hover:bg-white/60 transition-all duration-300 ease-in-out`}
+                        />
                         <div className="flex flex-col items-start w-full">
                           <div className="responsive-text-sm">{item.name}</div>
                         </div>
