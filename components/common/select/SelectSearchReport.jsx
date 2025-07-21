@@ -1,6 +1,7 @@
+import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
 import DropdownFilledIcon from '@/components/icons/common/DropdownFilledIcon'
 import { Empty, Select } from 'antd'
-import InfoFormLabel from '../orderManagement/InfoFormLabel'
+import { useRef, useState } from 'react'
 
 const { Option } = Select
 
@@ -18,13 +19,14 @@ const CustomRadio = ({ checked }) => {
   )
 }
 
-const SelectReport = ({
+const SelectSearchReport = ({
   isRequired = false,
   label,
   placeholder,
-  options,
+  options = [],
   value,
   onChange,
+  onSearch,
   onClear,
   disabled,
   isError = false,
@@ -32,6 +34,28 @@ const SelectReport = ({
   icon,
   className,
 }) => {
+  const [searchValue, setSearchValue] = useState('');
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef(null);
+  
+  // Xử lý khi thay đổi giá trị tìm kiếm
+  const handleSearch = (value) => {
+    setSearchValue(value);
+    onSearch && onSearch(value);
+  };
+
+  // Xử lý khi chọn giá trị
+  const handleChange = (selectedValue) => {
+    onChange && onChange(selectedValue);
+    setOpen(false);
+  };
+
+  // Xử lý khi xóa giá trị
+  const handleClear = () => {
+    setSearchValue('');
+    onClear && onClear();
+  };
+
   return (
     <div className={`group flex flex-col flex-wrap items-start gap-y-2 ${className}`}>
       {label && <InfoFormLabel isRequired={isRequired} label={label} />}
@@ -44,14 +68,34 @@ const SelectReport = ({
             placeholder={placeholder}
             allowClear
             value={value}
-            // open={true}
-            onChange={onChange}
-            onClear={onClear}
+            open={open}
+            onFocus={() => setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 200)}
+            onChange={handleChange}
+            onClear={handleClear}
             disabled={disabled}
+            showSearch
+            onSearch={handleSearch}
+            filterOption={(input, option) => 
+              (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+            }
             notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
             popupRender={(menu) => (
               <>
-                <div className="custom-select-dropdown">{menu}</div>
+                <div className="custom-select-dropdown">
+                  <div className="p-2 sticky top-0 bg-white z-10 border-b">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      className="w-full p-2 border rounded-md outline-none text-sm"
+                      placeholder="Tìm kiếm..."
+                      value={searchValue}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  {menu}
+                </div>
               </>
             )}
             optionLabelProp="label"
@@ -80,4 +124,4 @@ const SelectReport = ({
   )
 }
 
-export default SelectReport
+export default SelectSearchReport 

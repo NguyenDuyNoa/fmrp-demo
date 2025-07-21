@@ -14,6 +14,11 @@ import { PiPackage, PiWarehouseLight } from 'react-icons/pi'
 import { useState } from 'react'
 import Pagination from '@/components/UI/pagination'
 import { useGetWarehouse } from './hook/useGetWarehouse'
+import { useEffect } from 'react'
+import { useInventoryItems } from '@/containers/manufacture/inventory/hooks/useInventoryItems'
+import SelectSearchReport from '@/components/common/select/SelectSearchReport'
+import { useCallback } from 'react'
+import { useDebounce } from 'use-debounce'
 
 const data = [
   {
@@ -250,150 +255,6 @@ const data = [
     total: 600000,
     note: 'Có 2 sp lỗi',
   },
-  // {
-  //   id: 13,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 14,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 15,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 16,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 17,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 18,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 19,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
-  // {
-  //   id: 20,
-  //   date: '18/07/2025',
-  //   code: 'ST_000169',
-  //   mcc: 'DT88',
-  //   name: 'Duy Tân',
-  //   productCode: 'TABLE69',
-  //   productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-  //   unit: 'Chiếc',
-  //   location: 'Tầng G - Kho TP',
-  //   quantity: 12,
-  //   price: 50000,
-  //   ck: 0,
-  //   priceCk: 50000,
-  //   tax: 0,
-  //   total: 600000,
-  //   note: 'Có 2 sp lỗi',
-  // },
 ]
 
 const breadcrumbItems = [
@@ -409,16 +270,85 @@ const breadcrumbItems = [
 const ImportPurchase = (props) => {
   const dataLang = useLanguageContext()
   const statusExprired = useStatusExprired()
+
   const [dateRange, setDateRange] = useState({
     startDate: undefined,
     endDate: undefined,
   })
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const [productOptions, setProductOptions] = useState([]);
 
   const { data: warehouseData } = useGetWarehouse()
-  console.log(warehouseData)
+  const { data: dataProduct, refetch } = useInventoryItems(debouncedSearchTerm);
+  console.log(dateRange)
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  useEffect(() => {
+    // Cập nhật options khi dataProduct thay đổi
+    if (dataProduct) {
+      const options = Array.isArray(dataProduct) 
+        ? dataProduct.map(product => ({
+            value: product.value,
+            label: product.name
+          }))
+        : [];
+      setProductOptions(options);
+    }
+  }, [dataProduct]);
+
   const handleDateChange = (newValue) => {
-    console.log('Date changed:', newValue)
-    setDateRange(newValue)
+    console.log("Date range changed:", newValue);
+    
+    // Kiểm tra nếu là "Từ trước đến nay" (cả hai giá trị đều undefined hoặc null)
+    if (newValue && 
+        ((newValue.startDate === undefined || newValue.startDate === null) && 
+         (newValue.endDate === undefined || newValue.endDate === null))) {
+      
+      console.log("Detected 'Từ trước đến nay', resetting date range");
+      // Reset về giá trị mặc định
+      const resetValue = {
+        startDate: undefined,
+        endDate: undefined,
+      };
+      setDateRange(resetValue);
+      
+      // Log để kiểm tra
+      console.log("Date range reset to:", resetValue);
+      return;
+    }
+    
+    // Xử lý các lựa chọn khác
+    console.log("Setting date range to:", newValue);
+    setDateRange(newValue);
+  }
+
+  useEffect(() => {
+    // Tự động chọn kho đầu tiên khi dữ liệu kho được tải về
+    if (warehouseData?.rResult && warehouseData.rResult.length > 0) {
+      const firstWarehouse = warehouseData.rResult[0]
+      setSelectedWarehouse({
+        value: firstWarehouse.id,
+        label: firstWarehouse.name
+      })
+    }
+  }, [warehouseData?.rResult])
+
+  const handleWarehouseChange = (value) => {
+    const selected = warehouseData?.rResult?.find(w => w.id === value)
+    if (selected) {
+      setSelectedWarehouse({
+        value: selected.id,
+        label: selected.name
+      })
+    }
+  }
+
+  const handleClearWarehouse = () => {
+    setSelectedWarehouse(null)
   }
 
   // Define fixed columns configuration
@@ -607,30 +537,29 @@ const ImportPurchase = (props) => {
 
             <SelectReport
               placeholder="Kho thành phẩm"
-              onChange={() => {}}
+              onChange={handleWarehouseChange}
+              onClear={handleClearWarehouse}
               icon={<PiWarehouseLight color="#9295A4" className="size-4" />}
-              className="w-[200px]"
-              options={[
-                { value: '1', label: '1' },
-                { value: '2', label: '2' },
-                { value: '3', label: '3' },
-              ]}
+              className="w-[200px] 2xl:w-[250px]"
+              options={warehouseData?.rResult?.map(warehouse => ({
+                value: warehouse.id,
+                label: warehouse.name
+              }))}
+              value={selectedWarehouse}
             />
 
-            <SelectReport
+            <SelectSearchReport
               placeholder="Mặt hàng"
-              onChange={() => {}}
+              onSearch={(value) => {
+                setSearchTerm(value);
+              }}
               icon={<PiPackage color="#9295A4" className="size-4" />}
               className="w-[200px]"
-              options={[
-                { value: '1', label: '1' },
-                { value: '2', label: '2' },
-                { value: '3', label: '3' },
-              ]}
+              options={productOptions}
             />
           </div>
           <div className="flex gap-3 items-center">
-            <SearchComponent dataLang={dataLang} onChange={() => {}} classNameBox="!py-2" />
+            <SearchComponent dataLang={dataLang} onChange={() => {}} classNameBox="!py-2 2xl:!p-2.5" />
             <OnResetData sOnFetching={() => {}} onClick={() => {}} className="!py-3" />
             <ExcelFileComponent
               dataLang={dataLang}

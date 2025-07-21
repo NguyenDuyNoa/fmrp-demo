@@ -62,7 +62,7 @@ const DateToDateReport = ({ placeholder, value, onChange, colSpan, className }) 
   return (
     <div
       id="parentDatepicker"
-      className={`z-20 flex items-center parentDatepicker rounded-lg bg-white border border-border-gray-1 group hover:border-new-blue cursor-pointer transition-all duration-300 ease-in-out relative ${hasSelectedDates ? 'w-auto' : 'w-[150px]'} ${className}`}
+      className={`z-50 flex items-center parentDatepicker rounded-lg bg-white border border-border-gray-1 group hover:border-new-blue cursor-pointer transition-all duration-300 ease-in-out relative ${hasSelectedDates ? 'w-auto' : 'w-[150px]'} ${className}`}
     >
       <CalendarBlankIcon size={17} color="#9295A4" className="absolute left-3 top-1/2 -translate-y-1/2 z-10" />
       <Datepicker

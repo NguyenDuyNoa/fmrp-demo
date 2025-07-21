@@ -21,7 +21,7 @@ const ReportLayout = ({
           <TitleHeader title={title} breadcrumbItems={breadcrumbItems} />
           <div className="flex gap-4 h-full flex-1 min-h-0">
             <Navbar />
-            <div className="w-[calc(84%-16px)] max-h-full flex-1 min-h-0 h-full flex flex-col py-3 bg-white rounded-lg">
+            <div className="w-[calc(83%-16px)] max-h-full flex-1 min-h-0 h-full flex flex-col py-3 bg-white rounded-lg">
               {/* Filter Section */}
               <div className="px-4">{filterSection}</div>
 

@@ -111,7 +111,7 @@ const Navbar = (props) => {
         },
         {
           id: uuidv4(),
-          name: 'Báo cáo nhập xuất tồn',
+          name: 'BC nhập xuất tồn',
           path: '/report-statistical/warehouse-report/entry-and-exist',
         },
       ],
@@ -122,22 +122,22 @@ const Navbar = (props) => {
       children: [
         {
           id: uuidv4(),
-          name: 'Báo cáo nhập kho mua hàng',
+          name: 'BC nhập kho mua hàng',
           path: '/report-statistical/warehouse-report/import-purchase',
         },
         {
           id: uuidv4(),
-          name: 'Báo cáo nhập kho thành phẩm',
+          name: 'BC nhập kho thành phẩm',
           path: '/report-statistical/warehouse-report/import-finished-goods',
         },
         {
           id: uuidv4(),
-          name: 'Báo cáo xuất kho sản xuất',
+          name: 'BC xuất kho sản xuất',
           path: '/report-statistical/warehouse-report/export-production',
         },
         {
           id: uuidv4(),
-          name: 'Báo cáo xuất kho giao hàng',
+          name: 'BC xuất kho giao hàng',
           path: '/report-statistical/warehouse-report/export-delivery',
         },
       ],
@@ -305,7 +305,7 @@ const Navbar = (props) => {
   }, [router.pathname])
 
   return (
-    <ul className="w-[16%] h-fit xl:p-4 2xl:p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-primary-06 rounded-lg">
+    <ul className="w-[17%] h-fit xl:p-4 2xl:p-6 pt-4 flex flex-col gap-6 border border-[#E7F2FE] bg-primary-06 rounded-lg">
       {navbar &&
         navbar.map((item) => {
           return (

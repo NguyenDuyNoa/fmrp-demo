@@ -8,10 +8,10 @@ const styleDatePickerReport = {
     shortcuts: {
       fromBeginning: {
         text: "Từ trước đến nay",
-        period: {
+        period:{
           start: undefined,
           end: undefined
-        },
+        }
       },
       thisMonth: {
         text: "Tháng này",
