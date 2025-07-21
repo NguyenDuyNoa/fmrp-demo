@@ -41,7 +41,7 @@ const SelectReport = ({
         <div className="relative flex select-with-radio">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-[#7a7a7a]">{icon}</span>
           <Select
-            className="placeholder-secondary-color-text-disabled placeholder:responsive-text-sm cursor-pointer select-with-radio w-full custom-select-no-bg"
+            className="placeholder-secondary-color-text-disabled !responsive-text-base placeholder:!responsive-text-base cursor-pointer select-with-radio w-full custom-select-no-bg"
             placeholder={placeholder}
             allowClear
             value={value}

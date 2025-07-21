@@ -32,7 +32,7 @@ const SearchComponent = ({
 
   return (
     <div
-      className={`py-1.5 px-2 3xl:py-1.5 3xl:px-2 border bg-white border-border-gray-1 rounded-lg cursor-pointer flex-shrink-0 ${classNameBox}`}
+      className={`py-1.5 px-2 3xl:py-1.5 3xl:px-2 border bg-white border-border-gray-1 hover:border-new-blue transition-all duration-300 ease-in-out rounded-lg cursor-pointer flex-shrink-0 ${classNameBox}`}
     >
       <form className="flex items-center gap-2">
         <AnimatePresence>

@@ -1121,6 +1121,9 @@ body {
   border-color: #003da0 !important;
 }
 
+.ant-select-selector {
+  font-size: revert !important;
+}
 .select-by-search .ant-select-clear {
   margin-right: 60px;
   font-size: 14px;
