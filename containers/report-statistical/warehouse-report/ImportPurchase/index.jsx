@@ -1,261 +1,27 @@
 import OnResetData from '@/components/UI/btnResetData/btnReset'
-import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination'
 import { RowItemTable } from '@/components/UI/common/Table'
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit'
 import DateToDateReport from '@/components/UI/filterComponents/dateTodateReport'
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet'
 import SearchComponent from '@/components/UI/filterComponents/searchComponent'
+import Pagination from '@/components/UI/pagination'
 import SelectReport from '@/components/common/select/SelectReport'
+import SelectSearchReport from '@/components/common/select/SelectSearchReport'
 import ReportLayout from '@/components/layout/ReportLayout'
 import TableSection from '@/components/layout/ReportLayout/TableSection'
-import { useLanguageContext } from '@/context/ui/LanguageContext'
-import useStatusExprired from '@/hooks/useStatusExprired'
-import { PiPackage, PiWarehouseLight } from 'react-icons/pi'
-import { useState } from 'react'
-import Pagination from '@/components/UI/pagination'
-import { useGetWarehouse } from './hook/useGetWarehouse'
-import { useEffect } from 'react'
 import { useInventoryItems } from '@/containers/manufacture/inventory/hooks/useInventoryItems'
-import SelectSearchReport from '@/components/common/select/SelectSearchReport'
-import { useCallback } from 'react'
+import { useLanguageContext } from '@/context/ui/LanguageContext'
+import usePagination from '@/hooks/usePagination'
+import useStatusExprired from '@/hooks/useStatusExprired'
+import formatMoneyOrDash from '@/utils/helpers/formatMoneyOrDash'
+import formatNumber from '@/utils/helpers/formatnumber'
+import moment from 'moment'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { PiPackage, PiWarehouseLight } from 'react-icons/pi'
 import { useDebounce } from 'use-debounce'
-
-const data = [
-  {
-    id: 1,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 2,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 3,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 4,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 5,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 6,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 7,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 8,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 9,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 10,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 11,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 2,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-  {
-    id: 12,
-    date: '18/07/2025',
-    code: 'ST_000169',
-    mcc: 'DT88',
-    name: 'Duy Tân',
-    productCode: 'TABLE69',
-    productName: 'BÀN NHẬT CAO H1043 DƯƠNG 615',
-    unit: 'Chiếc',
-    location: 'Tầng G - Kho TP',
-    quantity: 12,
-    price: 50000,
-    ck: 0,
-    priceCk: 50000,
-    tax: 0,
-    total: 600000,
-    note: 'Có 2 sp lỗi',
-  },
-]
+import { useGetListReportImport } from './hook/useGetListReportImport'
+import { useGetWarehouse } from './hook/useGetWarehouse'
 
 const breadcrumbItems = [
   {
@@ -268,62 +34,70 @@ const breadcrumbItems = [
 ]
 
 const ImportPurchase = (props) => {
+  const { paginate } = usePagination()
   const dataLang = useLanguageContext()
   const statusExprired = useStatusExprired()
+  const router = useRouter()
 
   const [dateRange, setDateRange] = useState({
     startDate: undefined,
     endDate: undefined,
   })
   const [selectedWarehouse, setSelectedWarehouse] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-  const [productOptions, setProductOptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500)
+  const [productOptions, setProductOptions] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState([])
+  const [limit, setLimit] = useState(15)
+
+  // Convert page to number and default to 1 if invalid
+  const currentPage = Number(router.query.page) || 1
 
   const { data: warehouseData } = useGetWarehouse()
-  const { data: dataProduct, refetch } = useInventoryItems(debouncedSearchTerm);
-  console.log(dateRange)
+  const { data: dataProduct, refetch } = useInventoryItems(debouncedSearchTerm)
+  const {
+    data: dataReportImport,
+    isFetching,
+    refetch: refetchReportImport,
+  } = useGetListReportImport({
+    page: currentPage,
+    limit: limit,
+    filter: {
+      warehouses_id: selectedWarehouse?.value,
+      ...(dateRange?.startDate !== undefined && { start_date: dateRange.startDate }),
+      ...(dateRange?.endDate !== undefined && { end_date: dateRange.endDate }),
+    },
+  })
+
+  // Add useEffect to refetch when parameters change
   useEffect(() => {
-    refetch();
-  }, []);
+    if (refetchReportImport) {
+      refetchReportImport()
+    }
+  }, [limit, dateRange, selectedWarehouse, refetchReportImport])
+
+  // Add useEffect to refetch when page changes
+  useEffect(() => {
+    if (currentPage && refetchReportImport) {
+      refetchReportImport()
+    }
+  }, [currentPage, refetchReportImport])
 
   useEffect(() => {
     // Cập nhật options khi dataProduct thay đổi
     if (dataProduct) {
-      const options = Array.isArray(dataProduct) 
-        ? dataProduct.map(product => ({
+      const options = Array.isArray(dataProduct)
+        ? dataProduct.map((product) => ({
             value: product.value,
-            label: product.name
+            label: product.name,
           }))
-        : [];
-      setProductOptions(options);
+        : []
+      setProductOptions(options)
     }
-  }, [dataProduct]);
+  }, [dataProduct])
 
   const handleDateChange = (newValue) => {
-    console.log("Date range changed:", newValue);
-    
-    // Kiểm tra nếu là "Từ trước đến nay" (cả hai giá trị đều undefined hoặc null)
-    if (newValue && 
-        ((newValue.startDate === undefined || newValue.startDate === null) && 
-         (newValue.endDate === undefined || newValue.endDate === null))) {
-      
-      console.log("Detected 'Từ trước đến nay', resetting date range");
-      // Reset về giá trị mặc định
-      const resetValue = {
-        startDate: undefined,
-        endDate: undefined,
-      };
-      setDateRange(resetValue);
-      
-      // Log để kiểm tra
-      console.log("Date range reset to:", resetValue);
-      return;
-    }
-    
-    // Xử lý các lựa chọn khác
-    console.log("Setting date range to:", newValue);
-    setDateRange(newValue);
+    setDateRange(newValue)
   }
 
   useEffect(() => {
@@ -332,17 +106,17 @@ const ImportPurchase = (props) => {
       const firstWarehouse = warehouseData.rResult[0]
       setSelectedWarehouse({
         value: firstWarehouse.id,
-        label: firstWarehouse.name
+        label: firstWarehouse.name,
       })
     }
   }, [warehouseData?.rResult])
 
   const handleWarehouseChange = (value) => {
-    const selected = warehouseData?.rResult?.find(w => w.id === value)
+    const selected = warehouseData?.rResult?.find((w) => w.id === value)
     if (selected) {
       setSelectedWarehouse({
         value: selected.id,
-        label: selected.name
+        label: selected.name,
       })
     }
   }
@@ -351,50 +125,62 @@ const ImportPurchase = (props) => {
     setSelectedWarehouse(null)
   }
 
+  const handleProductChange = (selectedValues) => {
+    if (!selectedValues || selectedValues.length === 0) {
+      setSelectedProducts([])
+      return
+    }
+
+    const selectedItems = selectedValues.map((value) => {
+      const option = productOptions.find((opt) => opt.value === value)
+      return {
+        value,
+        label: option?.label || value,
+      }
+    })
+
+    setSelectedProducts(selectedItems)
+  }
+
+  const handleClearProducts = () => {
+    setSelectedProducts([])
+  }
+
   // Define fixed columns configuration
   const fixedColumns = [
     { title: 'STT', width: 'w-14', textAlign: 'center' },
-    { title: 'Ngày chứng từ', width: 'w-32', textAlign: 'center' },
-    { title: 'Mã chứng từ', width: 'w-28', textAlign: 'center' },
+    { title: 'Ngày chứng từ', width: 'w-32', textAlign: 'left' },
+    { title: 'Mã chứng từ', width: 'w-32', textAlign: 'center' },
   ]
 
   // Define scrollable columns configuration
   const scrollableColumns = [
-    { title: 'Mã MCC', width: 'w-20', textAlign: 'center' },
-    { title: 'Tên NCC', width: 'w-20', textAlign: 'center' },
-    { title: 'Mã mặt hàng', width: 'w-28', textAlign: 'center' },
-    { title: 'Mặt hàng', width: 'w-60', textAlign: 'center' },
+    { title: 'Nhà cung cấp', width: 'w-40', textAlign: 'left' },
+    { title: 'Mã mặt hàng', width: 'w-32', textAlign: 'center' },
+    { title: 'Mặt hàng', width: 'w-60', textAlign: 'left' },
     { title: 'ĐVT', width: 'w-24', textAlign: 'center' },
-    { title: 'Vị trí', width: 'w-32', textAlign: 'center' },
+    { title: 'Vị trí', width: 'w-32', textAlign: 'left' },
     { title: 'SL', width: 'w-20', textAlign: 'center' },
     { title: 'Đơn giá', width: 'w-28', textAlign: 'center' },
     { title: '%CK', width: 'w-16', textAlign: 'center' },
     { title: 'Đơn giá SCK', width: 'w-32', textAlign: 'center' },
     { title: 'Thuế', width: 'w-20', textAlign: 'center' },
-    { title: 'Thành tiền', width: 'w-32', textAlign: 'center' },
+    { title: 'Thành tiền', width: 'w-32', textAlign: 'end' },
     { title: 'Ghi chú', width: 'w-52', textAlign: 'center' },
   ]
 
   // Render function for fixed columns in each row
   const renderFixedRow = (item, index) => (
     <>
-      <RowItemTable
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-14 flex-shrink-0"
-        textAlign={'center'}
-      >
-        {item.id}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-14 flex-shrink-0">
+        {index + 1}
       </RowItemTable>
-      <RowItemTable
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0"
-        textAlign={'center'}
-      >
-        {item.date}
+      <RowItemTable className="flex flex-col justify-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+        <span>{moment(item.date).format('DD/MM/YYYY')}</span>
+        <span>{moment(item.date).format('HH:mm:ss')}</span>
       </RowItemTable>
-      <RowItemTable
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-semibold w-28 flex-shrink-0"
-        textAlign={'center'}
-      >
-        {item.code}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-semibold w-32 flex-shrink-0">
+        {item.code_import}
       </RowItemTable>
     </>
   )
@@ -402,87 +188,43 @@ const ImportPurchase = (props) => {
   // Render function for scrollable columns in each row
   const renderScrollableRow = (item, index) => (
     <>
-      <RowItemTable
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0"
-        textAlign={'center'}
-      >
-        {item.mcc}
+      <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-40 flex-shrink-0">
+        {item.name_supplier}
       </RowItemTable>
-      <RowItemTable
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0"
-        textAlign={'center'}
-      >
-        {item.name}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+        {item.item_code}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-28 flex-shrink-0"
-      >
-        {item.productCode}
-      </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-60 flex-shrink-0"
-      >
+      <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-60 flex-shrink-0">
         <div className="flex flex-col gap-2 justify-start">
-          <p className="text-left responsive-text-sm text-neutral-07 font-normal">{item.productName}</p>
-          <p className="text-left responsive-text-xxs text-neutral-07 font-normal">
-            Màu sắc: Trắng - Size: XL
-          </p>
+          <p className="text-left responsive-text-sm text-neutral-07 font-normal">{item.item_name}</p>
+          <p className="text-left responsive-text-xxs text-neutral-07 font-normal">{item.item_variation || ''}</p>
         </div>
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-24 flex-shrink-0"
-      >
-        {item.unit}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-24 flex-shrink-0">
+        {item.unit_name}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0"
-      >
-        {item.location}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+        {item.warehouse_name}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0"
-      >
-        {item.quantity}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
+        {formatNumber(Number(item.quantity))}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-28 flex-shrink-0"
-      >
-        {item.price}
+      <RowItemTable className="flex justify-center items-center gap-1 py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-28 flex-shrink-0">
+        {formatMoneyOrDash(Number(item.price))}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-16 flex-shrink-0"
-      >
-        {item.ck}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-16 flex-shrink-0">
+        {item.discount_percent}%
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0"
-      >
-        {item.priceCk}
+      <RowItemTable className="flex justify-center items-center gap-1 py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+        {formatMoneyOrDash(Number(item.price_after_discount))}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0"
-      >
-        {item.tax}
+      <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
+        {item.tax_rate}%
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0"
-      >
-        {item.total}
+      <RowItemTable className="flex justify-end items-center gap-1 py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+        {formatMoneyOrDash(Number(item.amount))}
       </RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal w-52 flex-shrink-0"
-      >
+      <RowItemTable className="flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal w-52 flex-shrink-0">
         {item.note}
       </RowItemTable>
     </>
@@ -493,16 +235,12 @@ const ImportPurchase = (props) => {
     <>
       <RowItemTable className="w-14 flex-shrink-0 bg-white"></RowItemTable>
       <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable className="w-28 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable className="w-20 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable className="w-20 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable className="w-28 flex-shrink-0 bg-white"></RowItemTable>
+      <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
+      <RowItemTable className="w-40 flex-shrink-0 bg-white"></RowItemTable>
+      <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
       <RowItemTable className="w-60 flex-shrink-0 bg-white"></RowItemTable>
       <RowItemTable className="w-24 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable
-        textAlign={'right'}
-        className="h-10 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white"
-      >
+      <RowItemTable className="h-10 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white">
         Tổng cộng
       </RowItemTable>
       <RowItemTable
@@ -515,15 +253,17 @@ const ImportPurchase = (props) => {
       <RowItemTable className="w-16 flex-shrink-0 bg-white"></RowItemTable>
       <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
       <RowItemTable className="w-20 flex-shrink-0 bg-white"></RowItemTable>
-      <RowItemTable
-        textAlign={'center'}
-        className="h-10 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white"
-      >
-        4.800.000đ
+      <RowItemTable className="h-10 flex justify-end items-center px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white">
+        4.800.000 đ
       </RowItemTable>
       <RowItemTable className="w-52 flex-shrink-0 bg-white"></RowItemTable>
     </>
   )
+
+  // Add limit handler
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit)
+  }
 
   return (
     <ReportLayout
@@ -541,9 +281,9 @@ const ImportPurchase = (props) => {
               onClear={handleClearWarehouse}
               icon={<PiWarehouseLight color="#9295A4" className="size-4" />}
               className="w-[200px] 2xl:w-[250px]"
-              options={warehouseData?.rResult?.map(warehouse => ({
+              options={warehouseData?.rResult?.map((warehouse) => ({
                 value: warehouse.id,
-                label: warehouse.name
+                label: warehouse.name,
               }))}
               value={selectedWarehouse}
             />
@@ -551,11 +291,15 @@ const ImportPurchase = (props) => {
             <SelectSearchReport
               placeholder="Mặt hàng"
               onSearch={(value) => {
-                setSearchTerm(value);
+                setSearchTerm(value)
               }}
+              onClear={handleClearProducts}
+              onChange={handleProductChange}
               icon={<PiPackage color="#9295A4" className="size-4" />}
-              className="w-[200px]"
+              className="w-[250px] 2xl:w-[400px]"
               options={productOptions}
+              value={selectedProducts}
+              mode="multiple"
             />
           </div>
           <div className="flex gap-3 items-center">
@@ -575,20 +319,22 @@ const ImportPurchase = (props) => {
         <TableSection
           fixedColumns={fixedColumns}
           scrollableColumns={scrollableColumns}
-          data={data}
+          data={dataReportImport?.rResult}
+          isFetching={isFetching}
           renderFixedRow={renderFixedRow}
           renderScrollableRow={renderScrollableRow}
           renderFooter={renderFooter}
         />
       }
       totalSection={
-        <div className="flex items-center justify-between gap-2">
-          <ContainerPagination>
-            <Pagination postsPerPage={10} totalPosts={100} paginate={() => {}} currentPage={1} />
-          </ContainerPagination>
-        </div>
+        <Pagination
+          postsPerPage={limit}
+          totalPosts={Number(dataReportImport?.output?.iTotalDisplayRecords) || 0}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
       }
-      paginationSection={<DropdowLimit sLimit={10} limit={10} dataLang={dataLang} />}
+      paginationSection={<DropdowLimit sLimit={handleLimitChange} limit={limit} dataLang={dataLang} />}
     />
   )
 }
