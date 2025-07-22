@@ -6,13 +6,13 @@ const styleDatePickerReport = {
   autoApply: true,
   configs: {
     shortcuts: {
-      fromBeginning: {
-        text: "Từ trước đến nay",
-        period:{
-          start: undefined,
-          end: undefined
-        }
-      },
+      // fromBeginning: {
+      //   text: "Từ trước đến nay",
+      //   period:{
+      //     start: undefined,
+      //     end: undefined
+      //   }
+      // },
       thisMonth: {
         text: "Tháng này",
         period: {
