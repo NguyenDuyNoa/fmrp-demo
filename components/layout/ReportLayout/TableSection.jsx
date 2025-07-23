@@ -159,7 +159,7 @@ const TableSection = ({
         ref={scrollbarRef}
         alwaysShowScrollbar={true}
       >
-        <div className="relative min-w-full w-max">
+        <div className="relative min-w-full w-max h-full">
           {isFetching ? (
             <Loading color="#0f4f9e" />
           ) : data?.length > 0 ? (
@@ -184,7 +184,7 @@ const TableSection = ({
               ))}
             </div>
           ) : (
-            <NoData type="table" />
+            <NoData type="report" classNameImage="w-[245px]"/>
           )}
         </div>
       </Customscrollbar>

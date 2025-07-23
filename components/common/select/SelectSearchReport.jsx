@@ -116,6 +116,7 @@ const SelectSearchReport = ({
           tagRender={mode === 'multiple' ? customTagRender : undefined}
           maxTagCount={mode === 'multiple' ? 'responsive' : undefined}
           maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} đã chọn`}
+          menuItemSelectedIcon={null}
           popupRender={(menu) => (
             <>
               <div className="custom-select-dropdown">
@@ -149,13 +150,16 @@ const SelectSearchReport = ({
             return (
               <Option key={opt.value} value={opt.value} label={opt.label}>
                 <div className={`${index > 0 && 'border-t border-[#F7F8F9]'}`}>
-                  <div className="flex items-center rounded-md p-3 my-0.5 gap-x-2 responsive-text-sm font-normal text-neutral-07 hover:bg-[#F7F8F9]">
+                  <div className="flex items-center rounded-md p-2 my-0.5 gap-x-2 hover:bg-[#F7F8F9]">
                     {mode === 'multiple' ? (
                       <CustomCheckbox checked={isSelected} />
                     ) : (
                       <CustomRadio checked={isSelected} />
                     )}
-                    {opt.label}
+                    <div className="flex flex-col gap-1">
+                      <span className="responsive-text-sm font-normal text-neutral-07">{opt.label}</span>
+                      <span className="text-blue-color flex flex-wrap responsive-text-xs">{opt.code}</span>
+                    </div>
                   </div>
                 </div>
               </Option>
