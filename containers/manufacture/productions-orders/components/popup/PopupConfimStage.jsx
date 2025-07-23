@@ -394,7 +394,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
       if (data?.po?.status_manufacture === '2') {
         // Không mở popup khi status_manufacture == '2'
         queryState({ open: false })
-        isToast('info', 'Lệnh SX đã được hoàn thành')
+        isToast('success', 'Lệnh SX đã được hoàn thành')
       } else {
         setIsOrderCompleted(false)
         const s = getPriorityItem(data?.stage_semi_products || [], data?.stage_products || [])
