@@ -1,4 +1,4 @@
-import ImportGoods from '@/containers/report-statistical/warehouse-report/import-goods'
+import ImportGoods from "@/containers/report-statistical/warehouse-report/ImportGoods"
 
 const Page = (props) => {
     return <ImportGoods {...props} />

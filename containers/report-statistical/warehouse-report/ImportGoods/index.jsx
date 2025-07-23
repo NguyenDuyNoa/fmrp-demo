@@ -10,22 +10,19 @@ import SelectSearchReport from '@/components/common/select/SelectSearchReport'
 import ReportLayout from '@/components/layout/ReportLayout'
 import TableSection from '@/components/layout/ReportLayout/TableSection'
 import { useInventoryItems } from '@/containers/manufacture/inventory/hooks/useInventoryItems'
-import PopupDetail from '@/containers/purchase-order/import/components/popup'
+import PopupDetail from '@/containers/manufacture/products-warehouse/components/pupup'
 import { useLanguageContext } from '@/context/ui/LanguageContext'
 import usePagination from '@/hooks/usePagination'
 import useStatusExprired from '@/hooks/useStatusExprired'
-import formatMoneyOrDash from '@/utils/helpers/formatMoneyOrDash'
 import formatNumber from '@/utils/helpers/formatnumber'
 import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { PiPackage, PiWarehouseLight } from 'react-icons/pi'
 import { useDebounce } from 'use-debounce'
+import { useGetWarehouse } from '../ImportPurchase/hook/useGetWarehouse'
 import { useExportExcel } from './hook/useExportExcel'
-import { useGetListReportImport } from './hook/useGetListReportImport'
-import { useGetWarehouse } from './hook/useGetWarehouse'
-import useFeature from '@/hooks/useConfigFeature'
-import { useSelector } from 'react-redux'
+import { useGetListReportImportFinishedGoods } from './hook/useGetListReportImport'
 
 const breadcrumbItems = [
   {
@@ -37,23 +34,11 @@ const breadcrumbItems = [
   },
 ]
 
-const ImportPurchase = (props) => {
+const ImportGoods = (props) => {
   const router = useRouter()
   const { paginate } = usePagination()
   const dataLang = useLanguageContext()
   const statusExprired = useStatusExprired()
-  const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature()
-//   console.log("material_expiry", dataMaterialExpiry?.is_enable)
-//   console.log("product_expiry", dataProductExpiry?.is_enable)
-// console.log("product_serial", dataProductSerial?.is_enable)
-  const auth = useSelector((state) => state.auth);
-  // Tạo biến kiểm tra quyền xem giá
-  const canViewPrice = auth?.permissions_current?.length === 0 || auth?.permissions_current?.report_warehouse_import?.is_price == 1;
-  
-  // Tạo biến kiểm tra các tính năng
-  const hasProductExpiry = dataProductExpiry?.is_enable == 1;
-  const hasMaterialExpiry = dataMaterialExpiry?.is_enable == 1;
-  const hasProductSerial = dataProductSerial?.is_enable == 1;
 
   const [dateRange, setDateRange] = useState({
     startDate: undefined,
@@ -71,12 +56,12 @@ const ImportPurchase = (props) => {
   const currentPage = Number(router.query.page) || 1
 
   const { data: warehouseData } = useGetWarehouse()
-  const { data: dataProduct, refetch } = useInventoryItems(debouncedSearchTerm)
+  const { data: dataProduct } = useInventoryItems(debouncedSearchTerm)
   const {
     data: dataReportImport,
     isFetching,
     refetch: refetchReportImport,
-  } = useGetListReportImport({
+  } = useGetListReportImportFinishedGoods({
     page: currentPage,
     limit: limit,
     search: debouncedSearchValue,
@@ -213,7 +198,7 @@ const ImportPurchase = (props) => {
 
   return (
     <ReportLayout
-      title={'Báo cáo nhập kho mua hàng'}
+      title={'Báo cáo nhập kho thành phẩm'}
       statusExprired={statusExprired}
       breadcrumbItems={breadcrumbItems}
       filterSection={
@@ -258,8 +243,8 @@ const ImportPurchase = (props) => {
             <OnResetData sOnFetching={handleResetData} onClick={handleResetData} className="!py-3" />
             <ExcelFileComponent
               dataLang={dataLang}
-              filename="Danh sách nhập kho mua hàng"
-              title="DSNK"
+              filename="Danh sách nhập kho thành phẩm"
+              title="DSNP"
               multiDataSet={multiDataSet}
               classBtn="!py-3"
             />
@@ -274,23 +259,13 @@ const ImportPurchase = (props) => {
             { title: 'Mã chứng từ', width: 'w-32', textAlign: 'center' },
           ]}
           scrollableColumns={[
-            { title: 'Nhà cung cấp', width: 'w-40', textAlign: 'left' },
+            { title: 'LSX chi tiết', width: 'w-40', textAlign: 'left' },
             { title: 'Mã mặt hàng', width: 'w-32', textAlign: 'center' },
             { title: 'Mặt hàng', width: 'w-60', textAlign: 'left' },
-            ...(hasProductExpiry || hasMaterialExpiry || hasProductSerial ? [
-              { title: 'Thông tin', width: 'w-40', textAlign: 'left' },
-            ] : []),
+            { title: 'Kho nhập', width: 'w-60', textAlign: 'left' },
             { title: 'ĐVT', width: 'w-24', textAlign: 'center' },
-            { title: 'Vị trí', width: 'w-36', textAlign: 'left' },
             { title: 'SL', width: 'w-20', textAlign: 'center' },
-            ...(canViewPrice ? [
-              { title: 'Đơn giá', width: 'w-28', textAlign: 'center' },
-              { title: '%CK', width: 'w-16', textAlign: 'center' },
-              { title: 'Đơn giá SCK', width: 'w-32', textAlign: 'center' },
-              { title: 'Thuế', width: 'w-20', textAlign: 'center' },
-              { title: 'Thành tiền', width: 'w-32 2xl:w-36', textAlign: 'end' },
-            ] : []),
-            { title: 'Ghi chú', width: 'w-52', textAlign: 'center' },
+            { title: 'Ghi chú', width: 'min-w-52', textAlign: 'center' },
           ]}
           data={dataReportImport?.rResult}
           isFetching={isFetching}
@@ -306,8 +281,8 @@ const ImportPurchase = (props) => {
               <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-semibold w-32 flex-shrink-0">
                 <PopupDetail
                   dataLang={dataLang}
-                  className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
-                  name={item.code_import}
+                  className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer"
+                  name={item.code}
                   id={item.id}
                 />
               </RowItemTable>
@@ -315,8 +290,8 @@ const ImportPurchase = (props) => {
           )}
           renderScrollableRow={(item, index) => (
             <>
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-40 flex-shrink-0">
-                {item.name_supplier}
+              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-normal w-40 flex-shrink-0">
+                {item.reference_no_detail}
               </RowItemTable>
               <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
                 {item.item_code}
@@ -329,52 +304,16 @@ const ImportPurchase = (props) => {
                   </p>
                 </div>
               </RowItemTable>
-              {(hasProductExpiry || hasMaterialExpiry || hasProductSerial) && (
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-40 flex-shrink-0">
-                <div className="flex flex-col gap-1 justify-start">
-                  {item.lot && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">LOT: {item.lot}</p>
-                  )}
-                  {(item.expiration_date) && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">Date: {moment(item.expiration_date).format('DD/MM/YYYY')}</p>
-                  )}
-                  {item.serial && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">
-                      Serial: {item.serial }
-                    </p>
-                  )}
-                </div>
+              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-60 flex-shrink-0">
+                {item.warehouse_name}
               </RowItemTable>
-              )}
               <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-24 flex-shrink-0">
                 {item.unit_name}
-              </RowItemTable>
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-36 flex-shrink-0">
-                {item.warehouse_name}
               </RowItemTable>
               <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
                 {formatNumber(Number(item.quantity))}
               </RowItemTable>
-              {canViewPrice && (
-                <>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-28 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.price))}
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-16 flex-shrink-0">
-                    {item.discount_percent}%
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.price_after_discount))}
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
-                    {item.tax_rate}%
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-end items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 2xl:w-36 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.amount))}
-                  </RowItemTable>
-                </>
-              )}
-              <RowItemTable className="flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal w-52 flex-shrink-0">
+              <RowItemTable className="flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal min-w-52 flex-shrink-0">
                 {item.note}
               </RowItemTable>
             </>
@@ -387,11 +326,8 @@ const ImportPurchase = (props) => {
               <RowItemTable className="w-40 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-60 flex-shrink-0 bg-white"></RowItemTable>
-              {(hasProductExpiry || hasMaterialExpiry || hasProductSerial) && (
-                <RowItemTable className="w-40 flex-shrink-0 bg-white"></RowItemTable>
-              )}
-              <RowItemTable className="w-24 flex-shrink-0 bg-white"></RowItemTable>
-              <RowItemTable className="h-10 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white">
+              <RowItemTable className="w-60 flex-shrink-0 bg-white"></RowItemTable>
+              <RowItemTable className="w-24 h-10 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
                 Tổng cộng
               </RowItemTable>
               <RowItemTable
@@ -400,18 +336,8 @@ const ImportPurchase = (props) => {
               >
                 {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
               </RowItemTable>
-              {canViewPrice && (
-                <>
-                  <RowItemTable className="w-28 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-16 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-20 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="h-10 flex justify-end items-center px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 2xl:w-36 flex-shrink-0 bg-white">
-                    {formatMoneyOrDash(Number(dataReportImport?.rTotal?.total_amount))}
-                  </RowItemTable>
-                </>
-              )}
               <RowItemTable className="w-52 flex-shrink-0 bg-white"></RowItemTable>
+
             </>
           )}
         />
@@ -429,4 +355,4 @@ const ImportPurchase = (props) => {
   )
 }
 
-export default ImportPurchase
+export default ImportGoods

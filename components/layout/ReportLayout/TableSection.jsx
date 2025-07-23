@@ -133,7 +133,7 @@ const TableSection = ({
 
         {/* Scrollable columns header - với ref để đồng bộ cuộn */}
         <div
-          className="flex bg-white border-b border-[#E0E0E1] overflow-auto no-scrollbar"
+          className="flex bg-white border-b border-[#E0E0E1] overflow-auto no-scrollbar w-full"
           ref={headerScrollRef}
           style={{ overflowY: 'hidden' }}
           onScroll={handleHeaderScroll}
@@ -179,7 +179,7 @@ const TableSection = ({
                   </div>
 
                   {/* Scrollable columns */}
-                  <div className="flex bg-white border-b border-[#E0E0E1]">{renderScrollableRow(item, rowIndex)}</div>
+                  <div className="flex bg-white border-b border-[#E0E0E1] w-full">{renderScrollableRow(item, rowIndex)}</div>
                 </div>
               ))}
             </div>

@@ -37,23 +37,24 @@ const breadcrumbItems = [
   },
 ]
 
-const ImportPurchase = (props) => {
+const ExportProduction = (props) => {
   const router = useRouter()
   const { paginate } = usePagination()
   const dataLang = useLanguageContext()
   const statusExprired = useStatusExprired()
   const { dataProductExpiry, dataMaterialExpiry, dataProductSerial } = useFeature()
-//   console.log("material_expiry", dataMaterialExpiry?.is_enable)
-//   console.log("product_expiry", dataProductExpiry?.is_enable)
-// console.log("product_serial", dataProductSerial?.is_enable)
-  const auth = useSelector((state) => state.auth);
+  //   console.log("material_expiry", dataMaterialExpiry?.is_enable)
+  //   console.log("product_expiry", dataProductExpiry?.is_enable)
+  // console.log("product_serial", dataProductSerial?.is_enable)
+  const auth = useSelector((state) => state.auth)
   // Tạo biến kiểm tra quyền xem giá
-  const canViewPrice = auth?.permissions_current?.length === 0 || auth?.permissions_current?.report_warehouse_import?.is_price == 1;
-  
+  const canViewPrice =
+    auth?.permissions_current?.length === 0 || auth?.permissions_current?.report_warehouse_import?.is_price == 1
+
   // Tạo biến kiểm tra các tính năng
-  const hasProductExpiry = dataProductExpiry?.is_enable == 1;
-  const hasMaterialExpiry = dataMaterialExpiry?.is_enable == 1;
-  const hasProductSerial = dataProductSerial?.is_enable == 1;
+  const hasProductExpiry = dataProductExpiry?.is_enable == 1
+  const hasMaterialExpiry = dataMaterialExpiry?.is_enable == 1
+  const hasProductSerial = dataProductSerial?.is_enable == 1
 
   const [dateRange, setDateRange] = useState({
     startDate: undefined,
@@ -213,7 +214,7 @@ const ImportPurchase = (props) => {
 
   return (
     <ReportLayout
-      title={'Báo cáo nhập kho mua hàng'}
+      title={'Báo cáo xuất kho sản xuất'}
       statusExprired={statusExprired}
       breadcrumbItems={breadcrumbItems}
       filterSection={
@@ -258,8 +259,8 @@ const ImportPurchase = (props) => {
             <OnResetData sOnFetching={handleResetData} onClick={handleResetData} className="!py-3" />
             <ExcelFileComponent
               dataLang={dataLang}
-              filename="Danh sách nhập kho mua hàng"
-              title="DSNK"
+              filename="Danh sách xuất kho sản xuất"
+              title="DSXK"
               multiDataSet={multiDataSet}
               classBtn="!py-3"
             />
@@ -274,36 +275,30 @@ const ImportPurchase = (props) => {
             { title: 'Mã chứng từ', width: 'w-32', textAlign: 'center' },
           ]}
           scrollableColumns={[
-            { title: 'Nhà cung cấp', width: 'w-40', textAlign: 'left' },
-            { title: 'Mã mặt hàng', width: 'w-32', textAlign: 'center' },
+            { title: 'Mã mặt hàng', width: 'w-32', textAlign: 'left' },
             { title: 'Mặt hàng', width: 'w-60', textAlign: 'left' },
-            ...(hasProductExpiry || hasMaterialExpiry || hasProductSerial ? [
-              { title: 'Thông tin', width: 'w-40', textAlign: 'left' },
-            ] : []),
-            { title: 'ĐVT', width: 'w-24', textAlign: 'center' },
-            { title: 'Vị trí', width: 'w-36', textAlign: 'left' },
+            { title: 'LSXCT', width: 'w-36', textAlign: 'left' },
+            { title: 'Kho - VT xuất', width: 'w-44', textAlign: 'left' },
+            { title: 'ĐVT', width: 'w-24', textAlign: 'left' },
             { title: 'SL', width: 'w-20', textAlign: 'center' },
-            ...(canViewPrice ? [
-              { title: 'Đơn giá', width: 'w-28', textAlign: 'center' },
-              { title: '%CK', width: 'w-16', textAlign: 'center' },
-              { title: 'Đơn giá SCK', width: 'w-32', textAlign: 'center' },
-              { title: 'Thuế', width: 'w-20', textAlign: 'center' },
-              { title: 'Thành tiền', width: 'w-32 2xl:w-36', textAlign: 'end' },
-            ] : []),
-            { title: 'Ghi chú', width: 'w-52', textAlign: 'center' },
+            { title: 'GT quy đổi', width: 'w-28', textAlign: 'center' },
+            { title: 'SL quy đổi', width: 'w-24', textAlign: 'center' },
+            { title: 'Giá vốn', width: 'w-28', textAlign: 'center' },
+            { title: 'Thành tiền', width: 'w-32 2xl:w-36', textAlign: 'end' },
+            { title: 'Ghi chú', width: 'w-52', textAlign: 'left' },
           ]}
           data={dataReportImport?.rResult}
           isFetching={isFetching}
           renderFixedRow={(item, index) => (
             <>
-              <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-14 flex-shrink-0">
+              <RowItemTable className="w-14 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {index + 1}
               </RowItemTable>
-              <RowItemTable className="flex flex-col justify-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 2xl:w-36 flex-shrink-0">
+              <RowItemTable className="w-32 2xl:w-36 flex flex-col justify-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0 text-center">
                 <span>{moment(item.date).format('DD/MM/YYYY')}</span>
                 <span>{moment(item.date).format('HH:mm:ss')}</span>
               </RowItemTable>
-              <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-semibold w-32 flex-shrink-0">
+              <RowItemTable className="w-32 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] !text-new-blue !responsive-text-sm font-semibold flex-shrink-0">
                 <PopupDetail
                   dataLang={dataLang}
                   className="responsive-text-sm font-semibold text-center text-[#003DA0] hover:text-blue-600 transition-all ease-linear cursor-pointer "
@@ -315,13 +310,13 @@ const ImportPurchase = (props) => {
           )}
           renderScrollableRow={(item, index) => (
             <>
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-40 flex-shrink-0">
+              <RowItemTable className="w-32 flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {item.name_supplier}
               </RowItemTable>
-              <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
+              <RowItemTable className="w-60 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {item.item_code}
               </RowItemTable>
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-60 flex-shrink-0">
+              <RowItemTable className="w-36 flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 <div className="flex flex-col gap-2 justify-start">
                   <p className="text-left responsive-text-sm text-neutral-07 font-normal">{item.item_name}</p>
                   <p className="text-left responsive-text-xxs text-neutral-07 font-normal">
@@ -329,53 +324,29 @@ const ImportPurchase = (props) => {
                   </p>
                 </div>
               </RowItemTable>
-              {(hasProductExpiry || hasMaterialExpiry || hasProductSerial) && (
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-40 flex-shrink-0">
-                <div className="flex flex-col gap-1 justify-start">
-                  {item.lot && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">LOT: {item.lot}</p>
-                  )}
-                  {(item.expiration_date) && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">Date: {moment(item.expiration_date).format('DD/MM/YYYY')}</p>
-                  )}
-                  {item.serial && (
-                    <p className="text-left responsive-text-xs text-neutral-07 font-normal">
-                      Serial: {item.serial }
-                    </p>
-                  )}
-                </div>
-              </RowItemTable>
-              )}
-              <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-24 flex-shrink-0">
+              <RowItemTable className="w-44 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {item.unit_name}
               </RowItemTable>
-              <RowItemTable className="flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-36 flex-shrink-0">
+              <RowItemTable className="w-24 flex items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {item.warehouse_name}
               </RowItemTable>
-              <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
+              <RowItemTable className="w-20 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
                 {formatNumber(Number(item.quantity))}
               </RowItemTable>
-              {canViewPrice && (
-                <>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-28 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.price))}
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-16 flex-shrink-0">
-                    {item.discount_percent}%
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.price_after_discount))}
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-20 flex-shrink-0">
-                    {item.tax_rate}%
-                  </RowItemTable>
-                  <RowItemTable className="flex justify-end items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal w-32 2xl:w-36 flex-shrink-0">
-                    {formatMoneyOrDash(Number(item.amount))}
-                  </RowItemTable>
-                </>
-              )}
-              <RowItemTable className="flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal w-52 flex-shrink-0">
-                {item.note}
+              <RowItemTable className="w-28 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
+                {formatNumber(Number(item.quantity))}
+              </RowItemTable>
+              <RowItemTable className="w-24 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
+                {formatNumber(Number(item.quantity))}
+              </RowItemTable>
+              <RowItemTable className="w-28 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
+                {formatNumber(Number(item.quantity))}
+              </RowItemTable>
+              <RowItemTable className="w-32 2xl:w-36 flex justify-center items-center py-2 px-3 border-r border-[#E0E0E1] text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
+                {formatNumber(Number(item.quantity))}
+              </RowItemTable>
+              <RowItemTable className="w-52 flex justify-start items-center py-2 px-3 text-neutral-07 !responsive-text-sm font-normal flex-shrink-0">
+                {item.note || '-'}
               </RowItemTable>
             </>
           )}
@@ -384,33 +355,28 @@ const ImportPurchase = (props) => {
               <RowItemTable className="w-14 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-32 2xl:w-36 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
-              <RowItemTable className="w-40 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
               <RowItemTable className="w-60 flex-shrink-0 bg-white"></RowItemTable>
-              {(hasProductExpiry || hasMaterialExpiry || hasProductSerial) && (
-                <RowItemTable className="w-40 flex-shrink-0 bg-white"></RowItemTable>
-              )}
-              <RowItemTable className="w-24 flex-shrink-0 bg-white"></RowItemTable>
-              <RowItemTable className="h-10 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 flex-shrink-0 bg-white">
+              <RowItemTable className="w-36 flex-shrink-0 bg-white"></RowItemTable>
+              <RowItemTable className="w-44 flex-shrink-0 bg-white"></RowItemTable>
+              <RowItemTable className="h-10 w-24 flex items-center justify-end px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
                 Tổng cộng
               </RowItemTable>
-              <RowItemTable
-                textAlign={'center'}
-                className="h-10 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold w-20 flex-shrink-0 bg-white"
-              >
+              <RowItemTable className="h-10 w-20 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
                 {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
               </RowItemTable>
-              {canViewPrice && (
-                <>
-                  <RowItemTable className="w-28 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-16 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-32 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="w-20 flex-shrink-0 bg-white"></RowItemTable>
-                  <RowItemTable className="h-10 flex justify-end items-center px-3 text-neutral-07 !responsive-text-sm font-semibold w-32 2xl:w-36 flex-shrink-0 bg-white">
-                    {formatMoneyOrDash(Number(dataReportImport?.rTotal?.total_amount))}
-                  </RowItemTable>
-                </>
-              )}
+              <RowItemTable className="h-10 w-28 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
+                {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
+              </RowItemTable>
+              <RowItemTable className="h-10 w-24 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
+                {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
+              </RowItemTable>
+              <RowItemTable className="h-10 w-28 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
+                {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
+              </RowItemTable>
+              <RowItemTable className="h-10 w-32 2xl:w-36 flex items-center justify-center px-3 text-neutral-07 !responsive-text-sm font-semibold flex-shrink-0 bg-white">
+                {formatNumber(Number(dataReportImport?.rTotal?.total_quantity))}
+              </RowItemTable>
               <RowItemTable className="w-52 flex-shrink-0 bg-white"></RowItemTable>
             </>
           )}
@@ -429,4 +395,4 @@ const ImportPurchase = (props) => {
   )
 }
 
-export default ImportPurchase
+export default ExportProduction
