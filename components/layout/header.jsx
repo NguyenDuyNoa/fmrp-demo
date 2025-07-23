@@ -720,7 +720,7 @@ const Header = () => {
             },
             {
               viewOwn: -1,
-              view: -1,
+              view: 1,
               name: 'Tồn kho',
               link: '/report-statistical/warehouse-report/card',
             },
