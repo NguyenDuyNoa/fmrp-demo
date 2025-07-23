@@ -269,7 +269,7 @@ const ExportDelivery = (props) => {
       }
       tableSection={
         <TableSection
-          fixedColumns={[
+          fixedColumns={[ 
             { title: 'STT', width: 'w-14', textAlign: 'center' },
             { title: 'Ngày chứng từ', width: 'w-32 2xl:w-36', textAlign: 'left' },
             { title: 'Mã chứng từ', width: 'w-32', textAlign: 'center' },
