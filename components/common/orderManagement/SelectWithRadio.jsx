@@ -146,44 +146,6 @@ const SelectWithRadio = ({
         </div>
       </div>
       {isError && errMess && <label className="text-sm text-red-500">{errMess}</label>}
-      
-      <style jsx global>{`
-        /* Loại bỏ màu nền xanh cho option được chọn */
-        .custom-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-          background-color: transparent !important;
-          color: inherit !important;
-          font-weight: normal !important;
-        }
-        
-        /* Màu xám khi hover */
-        .custom-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-          background-color: #f5f5f5 !important;
-        }
-        
-        .ant-select-dropdown .ant-select-item-option-selected {
-          background-color: transparent !important;
-          color: inherit !important;
-        }
-        
-        .ant-select-item-option-content {
-          background-color: transparent !important;
-        }
-        
-        /* Màu xám khi hover */
-        .ant-select-dropdown .ant-select-item:hover {
-          background-color: #f5f5f5 !important;
-        }
-        
-        /* Màu xám khi hover */
-        .ant-select-dropdown .ant-select-item-option-active {
-          background-color: #f5f5f5 !important;
-        }
-        
-        /* Loại bỏ màu nền xanh cho option được chọn trong dropdown */
-        .select-with-radio .ant-select-dropdown .ant-select-item-option-selected {
-          background-color: transparent !important;
-        }
-      `}</style>
     </div>
   )
 }
