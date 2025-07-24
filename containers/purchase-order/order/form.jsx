@@ -947,11 +947,12 @@ const OrderForm = (props) => {
         setSortedArr([])
         router.push(routerOrder.home)
       } else {
-        if (newDataOption.length === 0) {
-          isShow('error', `Chưa nhập thông tin mặt hàng`)
-        } else {
+        // console.log(newDataOption)
+        // if (newDataOption.length === 0) {
+        //   isShow('error', `Chưa nhập thông tin mặt hàng`)
+        // } else {
           isShow('error', dataLang[message] || message)
-        }
+        // }
       }
     } catch (error) {}
     sOnSending(false)

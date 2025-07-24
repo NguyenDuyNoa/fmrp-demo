@@ -352,12 +352,6 @@ const Header = () => {
               link: '/purchase-order/order',
               role: dataSeting?.package,
             },
-            // {
-            //     viewOwn: auth?.services?.is_view_own,
-            //     view: auth?.services?.is_view,
-            //     name: "Phiếu dịch vụ",
-            //     link: "/purchase-order/servicev-voucher",
-            // },
             {
               viewOwn: auth?.import?.is_view_own,
               view: auth?.import?.is_view,
@@ -370,6 +364,12 @@ const Header = () => {
               name: 'Trả hàng',
               link: '/purchase-order/returns',
             },
+            {
+              viewOwn: auth?.services?.is_view_own,
+              view: auth?.services?.is_view,
+              name: "Phiếu dịch vụ",
+              link: "/purchase-order/servicev-voucher",
+          },
           ],
         },
       ],
@@ -507,6 +507,12 @@ const Header = () => {
               name: 'Kế hoạch sản xuất',
               link: '/manufacture/production-plan',
             },
+            {
+              viewOwn: auth?.production_orders_fmrp?.is_view_own,
+              view: auth?.production_orders_fmrp?.is_view,
+              name: 'Lệnh sản xuất',
+              link: '/manufacture/productions-orders',
+            },
             // {
             //   viewOwn: auth?.production_plans_fmrp?.is_view_own,
             //   view: auth?.production_plans_fmrp?.is_view,
@@ -525,12 +531,6 @@ const Header = () => {
             //     title: "Tổng quan sản xuất",
             //     link: "/manufacture/production-overview",
             // },
-            {
-              viewOwn: -1,
-              view: -1,
-              name: 'Lệnh sản xuất',
-              link: '/manufacture/productions-orders',
-            },
             // {
             //     title: "Lịch sản xuất",
             //     link: "/manufacture/production-schedule",
@@ -544,8 +544,8 @@ const Header = () => {
           items: [
             {
               name: 'Phiếu kiểm tra chất lượng',
-              viewOwn: -1,
-              view: -1,
+              viewOwn: auth?.qc?.is_view_own,
+              view: auth?.qc?.is_view,
               link: '/manufacture/check-quality',
             },
             // {

@@ -5,7 +5,7 @@ import ContainerPagination from "@/components/UI/common/ContainerPagination/Cont
 import { Customscrollbar } from "@/components/UI/common/Customscrollbar";
 import { EmptyExprired } from "@/components/UI/common/EmptyExprired";
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from "@/components/UI/common/Table";
-import { TagColorMore, TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
+import { TagColorOrange, TagColorRed, TagColorSky } from "@/components/UI/common/Tag/TagStatus";
 import { ContainerTotal, LayOutTableDynamic } from "@/components/UI/common/layout";
 import CustomAvatar from "@/components/UI/common/user/CustomAvatar";
 import DropdowLimit from "@/components/UI/dropdowLimit/dropdowLimit";
@@ -406,7 +406,7 @@ const Receipts = (props) => {
                                     <ColumnTable colSpan={0.5} textAlign={"left"}>
                                         {"PTTT"}
                                     </ColumnTable>
-                                    <ColumnTable colSpan={1} textAlign={"left"}>
+                                    <ColumnTable colSpan={1} textAlign={"right"}>
                                         {dataLang?.payment_amountOfMoney || "payment_amountOfMoney"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"center"}>
@@ -478,7 +478,7 @@ const Receipts = (props) => {
                                                 <RowItemTable colSpan={0.5} textAlign={"left"}>
                                                     {e?.payment_mode_name}
                                                 </RowItemTable>
-                                                <RowItemTable colSpan={1} textAlign={"left"}>
+                                                <RowItemTable colSpan={1} textAlign={"right"} className={"flex items-center justify-end gap-0.5"}>
                                                     {renderMoneyOrDash(e?.total)}
                                                 </RowItemTable>
                                                 <RowItemTable colSpan={1} textAlign={"center"}>
@@ -541,7 +541,7 @@ const Receipts = (props) => {
                             <RowItemTable colSpan={7.5} className="p-2" textAlign={"right"}>
                                 {dataLang?.purchase_order_table_total_outside || "purchase_order_table_total_outside"}
                             </RowItemTable>
-                            <RowItemTable colSpan={1} textAlign={"left"} className="p-2 mr-1">
+                            <RowItemTable colSpan={1} textAlign={"right"} className="p-2 gap-0.5 flex items-center justify-end">
                                 {renderMoneyOrDash(data?.rTotal?.sum_total)}
                             </RowItemTable>
                         </ContainerTotal>
