@@ -507,7 +507,7 @@ const Order = (props) => {
                                         {dataLang?.purchase_order_table_branch || "purchase_order_table_branch"}
                                     </ColumnTable>
                                     <ColumnTable colSpan={1} textAlign={"left"}>
-                                        {dataLang?.purchase_order_table_operations || "purchase_order_table_operations"}
+                                        {dataLang?.import_action || "purchase_order_table_operations"}
                                     </ColumnTable>
                                 </HeaderTable>
                                 {isFetching ? (

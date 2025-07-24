@@ -612,11 +612,11 @@ const PurchaseImportForm = (props) => {
           sListData([])
           router.push(routerImport.home)
         } else {
-          if (total.totalPrice == 0) {
-            isShow('error', `Chưa nhập thông tin mặt hàng`)
-          } else {
+          // if (total.totalPrice == 0) {
+          //   isShow('error', `Chưa nhập thông tin mặt hàng`)
+          // } else {
             isShow('error', dataLang[message] || message)
-          }
+          // }
         }
       },
     })

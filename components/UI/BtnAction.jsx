@@ -750,11 +750,11 @@ export const BtnAction = React.memo((props) => {
             );
         } else if (props.type == "servicev_voucher") {
             allButtons.push(
-                <div key="edit" className="group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer px-5 rounded w-full">
-                    <EditIcon
+                <div key="edit" className="group transition-all ease-in-out flex items-center gap-2 2xl:text-sm xl:text-sm text-[8px] hover:bg-slate-50 text-left cursor-pointer rounded w-full">
+                    {/* <EditIcon
                         color="#064E3B"
-                        className="group-hover:text-sky-500 group-hover:shadow-md"
-                    />
+                        className="size-5 group-hover:text-sky-500 group-hover:shadow-md flex-shrink-0"
+                    /> */}
                     <Popup_servie
                         status_pay={props?.status_pay}
                         onRefreshGr={props.onRefreshGr}

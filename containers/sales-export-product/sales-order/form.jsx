@@ -1,4 +1,17 @@
 import apiSalesOrder from '@/Api/apiSalesExportProduct/salesOrder/apiSalesOrder'
+import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
+import DropdownTax from '@/components/common/orderManagement/DropdownTax'
+import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
+import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
+import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
+import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
+import SelectSearch from '@/components/common/orderManagement/SelectSearch'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
+import TableHeader from '@/components/common/orderManagement/TableHeader'
+import SelectWithSort from '@/components/common/select/SelectWithSort'
+import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
+import EmptyData from '@/components/UI/emptyData'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
@@ -19,37 +32,22 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
-import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
-import moment from 'moment'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { FiUser } from 'react-icons/fi'
-import { LuBriefcase } from 'react-icons/lu'
-import { PiHash, PiMapPinLight } from 'react-icons/pi'
-import { v4 as uuidv4 } from 'uuid'
-
-// Optimize UI
-import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
-import DropdownTax from '@/components/common/orderManagement/DropdownTax'
-import InfoFormLabel from '@/components/common/orderManagement/InfoFormLabel'
-import ItemTotalAndDelete from '@/components/common/orderManagement/ItemTotalAndDelete'
-import LayoutOrderManagement from '@/components/common/orderManagement/LayoutOrderManagement'
-import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
-import SelectSearch from '@/components/common/orderManagement/SelectSearch'
-import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
-import TableHeader from '@/components/common/orderManagement/TableHeader'
-import SelectWithSort from '@/components/common/select/SelectWithSort'
-import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
-import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
-import EmptyData from '@/components/UI/emptyData'
 import { ConfigProvider, DatePicker } from 'antd'
 import viVN from 'antd/lib/locale/vi_VN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
+import moment from 'moment'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import { FiUser } from 'react-icons/fi'
+import { LuBriefcase } from 'react-icons/lu'
+import { PiHash, PiMapPinLight } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
 
 dayjs.extend(customParseFormat)
 dayjs.locale('vi')
@@ -867,13 +865,13 @@ const SalesOrderForm = (props) => {
       )
     })
 
-    if (
-      isTotalMoney?.totalPrice > 0 &&
-      isTotalMoney?.totalDiscountPrice >= 0 &&
-      isTotalMoney?.totalDiscountAfterPrice > 0 &&
-      isTotalMoney?.totalTax >= 0 &&
-      isTotalMoney?.totalAmount > 0
-    ) {
+    // if (
+    //   isTotalMoney?.totalPrice > 0 &&
+    //   isTotalMoney?.totalDiscountPrice >= 0 &&
+    //   isTotalMoney?.totalDiscountAfterPrice > 0 &&
+    //   isTotalMoney?.totalTax >= 0 &&
+    //   isTotalMoney?.totalAmount > 0
+    // ) {
       try {
         const { isSuccess, message } = await apiSalesOrder.apiHandingSalesOrder(id, formData)
         if (isSuccess) {
@@ -900,15 +898,15 @@ const SalesOrderForm = (props) => {
         }
         setOnSending(false)
       } catch (error) {}
-    } else {
-      isShow(
-        'error',
-        newDataOption?.length === 0
-          ? `Chưa chọn thông tin mặt hàng!`
-          : 'Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!'
-      )
-      setOnSending(false)
-    }
+    // } else {
+    //   isShow(
+    //     'error',
+    //     newDataOption?.length === 0
+    //       ? `Chưa chọn thông tin mặt hàng!`
+    //       : 'Tiền không được âm, vui lòng kiểm tra lại thông tin mặt hàng!'
+    //   )
+    //   setOnSending(false)
+    // }
   }
 
   useEffect(() => {
@@ -967,6 +965,8 @@ const SalesOrderForm = (props) => {
       </div>
     </div>
   )
+
+
 
   return (
     <LayoutOrderManagement

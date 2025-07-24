@@ -1916,8 +1916,8 @@ const FilePDF = ({
                                                         italics: true,
                                                     },
                                                     {
-                                                        text: item?.item.expiration_date
-                                                            ? formatMoment(item?.item.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
+                                                        text: item?.item?.expiration_date
+                                                            ? formatMoment(item?.item?.expiration_date, FORMAT_MOMENT.DATE_SLASH_LONG)
                                                             : "-",
                                                         fontSize: 8.5,
                                                         italics: true,
@@ -2794,7 +2794,7 @@ const FilePDF = ({
                                 },
                                 "",
                                 {
-                                    text: `${formatMoney(data?.total_tax)}`,
+                                    text: `${formatMoney(data?.total_tax_price || data?.total_tax)}`,
                                     bold: true,
                                     alignment: "right",
                                     colSpan: 7,
@@ -3147,7 +3147,7 @@ const FilePDF = ({
                                 },
                                 "",
                                 {
-                                    text: `${formatMoney(data?.total_tax)}`,
+                                    text: `${formatMoney(data?.total_tax_price || data?.total_tax)}`,
                                     bold: true,
                                     alignment: "right",
                                     colSpan: 7,
@@ -3609,7 +3609,7 @@ const FilePDF = ({
                                 },
                                 "",
                                 {
-                                    text: `${formatMoney(data?.total_tax)}`,
+                                    text: `${formatMoney(data?.total_tax_price || data?.total_tax)}`,
                                     bold: true,
                                     alignment: "right",
                                     margin: styleMarginChildTotal,
@@ -4547,7 +4547,7 @@ const FilePDF = ({
                                 },
                                 "",
                                 {
-                                    text: `${formatMoney(data?.total_tax)}`,
+                                    text: `${formatMoney(data?.total_tax_price || data?.total_tax)}`,
                                     bold: true,
                                     alignment: "right",
                                     colSpan: 7,
