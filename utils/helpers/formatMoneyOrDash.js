@@ -30,7 +30,8 @@ const formatMoneyOrDash = (number, dataSeting, _d = 0) => {
         useGrouping: true, // Enable grouping separators
     }).format(number);
     // formattedMoney = number.toFixed(_d).replace(/\B(?=(\d{3})+(?!\d))/g, dataSeting?.thousand_separator).replace('.', dataSeting?.decimal_separator);
-    return number === 0 ? '-' : <>{formattedMoney} <span className="underline">đ</span></>;
+    
+    return number === 0 ? '-' : <>{formattedMoney}{" "}<span className="underline ml-1">đ</span></>;
 };
 
 export default formatMoneyOrDash
