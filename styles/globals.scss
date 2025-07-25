@@ -1248,10 +1248,10 @@ body {
   background-color: #f5f5f5 !important;
 }
 
-.ant-select-dropdown .ant-select-item-option-selected {
-  background-color: transparent !important;
-  color: inherit !important;
-}
+// .ant-select-dropdown .ant-select-item-option-selected {
+//   background-color: transparent !important;
+//   color: inherit !important;
+// }
 
 .ant-select-item-option-content {
   background-color: transparent !important;
@@ -1259,26 +1259,26 @@ body {
 
 }
 
-.ant-select-item-option-active {
-  padding: 0 !important;  
-}
-.ant-select-item {
-  padding: 0 !important;
-}
+// .ant-select-item-option-active {
+//   // padding: 0 !important;  
+// }
+// .ant-select-item {
+//   // padding: 0 !important;
+// }
 /* Màu xám khi hover */
-.ant-select-dropdown .ant-select-item:hover {
-  background-color: transparent !important;
-}
+// .ant-select-dropdown .ant-select-item:hover {
+//   background-color: transparent !important;
+// }
 
-/* Màu xám khi hover */
-.ant-select-dropdown .ant-select-item-option-active {
-  background-color: transparent !important;
-}
+// /* Màu xám khi hover */
+// .ant-select-dropdown .ant-select-item-option-active {
+//   background-color: transparent !important;
+// }
 
-/* Loại bỏ màu nền xanh cho option được chọn trong dropdown */
-.select-with-radio .ant-select-dropdown .ant-select-item-option-selected {
-  background-color: transparent !important;
-}
+// /* Loại bỏ màu nền xanh cho option được chọn trong dropdown */
+// .select-with-radio .ant-select-dropdown .ant-select-item-option-selected {
+//   background-color: transparent !important;
+// }
 
 
 /* date picker */
