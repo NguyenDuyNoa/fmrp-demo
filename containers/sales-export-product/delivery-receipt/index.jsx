@@ -492,7 +492,7 @@ const DeliveryReceipt = (props) => {
                   <ColumnTable textAlign="left">
                     {dataLang?.delivery_receipt_OrderNumber || 'delivery_receipt_OrderNumber'}
                   </ColumnTable>
-                  <ColumnTable textAlign="left">
+                  <ColumnTable textAlign="right">
                     {dataLang?.price_quote_into_money || 'price_quote_into_money'}
                   </ColumnTable>
                   <ColumnTable textAlign="left">
@@ -547,7 +547,7 @@ const DeliveryReceipt = (props) => {
                               id={e?.order_id}
                             />
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {renderMoneyOrDash(e.grand_total)}
                           </RowItemTable>
                           <RowItemTable colSpan={1} textAlign={'left'} className="flex items-center space-x-1">
@@ -590,7 +590,7 @@ const DeliveryReceipt = (props) => {
                             />
                           </RowItemTable>
 
-                          <RowItemTable colSpan={1} textAlign={'right'}>
+                          <RowItemTable colSpan={1} textAlign={'left'}>
                             {e?.note}
                           </RowItemTable>
                           <RowItemTable colSpan={1}>
@@ -629,7 +629,7 @@ const DeliveryReceipt = (props) => {
             <RowItemTable colSpan={0.5} textAlign={'start'}>
               {dataLang?.total_outside || 'total_outside'}
             </RowItemTable>
-            <RowItemTable colSpan={0.5} textAlign={'left'} className="whitespace-nowrap">
+            <RowItemTable colSpan={0.5} textAlign={'end'} className="whitespace-nowrap">
               {/* {formatMoney(data?.rTotal?.grand_total)} */}
               {renderMoneyOrDash(data?.rTotal?.grand_total)}
             </RowItemTable>

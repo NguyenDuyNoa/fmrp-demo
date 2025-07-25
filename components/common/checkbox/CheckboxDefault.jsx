@@ -8,11 +8,13 @@ const CheckboxDefault = ({
     onChange,
     disabled = false,
     className = "",
+    onClick,
 }) => {
     return (
         <label
             className={`inline-flex items-center space-x-2 cursor-pointer ${disabled ? "opacity-50 cursor-not-allowed" : ""
                 } ${className}`}
+            onClick={onClick}
         >
             <input
                 type="checkbox"

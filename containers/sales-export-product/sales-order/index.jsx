@@ -3,10 +3,9 @@ import { BtnAction } from '@/components/UI/BtnAction'
 import TabFilter from '@/components/UI/TabFilter'
 import Breadcrumb from '@/components/UI/breadcrumb/BreadcrumbCustom'
 import OnResetData from '@/components/UI/btnResetData/btnReset'
-import { BtnStatusApproved } from '@/components/UI/btnStatusApproved/BtnStatusApproved'
+import ButtonWarehouse from '@/components/UI/btnWarehouse/btnWarehouse'
 import ButtonAddNew from '@/components/UI/button/buttonAddNew'
 import ContainerPagination from '@/components/UI/common/ContainerPagination/ContainerPagination'
-import TitlePagination from '@/components/UI/common/ContainerPagination/TitlePagination'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import { EmptyExprired } from '@/components/UI/common/EmptyExprired'
 import { ColumnTable, HeaderTable, RowItemTable, RowTable } from '@/components/UI/common/Table'
@@ -21,11 +20,9 @@ import Loading from '@/components/UI/loading/loading'
 import NoData from '@/components/UI/noData/nodata'
 import Pagination from '@/components/UI/pagination'
 import PopupConfim from '@/components/UI/popupConfim/popupConfim'
-import Zoom from '@/components/UI/zoomElement/zoomElement'
 import { CONFIRMATION_OF_CHANGES, TITLE_STATUS } from '@/constants/changeStatus/changeStatus'
 import { FORMAT_MOMENT } from '@/constants/formatDate/formatDate'
 import { WARNING_STATUS_ROLE } from '@/constants/warningStatus/warningStatus'
-import PopupDetailQuote from '@/containers/sales-export-product/price-quote/components/PopupDetailQuote'
 import { useBranchList } from '@/hooks/common/useBranch'
 import { useClientCombobox } from '@/hooks/common/useClients'
 import useSetingServer from '@/hooks/useConfigNumber'
@@ -53,7 +50,6 @@ import PopupDetailProduct from './components/PopupDetailProduct'
 import { useSalesOrderCombobox } from './hooks/useSalesOrderCombobox'
 import { useSalesOrderFilterbar } from './hooks/useSalesOrderFilterbar'
 import { useSalesOrderList } from './hooks/useSalesOrderList'
-import ButtonWarehouse from '@/components/UI/btnWarehouse/btnWarehouse'
 registerLocale('vi', vi)
 
 const initialValue = {
@@ -527,7 +523,7 @@ const SalesOrder = (props) => {
                     {dataLang?.sales_product_type_order ||
                       "sales_product_type_order"}
                   </ColumnTable> */}
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={'center'}>
@@ -571,7 +567,7 @@ const SalesOrder = (props) => {
                           <RowItemTable colSpan={1.5} textAlign="left">
                             {e?.client_name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatNumber(e.total_amount)} <span className="underline">đ</span>
                           </RowItemTable>
 
@@ -727,11 +723,11 @@ const SalesOrder = (props) => {
         total={
           <>
             <ContainerTotal className={'grid-cols-26'}>
-              <RowItemTable colSpan={3} textAlign={'end'} className="p-2"></RowItemTable>
-              <RowItemTable colSpan={1} textAlign={'end'} className="p-2">
+              <RowItemTable colSpan={2.5} textAlign={'end'} className="p-2"></RowItemTable>
+              <RowItemTable colSpan={1} textAlign={'start'} className="p-2">
                 {dataLang?.total_outside || 'total_outside'}
               </RowItemTable>
-              <RowItemTable colSpan={2} textAlign={'left'} className="whitespace-nowrap">
+              <RowItemTable colSpan={1.5} textAlign={'end'} className="whitespace-nowrap p-0">
                 {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
               </RowItemTable>
             </ContainerTotal>

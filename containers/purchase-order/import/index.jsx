@@ -536,13 +536,13 @@ const PurchaseImport = (props) => {
                   <ColumnTable colSpan={1} textAlign={'left'}>
                     {dataLang?.import_the_order || 'import_the_order'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_total_amount || 'import_total_amount'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_tax_money || 'import_tax_money'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_into_money || 'import_into_money'}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={'center'}>
@@ -593,13 +593,13 @@ const PurchaseImport = (props) => {
                               ></PopupDetailThere>
                             )}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatMoney(e.total_price)} <span className="underline">đ</span>
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {renderMoneyOrDash(e.total_tax_price)}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatMoney(e.total_amount)} <span className="underline">đ</span>
                           </RowItemTable>
                           <RowItemTable colSpan={1} className="flex items-center mx-auto w-fit">
@@ -654,13 +654,13 @@ const PurchaseImport = (props) => {
               <RowItemTable colSpan={1} textAlign={'start'} className="px-2">
                 {dataLang?.import_total || 'import_total'}
               </RowItemTable>
-              <RowItemTable colSpan={1} textAlign={'left'} className="flex gap-1">
+              <RowItemTable colSpan={1} textAlign={'right'} className="flex justify-end gap-0.5">
                 {renderMoneyOrDash(data?.rTotal?.total_price)}
               </RowItemTable>
-              <RowItemTable colSpan={1} textAlign={'left'} className="flex gap-1">
+              <RowItemTable colSpan={1} textAlign={'right'} className="flex justify-end gap-0.5">
                 {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
               </RowItemTable>
-              <RowItemTable colSpan={1} textAlign={'left'} className="flex gap-1">
+              <RowItemTable colSpan={1} textAlign={'right'} className="flex justify-end gap-0.5">
                 {renderMoneyOrDash(data?.rTotal?.total_amount)}
               </RowItemTable>
             </ContainerTotal>

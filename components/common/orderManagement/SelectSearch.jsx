@@ -11,9 +11,7 @@ const SelectSearch = ({ options, onChange, value = [], formatOptionLabel, placeh
   const menuRef = useRef(null)
   const inputRef = useRef(null)
 
-  const filteredOptions = searchText
-    ? options.filter((option) => option.label.toLowerCase().includes(searchText.toLowerCase()))
-    : options
+  const filteredOptions = options;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,10 +44,15 @@ const SelectSearch = ({ options, onChange, value = [], formatOptionLabel, placeh
   }
 
   const handleSelectAll = () => {
-    if (value.length === options.length) {
-      onChange([])
+    const allSelected = options.every(opt => value.some(item => item.value === opt.value));
+    if (allSelected) {
+      // Bỏ chọn tất cả: chỉ bỏ các option đang hiển thị (theo search/options), giữ lại các phần tử đã chọn trước đó không nằm trong options hiện tại
+      const remain = value.filter(item => !options.some(opt => opt.value === item.value));
+      onChange(remain);
     } else {
-      onChange(options)
+      // Chọn tất cả: push các option mới vào đầu value cũ (không trùng lặp)
+      const newOptions = options.filter(opt => !value.some(item => item.value === opt.value));
+      onChange([...newOptions, ...value]);
     }
   }
 
@@ -85,7 +88,7 @@ const SelectSearch = ({ options, onChange, value = [], formatOptionLabel, placeh
           <div className="2xl:p-6 p-5 pl-4 flex items-center justify-between gap-4 border-b">
             <CheckboxDefault
               label={'Chọn mặt hàng'}
-              checked={value.length === options.length}
+              checked={options.every(opt => value.some(item => item.value === opt.value))}
               onChange={handleSelectAll}
             />
             <p className="responsive-text-sm font-normal text-blue-color">{value.length} đã chọn</p>
@@ -111,7 +114,8 @@ const SelectSearch = ({ options, onChange, value = [], formatOptionLabel, placeh
                       <div className="mr-2">
                         <CheckboxDefault
                           checked={value.some((item) => item.value === option.value)}
-                          onChange={() => {}}
+                          onChange={() => handleSelect(option)}
+                          onClick={e => e.stopPropagation()}
                         />
                       </div>
                       <div className="flex-grow">

@@ -499,13 +499,13 @@ const PurchaseReturns = (props) => {
                   <ColumnTable colSpan={1.5} textAlign={'left'}>
                     {dataLang?.import_supplier || 'import_supplier'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_total_amount || 'import_total_amount'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_tax_money || 'import_tax_money'}
                   </ColumnTable>
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.import_into_money || 'import_into_money'}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={'center'}>
@@ -545,13 +545,13 @@ const PurchaseReturns = (props) => {
                           <RowItemTable colSpan={1.5} textAlign={'left'}>
                             {e.supplier_name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatMoney(e.total_price)} <span className="underline">đ</span>
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {renderMoneyOrDash(e.total_tax_price)}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatMoney(e.total_amount)} <span className="underline">đ</span>
                           </RowItemTable>
                           <RowItemTable colSpan={1} className="mx-auto flex items-center w-fit">
@@ -604,13 +604,13 @@ const PurchaseReturns = (props) => {
               <RowItemTable colSpan={2} textAlign={'end'} className="px-5">
                 {dataLang?.import_total || 'import_total'}
               </RowItemTable>
-              <RowItemTable colSpan={0.5} textAlign={'left'} className={'mr-1'}>
+              <RowItemTable colSpan={0.5} textAlign={'right'}>
                 {renderMoneyOrDash(data?.rTotal?.total_price)}
               </RowItemTable>
-              <RowItemTable colSpan={0.5} textAlign={'left'} className={'mr-1'}>
+              <RowItemTable colSpan={0.5} textAlign={'right'}>
                 {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
               </RowItemTable>
-              <RowItemTable colSpan={0.5} textAlign={'left'} className={'mr-1'}>
+              <RowItemTable colSpan={0.5} textAlign={'right'}>
                 {renderMoneyOrDash(data?.rTotal?.total_amount)}
               </RowItemTable>
             </ContainerTotal>

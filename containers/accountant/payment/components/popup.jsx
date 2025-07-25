@@ -690,7 +690,7 @@ const Popup_dspc = (props) => {
 
     const _AutoBalanceRemainingAmount = () => {
         if (currentFloatValue <= 0) {
-            isShow("warning", "Không có số tiền để phân bổ.");
+            isShow("error", "Không có số tiền để phân bổ.");
             return;
         }
         
@@ -726,7 +726,7 @@ const Popup_dspc = (props) => {
             );
             
             if (validExpenses.length === 0) {
-                isShow("warning", "Không có chi phí hợp lệ để phân bổ. Vui lòng chọn loại chi phí trước.", 3000);
+                isShow("error", "Không có chi phí hợp lệ để phân bổ. Vui lòng chọn loại chi phí trước.", 3000);
                 return;
             }
             
