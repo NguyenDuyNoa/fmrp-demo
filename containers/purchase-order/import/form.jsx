@@ -270,13 +270,13 @@ const PurchaseImportForm = (props) => {
           unit: e?.e?.unit_name,
           amount: Number(e?.e?.quantity_left) || 1,
           price: e?.e?.price,
-          discount: discount ? discount : e?.e?.discount_percent,
+          discount: 0, // Changed from: discount ? discount : e?.e?.discount_percent
           priceAfter: Number(e?.e?.price_after_discount),
           tax: tax
             ? tax
             : {
                 label: e?.e?.tax_name,
-                value: e?.e?.tax_id,
+                value: e?.e?.tax_id || 0,
                 tax_rate: e?.e?.tax_rate,
               },
           totalMoney: Number(e?.e?.amount),
@@ -333,12 +333,21 @@ const PurchaseImportForm = (props) => {
       sIdSurplusWarehouse(value)
     } else if (type == 'itemAll') {
       if (value?.length === 0) {
+        // Nếu không còn mặt hàng nào được chọn, xóa toàn bộ danh sách
         sListData([])
-      } else if (value?.length > 0) {
-        const newData = value?.map((e, index) => {
-          return _DataValueItem(e, index)
-        })
-        sListData(newData)
+      } else {
+        // Xóa các item không còn trong value
+        const updatedListData = listData.filter(existingItem =>
+          value.some(selectedItem => selectedItem.value === existingItem.item.value)
+        )
+        // Thêm các mặt hàng mới được chọn
+        const newSelectedItems = value.filter(selectedItem =>
+          !updatedListData.some(existingItem => existingItem.item.value === selectedItem.value)
+        )
+        const newData = newSelectedItems.map((e, index) =>
+          _DataValueItem(e, updatedListData.length + index)
+        )
+        sListData([...newData, ...updatedListData])
       }
     } else if (type === 'warehouseAll') {
       sWarehouseAll(value)
@@ -505,17 +514,25 @@ const PurchaseImportForm = (props) => {
       }, 0)
       return accumulator + childTotal
     }, 0)
-
+console.log(option)
     const totalAmount = option?.reduce((accumulator, item) => {
       const childTotal = item.child?.reduce((childAccumulator, childItem) => {
         const product =
-          Number(childItem?.price * (1 - childItem?.discount / 100)) *
-          (1 + Number(childItem?.tax?.tax_rate) / 100) *
+          Number(childItem?.price * ((1 - childItem?.discount / 100) || 0)) *
+          (1 + Number(childItem?.tax?.tax_rate || 0) / 100) *
           Number(childItem?.amount)
         return childAccumulator + product
       }, 0)
       return accumulator + childTotal
     }, 0)
+
+    console.log('Chi tiết tính toán:', {
+      totalPrice,
+      totalDiscountPrice,
+      totalDiscountAfterPrice,
+      totalTax,
+      totalAmount
+    })
 
     return {
       totalPrice: totalPrice || 0,
@@ -647,7 +664,7 @@ const PurchaseImportForm = (props) => {
           unit: value?.e?.unit_name,
           price: value?.e?.price,
           amount: 1,
-          discount: discount ? discount : Number(value?.e?.discount_percent),
+          discount: 0, // Changed from: discount ? discount : Number(value?.e?.discount_percent),
           priceAfter: Number(value?.e?.price_after_discount),
           tax: tax
             ? tax
@@ -808,7 +825,7 @@ const PurchaseImportForm = (props) => {
       </div>
     </div>
   )
-
+console.log(listData)
   return (
     <LayoutOrderManagement
       dataLang={dataLang}
@@ -1127,7 +1144,7 @@ const PurchaseImportForm = (props) => {
                                       <InPutNumericFormat
                                         className="appearance-none w-full focus:outline-none text-right"
                                         onValueChange={_HandleChangeChild.bind(this, e?.id, ce?.id, 'discount')}
-                                        value={ce?.discount}
+                                        value={ce?.discount || 0}
                                         isAllowed={isAllowedDiscount}
                                         allowNegative={false}
                                       />

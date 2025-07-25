@@ -187,6 +187,7 @@ const Popup_dspt = (props) => {
         queryKey: ["api_detail_receipts_form", id],
         queryFn: async () => {
             const result = await apiReceipts.apiReceiptsDetail(id);
+            console.log(result)
             updateListValue({
                 date: moment(result?.date).toDate(),
                 code: result?.code,
@@ -196,12 +197,14 @@ const Popup_dspt = (props) => {
                     ? { label: result?.object_text, value: result?.object_text }
                     : { label: dataLang[result?.object_text] || result?.object_text, value: result?.objects_id },
                 typeOfDocument: result?.type_vouchers ? { label: dataLang[result?.type_vouchers] || result?.type_vouchers, value: result?.type_vouchers } : null,
-                listTypeOfDocument: result?.type_vouchers ? result?.voucher?.map(({ code, id, money, total }) => ({
-                    label: code,
-                    value: id,
-                    money: money,
-                    total: total,
-                })) : [],
+                listTypeOfDocument: result?.type_vouchers ? result?.voucher?.map(({ code, id, money, total }) => {
+                    return {
+                        label: code,
+                        value: id,
+                        money: money,
+                        total: total || money, // Fallback to money if total is not available
+                    };
+                }) : [],
                 price: +result?.total,
                 method: { label: result?.payment_mode_name, value: result?.payment_mode_id },
                 note: result?.note,
@@ -268,19 +271,38 @@ const Popup_dspt = (props) => {
             case "listTypeOfDocument":
                 updateListValue({ listTypeOfDocument: value });
                 if (value && value.length > 0) {
-                    const formattedTotal = parseFloat(
-                        value.reduce((total, item) => total + parseFloat(item.money || 0), 0)
-                    );
-                    updateListValue({ price: formattedTotal });
-                    
-                    // Khởi tạo adjustedDocuments với giá trị ban đầu giống với money
-                    const initialAdjustedDocs = value.map(item => ({
+                    // Đảm bảo mỗi item đều có total
+                    const processedDocuments = value.map(item => ({
                         ...item,
-                        adjustedMoney: parseFloat(item.money || 0)
+                        total: parseFloat(item.total || item.money || 0),
+                        money: parseFloat(item.money || item.total || 0)
                     }));
-                    updateListValue({ adjustedDocuments: initialAdjustedDocs });
+
+                    const formattedTotal = parseFloat(
+                        processedDocuments.reduce((total, item) => total + (item.total || item.money || 0), 0)
+                    );
+
+                    updateListValue({ 
+                        listTypeOfDocument: processedDocuments,
+                        price: formattedTotal 
+                    });
+                    
+                    // Khởi tạo adjustedDocuments với giá trị total
+                    const initialAdjustedDocs = processedDocuments.map(item => ({
+                        ...item,
+                        adjustedMoney: item.total || item.money,
+                        total: item.total || item.money
+                    }));
+
+                    updateListValue({ 
+                        adjustedDocuments: initialAdjustedDocs 
+                    });
                 } else {
-                    updateListValue({ price: "", adjustedDocuments: [] });
+                    updateListValue({ 
+                        price: "", 
+                        listTypeOfDocument: [],
+                        adjustedDocuments: [] 
+                    });
                 }
                 break;
             case "price":
@@ -380,21 +402,26 @@ const Popup_dspt = (props) => {
 
     const handleSelectAll = () => {
         // Lấy toàn bộ danh sách từ dataListTypeofDoc
-        const allDocuments = [...dataListTypeofDoc];
-        
+        const allDocuments = [...dataListTypeofDoc].map(doc => ({
+            ...doc,
+            total: parseFloat(doc.total || doc.money || 0), // Đảm bảo luôn có total
+            money: parseFloat(doc.money || doc.total || 0)  // Đảm bảo luôn có money
+        }));
+
         // Tính tổng tiền từ tất cả chứng từ
         const totalMoney = allDocuments.reduce((total, item) => {
-            return total + (parseFloat(item.money) || 0);
+            return total + (parseFloat(item.total) || 0);
         }, 0);
 
         // Cập nhật danh sách và số tiền
         updateListValue({
             listTypeOfDocument: allDocuments,
             price: totalMoney,
-            // Khởi tạo adjustedDocuments với giá trị ban đầu từ money
+            // Khởi tạo adjustedDocuments với giá trị ban đầu từ total
             adjustedDocuments: allDocuments.map(item => ({
                 ...item,
-                adjustedMoney: parseFloat(item.money || 0)
+                adjustedMoney: item.total,
+                total: item.total
             }))
         });
         
@@ -440,7 +467,7 @@ const Popup_dspt = (props) => {
             return await apiReceipts.apiHandingReceipts(id, data);
         }
     })
-
+console.log(currentFloatValue)
     const _ServerSending = () => {
         let formData = new FormData();
 
@@ -468,6 +495,10 @@ const Popup_dspt = (props) => {
             if (e.adjustedMoney !== undefined) {
                 formData.append(`voucher_money[${index}]`, e.adjustedMoney);
             }
+            // Thêm dòng này để gửi total
+            // if (e.total !== undefined) {
+            //     formData.append(`voucher_money[${index}]`, e.total);
+            // }
         });
         
         formData.append("note", listValue.note ? listValue.note : "");
@@ -839,6 +870,7 @@ const Popup_dspt = (props) => {
                                                     (total, item) => total + parseFloat(item.total || 0),
                                                     0
                                                 );
+                                                console.log(floatValue, totalMoney)
                                                 if (floatValue > totalMoney) {
                                                     isShow("error", `${props.dataLang?.payment_errPlease || "payment_errPlease"} ${formatNumber(totalMoney)}`);
                                                     return false;
@@ -853,7 +885,7 @@ const Popup_dspt = (props) => {
                                                 (total, item) => total + parseFloat(item.money || 0),
                                                 0
                                             );
-                                            
+                                            console.log(originalTotal)
                                             if (originalTotal > 0 && floatValue > 0) {
                                                 const ratio = floatValue / originalTotal;
                                                 
@@ -928,7 +960,7 @@ const Popup_dspt = (props) => {
                                                     </span>
                                                 </div>
                                                 <div className="col-span-5 p-2 text-xs flex items-center justify-center border-l font-medium text-gray-700">
-                                                    {formatNumber(e.adjustedMoney !== undefined ? e.adjustedMoney : e.money)}
+                                                    {formatNumber(e.adjustedMoney !== undefined ? e.adjustedMoney : (e.total || e.money))}
                                                 </div>
                                             </div>
                                         ))}
