@@ -3,16 +3,15 @@ import InputCustom from '@/components/common/input/InputCustom'
 import ButtonDelete from '@/components/common/orderManagement/ButtonDelete'
 import DropdownDiscount from '@/components/common/orderManagement/DropdownDiscount'
 import DropdownTax from '@/components/common/orderManagement/DropdownTax'
+import { DocumentDate, DocumentNumber } from '@/components/common/orderManagement/GeneralInfo'
 import MenuList from '@/components/common/orderManagement/MenuList'
 import OrderFormTabs from '@/components/common/orderManagement/OrderFormTabs'
 import SelectCustomLabel from '@/components/common/orderManagement/SelectCustomLabel'
 import SelectSearch from '@/components/common/orderManagement/SelectSearch'
-import CalendarBlankIcon from '@/components/icons/common/CalendarBlankIcon'
-import IconStar from '@/components/icons/common/IconStar'
+import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
 import LayoutForm from '@/components/layout/LayoutForm'
 import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import EmptyData from '@/components/UI/emptyData'
-import SelectComponent from '@/components/UI/filterComponents/selectComponent'
 import SelectItemComponent, { MenuListClickAll } from '@/components/UI/filterComponents/selectItemComponent'
 import InPutMoneyFormat from '@/components/UI/inputNumericFormat/inputMoneyFormat'
 import InPutNumericFormat from '@/components/UI/inputNumericFormat/inputNumericFormat'
@@ -35,19 +34,16 @@ import { formatMoment } from '@/utils/helpers/formatMoment'
 import formatMoneyConfig from '@/utils/helpers/formatMoney'
 import formatNumberConfig from '@/utils/helpers/formatnumber'
 import { useQuery } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowDown2, ArrowUp2 } from 'iconsax-react'
 import moment from 'moment/moment'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import DatePicker from 'react-datepicker'
-import { MdClear } from 'react-icons/md'
-import { PiCaretDownBold, PiMapPinLight } from 'react-icons/pi'
+import { PiMapPinLight } from 'react-icons/pi'
 import { useSelector } from 'react-redux'
 import { useOrderByPurchase } from './hooks/useOrderByPurchase'
-import { Add, ArrowDown2, ArrowUp2, Minus } from 'iconsax-react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { DocumentDate, DocumentNumber } from '@/components/common/orderManagement/GeneralInfo'
-import SelectWithRadio from '@/components/common/orderManagement/SelectWithRadio'
+import { debounce } from 'lodash'
 
 const OrderForm = (props) => {
   const isShow = useToast()
@@ -520,11 +516,34 @@ const OrderForm = (props) => {
     enabled: !!onFetchingItemsAll,
   })
 
+  const _HandleSeachApi = debounce(async (inputValue) => {
+    if (optionType === '0' && idBranch != null) {
+      let form = new FormData()
+      form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : '')
+      form.append(`term`, inputValue)
+      form.append(`id_suppliers`, idSupplier?.value ?? '')
+      sortedArr?.map((item, index) => {
+        form.append(`items_id_selected[${index}]`, item.items?.value.toString())
+      })
+      const { data } = await apiOrder.apiSearchProductItems(form)
+      sDataItems(data?.result)
+    } else {
+      return
+    }
+  }, 500)
+
   const _ServerFetching_ItemsAll = async () => {
+    console.log('FormData:', FormData)
     if (optionType == '0') {
       let form = new FormData()
       form.append(`branch_id[]`, +idBranch?.value ? +idBranch?.value : '')
-      form.append(`id_suppliers`, idSupplier?.value ?? '')
+      form.append('id_suppliers', idSupplier?.value ?? '')
+
+      // Thêm từng phần tử với chỉ mục
+      sortedArr?.map((item, index) => {
+        form.append(`items_id_selected[${index}]`, item.items?.value.toString())
+      })
+      
       try {
         const { data } = await apiOrder.apiSearchProductItems(form)
 
@@ -553,6 +572,8 @@ const OrderForm = (props) => {
             branch_id: idBranch != null ? +idBranch?.value : '',
             purchase_order_id: id,
             id_suppliers: idSupplier?.value ?? '',
+            // Sửa: items_id_selected là mảng
+            // items_id_selected: sortedArr?.map((item) => item.items?.value) ?? [],
           },
         })
         sDataItems(data?.result)
@@ -951,7 +972,7 @@ const OrderForm = (props) => {
         // if (newDataOption.length === 0) {
         //   isShow('error', `Chưa nhập thông tin mặt hàng`)
         // } else {
-          isShow('error', dataLang[message] || message)
+        isShow('error', dataLang[message] || message)
         // }
       }
     } catch (error) {}
@@ -1054,6 +1075,7 @@ const OrderForm = (props) => {
                 onChange={(value) => {
                   _HandleChangeInput('itemAll', value)
                 }}
+                setSearch={_HandleSeachApi}
                 MenuList={(props) => (
                   <MenuList
                     dataItems={itemAll}

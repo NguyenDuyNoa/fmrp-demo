@@ -523,7 +523,7 @@ const SalesOrder = (props) => {
                     {dataLang?.sales_product_type_order ||
                       "sales_product_type_order"}
                   </ColumnTable> */}
-                  <ColumnTable colSpan={1} textAlign={'left'}>
+                  <ColumnTable colSpan={1} textAlign={'right'}>
                     {dataLang?.sales_product_total_into_money || 'sales_product_total_into_money'}
                   </ColumnTable>
                   <ColumnTable colSpan={1} textAlign={'center'}>
@@ -567,7 +567,7 @@ const SalesOrder = (props) => {
                           <RowItemTable colSpan={1.5} textAlign="left">
                             {e?.client_name}
                           </RowItemTable>
-                          <RowItemTable colSpan={1} textAlign={'left'}>
+                          <RowItemTable colSpan={1} textAlign={'right'}>
                             {formatNumber(e.total_amount)} <span className="underline">đ</span>
                           </RowItemTable>
 
@@ -723,11 +723,11 @@ const SalesOrder = (props) => {
         total={
           <>
             <ContainerTotal className={'grid-cols-26'}>
-              <RowItemTable colSpan={3} textAlign={'end'} className="p-2"></RowItemTable>
-              <RowItemTable colSpan={1} textAlign={'end'} className="p-2">
+              <RowItemTable colSpan={2.5} textAlign={'end'} className="p-2"></RowItemTable>
+              <RowItemTable colSpan={1} textAlign={'start'} className="p-2">
                 {dataLang?.total_outside || 'total_outside'}
               </RowItemTable>
-              <RowItemTable colSpan={2} textAlign={'left'} className="whitespace-nowrap">
+              <RowItemTable colSpan={1.5} textAlign={'end'} className="whitespace-nowrap p-0">
                 {formatNumber(data?.rTotal?.total_amount)} <span className="underline">đ</span>
               </RowItemTable>
             </ContainerTotal>

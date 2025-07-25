@@ -3,8 +3,8 @@ import React from "react";
 
 const ImportFileTemplate = ({ dataLang, tabPage }) => {
     const file = {
-        fileTab5: "/file/products/import_stages.xlsx",
-        fileTab6: "/file/products/import_bom.xlsx?vs=1.1",
+        fileTab5: `/file/products/import_stages.xlsx?vs=${Date.now()}`,
+        fileTab6: `/file/products/import_bom.xlsx?vs=${Date.now()}`,
     };
     return (
         <React.Fragment>

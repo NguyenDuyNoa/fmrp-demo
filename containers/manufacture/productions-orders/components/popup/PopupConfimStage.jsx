@@ -75,7 +75,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
 
   const checkItemFinalStage = isState.dataTableProducts?.data?.items?.some((e) => e?.final_stage == 1)
   const showSerialColumns = checkItemFinalStage && dataProductSerial.is_enable === '1'
-  const showExpiryColumns = checkItemFinalStage && dataMaterialExpiry.is_enable === '1' && dataProductExpiry.is_enable === '1'
+  const showExpiryColumns = checkItemFinalStage && dataProductExpiry.is_enable === '1'
 
   const handleSelectStep = async (type, e, action) => {
     if (action == 'click' && e?.stage_id == activeStep?.item?.stage_id && type == activeStep?.type) return
@@ -286,6 +286,9 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           },
           newData
         )
+      } else {
+        // Đặt isInputPending về false cho các trường hợp khác như lot, date
+        setIsInputPending(false)
       }
     }
 
@@ -304,6 +307,7 @@ const PopupConfimStage = ({ dataLang, dataRight, refetch: refetchMainTable, type
           },
         },
       })
+      setIsInputPending(false)
     }
   }
 

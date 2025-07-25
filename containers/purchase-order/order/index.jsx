@@ -652,19 +652,19 @@ const Order = (props) => {
                         </RowItemTable>
                         <RowItemTable
                             colSpan={0.5}
-                            textAlign={"left"}
+                            textAlign={"right"}
                         >
                             {renderMoneyOrDash(data?.rTotal?.total_price)}
                         </RowItemTable>
                         <RowItemTable
                             colSpan={0.5}
-                            textAlign={"left"}
+                            textAlign={"right"}
                         >
                             {renderMoneyOrDash(data?.rTotal?.total_tax_price)}
                         </RowItemTable>
                         <RowItemTable
                             colSpan={0.5}
-                            textAlign={"left"}
+                            textAlign={"right"}
                         >
                             {renderMoneyOrDash(data?.rTotal?.total_amount)}
                         </RowItemTable>

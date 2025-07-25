@@ -244,7 +244,7 @@ const PopupUpgradeProfessional = (props) => {
         } catch (error) {
           setIsQrUpdating(false);
           isShow(
-            "warning",
+            "error",
             "Đã nâng cấp gói thành công nhưng không thể cập nhật QR. Vui lòng thử làm mới."
           );
         }
