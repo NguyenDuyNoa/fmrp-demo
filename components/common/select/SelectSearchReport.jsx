@@ -56,6 +56,7 @@ const SelectSearchReport = ({
   const [searchValue, setSearchValue] = useState('')
   const [open, setOpen] = useState(false)
   const inputRef = useRef(null)
+  const selectRef = useRef(null)
 
   // Xử lý khi thay đổi giá trị tìm kiếm
   const handleSearch = (value) => {
@@ -68,6 +69,15 @@ const SelectSearchReport = ({
     onChange && onChange(selectedValue)
     if (mode === 'single') {
       setOpen(false)
+      // Blur input để bỏ focus
+      setTimeout(() => {
+        if (selectRef.current) {
+          selectRef.current.blur()
+        }
+        if (inputRef.current) {
+          inputRef.current.blur()
+        }
+      }, 100)
     }
   }
 
@@ -98,11 +108,13 @@ const SelectSearchReport = ({
       <div className="h-[42px] relative flex select-with-radio w-full">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-[#7a7a7a]">{icon}</span>
         <Select
+          ref={selectRef}
           className="placeholder-secondary-color-text-disabled !responsive-text-base placeholder:!responsive-text-base cursor-pointer select-with-radio w-full custom-select-no-bg"
           placeholder={placeholder}
           allowClear
           value={value}
           open={open}
+          // open={true}
           mode={mode === 'multiple' ? 'multiple' : undefined}
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 200)}
@@ -148,9 +160,9 @@ const SelectSearchReport = ({
                 : value?.value === opt.value
 
             return (
-              <Option key={opt.value} value={opt.value} label={opt.label}>
+              <Option key={opt.value} value={opt.value} label={opt.label} className="ant-custom">
                 <div className={`${index > 0 && 'border-t border-[#F7F8F9]'}`}>
-                  <div className="flex items-center rounded-md p-2 my-0.5 gap-x-2 hover:bg-[#F7F8F9]">
+                  <div className="flex items-center rounded-md p-2 my-0.5 gap-x-2">
                     {mode === 'multiple' ? (
                       <CustomCheckbox checked={isSelected} />
                     ) : (
