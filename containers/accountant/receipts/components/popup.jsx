@@ -960,7 +960,7 @@ console.log(currentFloatValue)
                                                     </span>
                                                 </div>
                                                 <div className="col-span-5 p-2 text-xs flex items-center justify-center border-l font-medium text-gray-700">
-                                                    {formatNumber(e.adjustedMoney !== undefined ? e.adjustedMoney : (e.total || e.money))}
+                                                    {formatNumber(e.adjustedMoney !== undefined ? e.adjustedMoney : (e.money))}
                                                 </div>
                                             </div>
                                         ))}
