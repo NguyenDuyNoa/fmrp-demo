@@ -74,9 +74,9 @@ const SelectSearchReport = ({
         if (selectRef.current) {
           selectRef.current.blur()
         }
-        if (inputRef.current) {
-          inputRef.current.blur()
-        }
+        // if (inputRef.current) {
+        //   inputRef.current.blur()
+        // }
       }, 100)
     }
   }
@@ -129,24 +129,24 @@ const SelectSearchReport = ({
           maxTagCount={mode === 'multiple' ? 'responsive' : undefined}
           maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} đã chọn`}
           menuItemSelectedIcon={null}
-          popupRender={(menu) => (
-            <>
-              <div className="custom-select-dropdown">
-                <div className="p-2 sticky top-0 bg-white z-10 border-b">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    className="w-full p-2 border rounded-md outline-none text-sm"
-                    placeholder="Tìm kiếm..."
-                    value={searchValue}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-                {menu}
-              </div>
-            </>
-          )}
+          // popupRender={(menu) => (
+          //   <>
+          //     <div className="custom-select-dropdown">
+          //       <div className="p-2 sticky top-0 bg-white z-10 border-b">
+          //         <input
+          //           ref={inputRef}
+          //           type="text"
+          //           className="w-full p-2 border rounded-md outline-none text-sm"
+          //           placeholder="Tìm kiếm..."
+          //           value={searchValue}
+          //           onChange={(e) => handleSearch(e.target.value)}
+          //           onClick={(e) => e.stopPropagation()}
+          //         />
+          //       </div>
+          //       {menu}
+          //     </div>
+          //   </>
+          // )}
           optionLabelProp="label"
           status={isError ? 'error' : ''}
           suffixIcon={

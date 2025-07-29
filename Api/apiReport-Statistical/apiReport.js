@@ -28,6 +28,14 @@ const apiReport = {
     const response = await axiosCustom('GET', `/api_web/Api_reports/getListReportStock`, data)
     return response.data
   },
+  async apiGetDetailInItems(data) {
+    const response = await axiosCustom('GET', `/api_web/Api_reports/getDetailInItems`, data)
+    return response.data
+  },
+  async apiGetDetailOutItems(data) {
+    const response = await axiosCustom('GET', `/api_web/Api_reports/getDetailOutItems`, data)
+    return response.data
+  },
 }
 
 export default apiReport
