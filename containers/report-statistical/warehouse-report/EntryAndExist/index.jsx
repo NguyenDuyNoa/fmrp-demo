@@ -61,7 +61,9 @@ const EntryAndExist = (props) => {
   const currentPage = Number(router.query.page) || 1
 
   const { data: warehouseData } = useGetWarehouse()
+  // Luôn gọi API, dù có search term hay không để load danh sách mặc định
   const { data: dataProduct } = useInventoryItems(debouncedSearchTerm)
+
   const {
     data: dataReportStock,
     isFetching,
@@ -86,28 +88,31 @@ const EntryAndExist = (props) => {
 
   useEffect(() => {
     // Cập nhật options khi dataProduct thay đổi
-    if (dataProduct) {
-      const newOptions = Array.isArray(dataProduct)
-        ? dataProduct.map((product) => ({
-            value: product.value,
-            label: product.name,
-            code: product.code,
-          }))
-        : []
+    if (dataProduct && Array.isArray(dataProduct)) {
+      const newOptions = dataProduct.map((product) => ({
+        value: product.value,
+        label: product.name, // Sử dụng name từ API
+        code: product.code,
+      }))
 
       // Giữ lại các options đã được chọn
       const selectedOptionValues = selectedProducts.map((p) => p.value)
       const existingSelectedOptions = productOptions.filter((opt) => selectedOptionValues.includes(opt.value))
-
+      
       // Kết hợp options mới với các options đã chọn, loại bỏ trùng lặp
       const combinedOptions = [...existingSelectedOptions, ...newOptions]
       const uniqueOptions = combinedOptions.filter(
         (option, index, self) => index === self.findIndex((o) => o.value === option.value)
       )
-
+      
       setProductOptions(uniqueOptions)
+    } else if (!dataProduct && selectedProducts.length > 0) {
+      // Nếu không có dữ liệu mới nhưng có sản phẩm đã chọn, giữ lại chúng
+      const selectedOptionValues = selectedProducts.map((p) => p.value)
+      const existingSelectedOptions = productOptions.filter((opt) => selectedOptionValues.includes(opt.value))
+      setProductOptions(existingSelectedOptions)
     }
-  }, [dataProduct])
+  }, [dataProduct, selectedProducts])
 
   const handleDateChange = (newValue) => {
     setDateRange(newValue)
@@ -161,6 +166,8 @@ const EntryAndExist = (props) => {
 
   const handleClearProducts = () => {
     setSelectedProducts([])
+    setSearchTerm('') // Reset search term khi clear products
+    setProductOptions([]) // Reset product options
   }
 
   const handleSearch = (value) => {
