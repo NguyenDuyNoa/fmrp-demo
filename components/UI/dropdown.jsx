@@ -298,7 +298,7 @@ export const Dropdown = (props) => {
                                   onClick={() =>
                                     showToat(
                                       "error",
-                                      e?.forceDisableForAdmin ? "Tính năng đang phát triển" : "Bạn không có quyền truy cập"
+                                      e?.forceDisableForAdmin ? "Báo cáo đang tối ưu" : "Bạn không có quyền truy cập"
                                     )
                                   }
                                   className="w-full text-left text-gray-100 outline-none cursor-not-allowed opacity-60"

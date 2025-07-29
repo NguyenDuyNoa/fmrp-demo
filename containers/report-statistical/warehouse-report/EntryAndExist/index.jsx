@@ -180,7 +180,7 @@ const EntryAndExist = (props) => {
     })
 
     // Reset warehouse selection
-    setSelectedWarehouse(null)
+    // setSelectedWarehouse(null)
 
     // Reset product search and selection
     setSearchTerm('')
@@ -459,6 +459,8 @@ const EntryAndExist = (props) => {
           isOpen={showPopupImport}
           onClose={handleCloseImportPopup}
           itemData={selectedImportItem}
+          dateRange={dateRange}
+          selectedWarehouse={selectedWarehouse}
           type="import"
         />
       )}
@@ -469,6 +471,8 @@ const EntryAndExist = (props) => {
           isOpen={showPopupExport}
           onClose={handleCloseExportPopup}
           itemData={selectedExportItem}
+          dateRange={dateRange}
+          selectedWarehouse={selectedWarehouse}
           type="export"
         />
       )}

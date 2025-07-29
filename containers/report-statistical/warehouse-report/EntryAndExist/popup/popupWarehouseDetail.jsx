@@ -1,48 +1,55 @@
 import CloseXIcon from '@/components/icons/common/CloseXIcon'
 import OnResetData from '@/components/UI/btnResetData/btnReset'
+import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
 import DropdowLimit from '@/components/UI/dropdowLimit/dropdowLimit'
 import ExcelFileComponent from '@/components/UI/filterComponents/excelFilecomponet'
+import Loading from '@/components/UI/loading/loading'
+import NoData from '@/components/UI/noData/nodata'
 import Pagination from '@/components/UI/pagination'
 import { useLanguageContext } from '@/context/ui/LanguageContext'
-import { motion } from 'framer-motion'
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { useGetDetailInItems, useGetDetailOutItems } from '../hooks/useGetDetailInItems'
-import { useExportExcelDetail } from '../hooks/useExportExcelDetail'
-import moment from 'moment'
-import { Customscrollbar } from '@/components/UI/common/Customscrollbar'
-import Loading from '@/components/UI/loading/loading'
-import NoData from '@/components/UI/noData/noData'
 import formatNumber from '@/utils/helpers/formatnumber'
+import { motion } from 'framer-motion'
+import moment from 'moment'
+import Image from 'next/image'
+import { useState } from 'react'
+import { useExportExcelDetail } from '../hooks/useExportExcelDetail'
+import { useGetDetailInItems, useGetDetailOutItems } from '../hooks/useGetDetailInItems'
 
-const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import' }) => {
+const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import', dateRange, selectedWarehouse }) => {
   const dataLang = useLanguageContext()
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
-  
+
   // Xác định loại thống kê dựa trên type
   const isImport = type === 'import'
   const title = isImport ? 'Thống kê nhập kho' : 'Thống kê xuất kho'
   const filename = isImport ? 'Danh sách nhập kho' : 'Danh sách xuất kho'
   const quantityLabel = isImport ? 'Số lượng nhập' : 'Số lượng xuất'
-  
+
   // Sử dụng hook phù hợp dựa trên type
   const requestParams = {
     item_id: itemData?.item_id,
     page: currentPage,
     limit: itemsPerPage,
     item_variation_id: itemData?.item_variation_id,
-    item_type: 'product',
+    item_type: itemData?.item_type,
+    ...(dateRange?.startDate !== undefined && { start_date: dateRange.startDate }),
+    ...(dateRange?.endDate !== undefined && { end_date: dateRange.endDate }),
+    ...(selectedWarehouse?.value !== undefined && { warehouses_id: selectedWarehouse.value }),
   }
-  
-  const { data: detailInItems, isLoading: isLoadingIn, refetch: refetchInItems } = useGetDetailInItems(
-    isImport && !!itemData ? requestParams : null
-  )
-  
-  const { data: detailOutItems, isLoading: isLoadingOut, refetch: refetchOutItems } = useGetDetailOutItems(
-    !isImport && !!itemData ? requestParams : null
-  )
-  
+
+  const {
+    data: detailInItems,
+    isLoading: isLoadingIn,
+    refetch: refetchInItems,
+  } = useGetDetailInItems(isImport && !!itemData ? requestParams : null)
+
+  const {
+    data: detailOutItems,
+    isLoading: isLoadingOut,
+    refetch: refetchOutItems,
+  } = useGetDetailOutItems(!isImport && !!itemData ? requestParams : null)
+
   // Chọn dữ liệu phù hợp
   const detailItems = isImport ? detailInItems : detailOutItems
   const isLoading = isImport ? isLoadingIn : isLoadingOut
@@ -56,7 +63,7 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import' }) =>
   const handleReload = () => {
     // Reset về trang đầu tiên
     setCurrentPage(1)
-    
+
     // Tải lại dữ liệu dựa trên type
     if (refetch) {
       refetch()
@@ -80,7 +87,7 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import' }) =>
             <ExcelFileComponent
               dataLang={dataLang}
               filename={filename}
-              title={isImport ? "DSNK" : "DSXK"}
+              title={isImport ? 'DSNK' : 'DSXK'}
               multiDataSet={multiDataSet}
               classBtn="!py-3"
             />
@@ -98,10 +105,10 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import' }) =>
         <div className="bg-primary-06 p-2 rounded-lg flex gap-2">
           <Image
             src={detailItems?.summary?.image || '/productionPlan/default-product.svg'}
-            alt={isImport ? "icon-import" : "icon-export"}
+            alt={isImport ? 'icon-import' : 'icon-export'}
             width={40}
             height={40}
-            className="size-10 flex-shrink-0 rounded bg-neutral-02"
+            className="size-10 flex-shrink-0 rounded bg-neutral-01"
           />
           <div className="flex w-full items-center">
             <div className="flex-1 flex flex-col gap-1">
@@ -203,4 +210,4 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import' }) =>
   )
 }
 
-export default PopupWarehouseDetail 
+export default PopupWarehouseDetail
