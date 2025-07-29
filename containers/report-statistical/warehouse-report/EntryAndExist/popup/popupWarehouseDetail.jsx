@@ -13,7 +13,12 @@ import moment from 'moment'
 import Image from 'next/image'
 import { useState } from 'react'
 import { useExportExcelDetail } from '../hooks/useExportExcelDetail'
-import { useGetDetailInItems, useGetDetailOutItems } from '../hooks/useGetDetailInItems'
+import {
+  useGetAllDetailInItems,
+  useGetAllDetailOutItems,
+  useGetDetailInItems,
+  useGetDetailOutItems,
+} from '../hooks/useGetDetailInItems'
 
 const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import', dateRange, selectedWarehouse }) => {
   const dataLang = useLanguageContext()
@@ -38,6 +43,16 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import', date
     ...(selectedWarehouse?.value !== undefined && { warehouses_id: selectedWarehouse.value }),
   }
 
+  // Tạo params cho việc lấy tất cả dữ liệu (không có page và limit)
+  const allDataParams = {
+    item_id: itemData?.item_id,
+    item_variation_id: itemData?.item_variation_id,
+    item_type: itemData?.item_type,
+    ...(dateRange?.startDate !== undefined && { start_date: dateRange.startDate }),
+    ...(dateRange?.endDate !== undefined && { end_date: dateRange.endDate }),
+    ...(selectedWarehouse?.value !== undefined && { warehouses_id: selectedWarehouse.value }),
+  }
+
   const {
     data: detailInItems,
     isLoading: isLoadingIn,
@@ -50,13 +65,27 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import', date
     refetch: refetchOutItems,
   } = useGetDetailOutItems(!isImport && !!itemData ? requestParams : null)
 
+  // Hook để lấy tất cả dữ liệu cho việc xuất Excel - enabled khi có itemData
+  const { data: allDetailInItems, refetch: refetchAllInItems } = useGetAllDetailInItems(
+    allDataParams,
+    isImport && !!itemData
+  )
+
+  const { data: allDetailOutItems, refetch: refetchAllOutItems } = useGetAllDetailOutItems(
+    allDataParams,
+    !isImport && !!itemData
+  )
+
   // Chọn dữ liệu phù hợp
   const detailItems = isImport ? detailInItems : detailOutItems
   const isLoading = isImport ? isLoadingIn : isLoadingOut
   const refetch = isImport ? refetchInItems : refetchOutItems
 
-  // Hook xuất Excel
-  const { multiDataSet } = useExportExcelDetail(detailItems, type)
+  // Dữ liệu cho việc xuất Excel (tất cả dữ liệu)
+  const allDetailItems = isImport ? allDetailInItems : allDetailOutItems
+
+  // Hook xuất Excel với tất cả dữ liệu
+  const { multiDataSet } = useExportExcelDetail(allDetailItems, type)
 
   // Hooks sẽ tự động refetch khi requestParams thay đổi nhờ dependency của React Query
 
@@ -67,6 +96,13 @@ const PopupWarehouseDetail = ({ isOpen, onClose, itemData, type = 'import', date
     // Tải lại dữ liệu dựa trên type
     if (refetch) {
       refetch()
+    }
+
+    // Tải lại dữ liệu cho Excel
+    if (isImport && refetchAllInItems) {
+      refetchAllInItems()
+    } else if (!isImport && refetchAllOutItems) {
+      refetchAllOutItems()
     }
   }
 
