@@ -102,23 +102,6 @@ const Navbar = (props) => {
   const isNavbarWarehouse = [
     {
       id: uuidv4(),
-      title: 'Báo cáo tồn kho',
-      children: [
-        {
-          id: uuidv4(),
-          name: 'Thẻ kho',
-          path: '/report-statistical/warehouse-report/card',
-          disabled: true, // Thêm thuộc tính disabled
-        },
-        {
-          id: uuidv4(),
-          name: 'BC nhập xuất tồn',
-          path: '/report-statistical/warehouse-report/entry-and-exist',
-        },
-      ],
-    },
-    {
-      id: uuidv4(),
       title: 'Báo cáo chi tiết các phiếu',
       children: [
         {
@@ -140,6 +123,23 @@ const Navbar = (props) => {
           id: uuidv4(),
           name: 'BC xuất kho giao hàng',
           path: '/report-statistical/warehouse-report/export-delivery',
+        },
+      ],
+    },
+    {
+      id: uuidv4(),
+      title: 'Báo cáo tồn kho',
+      children: [
+        {
+          id: uuidv4(),
+          name: 'BC nhập xuất tồn',
+          path: '/report-statistical/warehouse-report/entry-and-exist',
+        },
+        {
+          id: uuidv4(),
+          name: 'Thẻ kho',
+          path: '/report-statistical/warehouse-report/card',
+          disabled: true, // Thêm thuộc tính disabled
         },
       ],
     },
@@ -318,13 +318,9 @@ const Navbar = (props) => {
                     return (
                       <div key={child.id} className="relative">
                         {child.disabled ? (
-                          <li
-                            className="group font-medium flex gap-2 p-2 items-center justify-between w-full rounded-lg cursor-not-allowed opacity-50"
-                          >
+                          <li className="group font-medium flex gap-2 p-2 items-center justify-between w-full rounded-lg cursor-not-allowed opacity-50">
                             <div className="flex items-center gap-2">
-                              <div
-                                className="size-1.5 rounded-full flex-shrink-0 bg-gray-400"
-                              />
+                              <div className="size-1.5 rounded-full flex-shrink-0 bg-gray-400" />
                               <div className="flex flex-col items-start w-full">
                                 <div className="responsive-text-sm text-gray-400">{child.name}</div>
                               </div>

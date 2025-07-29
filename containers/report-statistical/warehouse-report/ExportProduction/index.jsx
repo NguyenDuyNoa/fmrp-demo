@@ -200,7 +200,7 @@ const ExportProduction = (props) => {
     })
 
     // Reset warehouse selection
-    setSelectedWarehouse(null)
+    // setSelectedWarehouse(null)
 
     // Reset product search and selection
     setSearchTerm('')
