@@ -64,19 +64,25 @@ const SelectSearchReport = ({
     onSearch && onSearch(value)
   }
 
+  // Lọc options dựa trên searchValue để hiển thị
+  const filteredOptions = searchValue 
+    ? options?.filter(opt => 
+        (opt?.label?.toLowerCase() ?? '').includes(searchValue.toLowerCase()) ||
+        (opt?.code?.toLowerCase() ?? '').includes(searchValue.toLowerCase())
+      ) 
+    : options
+
   // Xử lý khi chọn giá trị
   const handleChange = (selectedValue) => {
     onChange && onChange(selectedValue)
     if (mode === 'single') {
       setOpen(false)
+      setSearchValue('') // Reset search khi chọn xong
       // Blur input để bỏ focus
       setTimeout(() => {
         if (selectRef.current) {
           selectRef.current.blur()
         }
-        // if (inputRef.current) {
-        //   inputRef.current.blur()
-        // }
       }, 100)
     }
   }
@@ -85,6 +91,14 @@ const SelectSearchReport = ({
   const handleClear = () => {
     setSearchValue('')
     onClear && onClear()
+  }
+
+  // Xử lý khi dropdown đóng
+  const handleDropdownVisibleChange = (visible) => {
+    setOpen(visible)
+    if (!visible) {
+      setSearchValue('') // Reset search khi đóng dropdown
+    }
   }
 
   // Tùy chỉnh hiển thị giá trị đã chọn
@@ -114,46 +128,33 @@ const SelectSearchReport = ({
           allowClear
           value={value}
           open={open}
-          // open={true}
           mode={mode === 'multiple' ? 'multiple' : undefined}
-          onFocus={() => setOpen(true)}
-          onBlur={() => setTimeout(() => setOpen(false), 200)}
+          onDropdownVisibleChange={handleDropdownVisibleChange}
           onChange={handleChange}
           onClear={handleClear}
           disabled={disabled}
           showSearch
+          searchValue={searchValue}
           onSearch={handleSearch}
-          filterOption={(input, option) => (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())}
-          notFoundContent={<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có dữ liệu" />}
+          filterOption={false} // Tắt filter mặc định vì đã tự xử lý
+          notFoundContent={
+            searchValue && (!filteredOptions || filteredOptions.length === 0) ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không tìm thấy kết quả" />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Nhập để tìm kiếm" />
+            )
+          }
           tagRender={mode === 'multiple' ? customTagRender : undefined}
           maxTagCount={mode === 'multiple' ? 'responsive' : undefined}
           maxTagPlaceholder={(omittedValues) => `+${omittedValues.length} đã chọn`}
           menuItemSelectedIcon={null}
-          // popupRender={(menu) => (
-          //   <>
-          //     <div className="custom-select-dropdown">
-          //       <div className="p-2 sticky top-0 bg-white z-10 border-b">
-          //         <input
-          //           ref={inputRef}
-          //           type="text"
-          //           className="w-full p-2 border rounded-md outline-none text-sm"
-          //           placeholder="Tìm kiếm..."
-          //           value={searchValue}
-          //           onChange={(e) => handleSearch(e.target.value)}
-          //           onClick={(e) => e.stopPropagation()}
-          //         />
-          //       </div>
-          //       {menu}
-          //     </div>
-          //   </>
-          // )}
           optionLabelProp="label"
           status={isError ? 'error' : ''}
           suffixIcon={
             <DropdownFilledIcon className="size-3 group-hover:text-[#003DA0] group-hover:rotate-180 transition-all duration-300" />
           }
         >
-          {options?.map((opt, index) => {
+          {filteredOptions?.map((opt, index) => {
             const isSelected =
               mode === 'multiple'
                 ? Array.isArray(value) && value.some((item) => item.value === opt.value)
